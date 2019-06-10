@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">Accentor</string>
+    <string name="title_activity_main">Accentor</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_sign_out">Sign out</string>
+
+    <string name="menu_home">Home</string>
+
+    <string name="title_activity_login">Sign in</string>
+    <string name="prompt_server">Server</string>
+    <string name="prompt_username">Username</string>
+    <string name="prompt_password">Password</string>
+    <string name="action_sign_in">Sign in</string>
+    <string name="invalid_server">Server is not a valid URL</string>
+    <string name="login_failed">"Login failed"</string>
+    <string name="login_succeeded">"Login succeeded"</string>
+</resources>
