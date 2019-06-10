@@ -13,7 +13,6 @@ class SharedPreferencesAuthenticationDataSource(context: Context) {
     private val sharedPreferences =
         context.getSharedPreferences("me.vanpetegem.accentor.authenticationData", Context.MODE_PRIVATE)
 
-
     var authData: AuthenticationData?
         get() {
             if (sharedPreferences.contains(ID_KEY) &&
