@@ -13,7 +13,13 @@ class Credentials(val name: String, val password: String, val auth_token: AuthTo
 fun create(server: String, username: String, password: String): Result<AuthenticationData> {
     "$server/api/auth_tokens".httpPost()
         .set("Accept", "application/json")
-        .jsonBody(Credentials(username, password, AuthToken("Accentor on Android")))
+        .jsonBody(
+            Credentials(
+                username,
+                password,
+                AuthToken("Accentor on Android ${android.os.Build.VERSION.SDK_INT} (${android.os.Build.DEVICE})")
+            )
+        )
         .responseObject<AuthenticationData>().third
         .fold(
             { user: AuthenticationData -> return Result.Success(user) },
