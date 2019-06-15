@@ -1,18 +1,20 @@
 package me.vanpetegem.accentor.ui.login
 
+import android.app.Application
 import android.util.Log
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import me.vanpetegem.accentor.R
-import me.vanpetegem.accentor.data.AuthenticationRepository
+import me.vanpetegem.accentor.data.authentication.AuthenticationDataSource
+import me.vanpetegem.accentor.data.authentication.AuthenticationRepository
 import me.vanpetegem.accentor.util.Result
-import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.uiThread
 import java.net.URI
 import java.net.URISyntaxException
 
-class LoginViewModel(private val authenticationRepository: AuthenticationRepository) : ViewModel() {
+class LoginViewModel(application: Application) : AndroidViewModel(application) {
+
+    private val repository: AuthenticationRepository = AuthenticationRepository(AuthenticationDataSource(application))
 
     private val _loginForm = MutableLiveData<LoginFormState>()
     val loginFormState: LiveData<LoginFormState> = _loginForm
@@ -21,16 +23,12 @@ class LoginViewModel(private val authenticationRepository: AuthenticationReposit
     val loginResult: LiveData<LoginResult> = _loginResult
 
     fun login(server: String, username: String, password: String) {
-        // can be launched in a separate asynchronous job
-        doAsync {
-            val result = authenticationRepository.login(server, username, password)
-
-            uiThread {
-                if (result is Result.Success) {
-                    _loginResult.value = LoginResult()
-                } else if (result is Result.Error) {
+        repository.login(server, username, password) { result ->
+            _loginResult.value = when (result) {
+                is Result.Success -> LoginResult()
+                is Result.Error -> {
                     Log.e("LOGIN", "login failed", result.exception)
-                    _loginResult.value = LoginResult(error = R.string.login_failed)
+                    LoginResult(error = R.string.login_failed)
                 }
             }
         }

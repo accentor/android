@@ -12,14 +12,14 @@
     android:theme="@style/ThemeOverlay.AppCompat.Dark">
 
     <TextView
-        android:id="@+id/username"
+        android:id="@+id/nav_header_username"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingTop="@dimen/nav_header_vertical_spacing"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 
     <TextView
-        android:id="@+id/serverURL"
+        android:id="@+id/nav_header_server_url"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
