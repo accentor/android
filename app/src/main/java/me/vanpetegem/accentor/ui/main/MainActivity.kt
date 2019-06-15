@@ -3,6 +3,8 @@ package me.vanpetegem.accentor.ui.main
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
+import android.widget.TextView
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
@@ -12,6 +14,9 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.google.android.material.navigation.NavigationView
 import me.vanpetegem.accentor.R
+import me.vanpetegem.accentor.ui.albums.AlbumsFragment
+import me.vanpetegem.accentor.ui.artists.ArtistsFragment
+import me.vanpetegem.accentor.ui.home.HomeFragment
 import me.vanpetegem.accentor.ui.login.LoginActivity
 import org.jetbrains.anko.startActivity
 
@@ -34,18 +39,64 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             R.string.navigation_drawer_open,
             R.string.navigation_drawer_close
         )
+
+        val headerView: View = navView.getHeaderView(0)
+        val usernameText: TextView = headerView.findViewById(R.id.nav_header_username)
+        val serverURLText: TextView = headerView.findViewById(R.id.nav_header_server_url)
+
+        toggle.setHomeAsUpIndicator(R.drawable.ic_menu_back)
         drawerLayout.addDrawerListener(toggle)
         toggle.syncState()
 
         navView.setNavigationItemSelectedListener(this)
 
-        mainViewModel = ViewModelProviders.of(this, MainViewModelFactory(this)).get(MainViewModel::class.java)
+        mainViewModel = ViewModelProviders.of(this).get(MainViewModel::class.java)
         mainViewModel.loginState.observe(this@MainActivity, Observer {
             val loggedIn = it ?: return@Observer
             if (!loggedIn) {
                 startActivity<LoginActivity>()
                 finish()
+            } else {
+                mainViewModel.refresh()
             }
+        })
+
+        mainViewModel.currentUser.observe(this@MainActivity, Observer {
+            if (it == null) {
+                usernameText.text = ""
+            } else {
+                usernameText.text = it.name
+            }
+        })
+
+        mainViewModel.serverURL.observe(this@MainActivity, Observer {
+            if (it == null) {
+                serverURLText.text = ""
+            } else {
+                serverURLText.text = it
+            }
+        })
+
+        mainViewModel.navState.observe(this@MainActivity, Observer {
+            val navState = it ?: return@Observer
+
+            val transaction = supportFragmentManager.beginTransaction()
+            val fragment = when (navState.fragmentId) {
+                R.id.nav_home -> HomeFragment()
+                R.id.nav_albums -> AlbumsFragment()
+                R.id.nav_artists -> ArtistsFragment()
+                else -> HomeFragment()
+
+            }
+
+            transaction.replace(R.id.main_fragment_container, fragment)
+            if (navState.showBack) {
+                transaction.addToBackStack(null)
+            }
+            transaction.commit()
+
+            toggle.isDrawerIndicatorEnabled = !navState.showBack
+            toggle.syncState()
         })
     }
 
@@ -78,11 +129,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
-        // Handle navigation view item clicks here.
-        when (item.itemId) {
-            R.id.nav_home -> {
-            }
-        }
+        mainViewModel.navigate(item.itemId)
         val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
         drawerLayout.closeDrawer(GravityCompat.START)
         return true

@@ -1,7 +1,6 @@
-package me.vanpetegem.accentor.data
+package me.vanpetegem.accentor.data.authentication
 
 import android.content.Context
-import me.vanpetegem.accentor.data.model.AuthenticationData
 
 const val ID_KEY = "id"
 const val SERVER_KEY = "server"
@@ -9,7 +8,7 @@ const val USER_ID_KEY = "user_id"
 const val DEVICE_ID_KEY = "device_id"
 const val SECRET_KEY = "secret"
 
-class SharedPreferencesAuthenticationDataSource(context: Context) {
+class AuthenticationDataSource(context: Context) {
     private val sharedPreferences =
         context.getSharedPreferences("me.vanpetegem.accentor.authenticationData", Context.MODE_PRIVATE)
 
@@ -20,16 +19,14 @@ class SharedPreferencesAuthenticationDataSource(context: Context) {
                 sharedPreferences.contains(DEVICE_ID_KEY) &&
                 sharedPreferences.contains(SECRET_KEY)
             ) {
-                val deviceId = sharedPreferences.getString(DEVICE_ID_KEY, "")
-                val secret = sharedPreferences.getString(SECRET_KEY, "")
-                if (deviceId != null && secret != null) {
-                    return AuthenticationData(
-                        sharedPreferences.getInt(ID_KEY, 0),
-                        sharedPreferences.getInt(USER_ID_KEY, 0),
-                        deviceId,
-                        secret
-                    )
-                }
+                val deviceId = sharedPreferences.getString(DEVICE_ID_KEY, "") ?: return null
+                val secret = sharedPreferences.getString(SECRET_KEY, "") ?: return null
+                return AuthenticationData(
+                    sharedPreferences.getInt(ID_KEY, 0),
+                    sharedPreferences.getInt(USER_ID_KEY, 0),
+                    deviceId,
+                    secret
+                )
             }
             return null
         }
@@ -44,8 +41,8 @@ class SharedPreferencesAuthenticationDataSource(context: Context) {
             } else {
                 sharedPreferences.edit()
                     .putInt(ID_KEY, value.id)
-                    .putInt(USER_ID_KEY, value.user_id)
-                    .putString(DEVICE_ID_KEY, value.device_id)
+                    .putInt(USER_ID_KEY, value.userId)
+                    .putString(DEVICE_ID_KEY, value.deviceId)
                     .putString(SECRET_KEY, value.secret)
                     .apply()
             }

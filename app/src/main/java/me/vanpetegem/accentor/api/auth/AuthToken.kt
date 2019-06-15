@@ -1,11 +1,12 @@
-package me.vanpetegem.accentor.api
+package me.vanpetegem.accentor.api.auth
 
-import com.github.kittinunf.fuel.gson.jsonBody
-import com.github.kittinunf.fuel.gson.responseObject
+import android.os.Build
 import com.github.kittinunf.fuel.httpDelete
 import com.github.kittinunf.fuel.httpPost
-import me.vanpetegem.accentor.data.model.AuthenticationData
+import me.vanpetegem.accentor.data.authentication.AuthenticationData
 import me.vanpetegem.accentor.util.Result
+import me.vanpetegem.accentor.util.jsonBody
+import me.vanpetegem.accentor.util.responseObject
 
 class AuthToken(val user_agent: String)
 class Credentials(val name: String, val password: String, val auth_token: AuthToken)
@@ -17,7 +18,7 @@ fun create(server: String, username: String, password: String): Result<Authentic
             Credentials(
                 username,
                 password,
-                AuthToken("Accentor on Android ${android.os.Build.VERSION.SDK_INT} (${android.os.Build.DEVICE})")
+                AuthToken("Accentor on Android ${Build.VERSION.SDK_INT} (${Build.DEVICE})")
             )
         )
         .responseObject<AuthenticationData>().third
@@ -31,7 +32,7 @@ fun destroy(server: String, authenticationData: AuthenticationData, id: Int): Re
     "$server/api/auth_tokens/$id".httpDelete()
         .set("Accept", "application/json")
         .set("X-Secret", authenticationData.secret)
-        .set("X-Device-Id", authenticationData.device_id)
+        .set("X-Device-Id", authenticationData.deviceId)
         .response().third
         .fold(
             { return Result.Success(Unit) },
