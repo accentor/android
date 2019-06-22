@@ -11,8 +11,8 @@ import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 
 class AlbumRepository(private val albumDao: AlbumDao, private val authenticationRepository: AuthenticationRepository) {
-    val allAlbums: LiveData<List<Album>> = albumDao.getAllAlbums()
-    val allAlbumsById = map(allAlbums) {
+    val allAlbums: LiveData<List<Album>> = albumDao.getAll()
+    val allAlbumsById: LiveData<SparseArray<Album>> = map(allAlbums) {
         val map = SparseArray<Album>()
         it.forEach { a -> map.put(a.id, a) }
         map
@@ -24,12 +24,10 @@ class AlbumRepository(private val albumDao: AlbumDao, private val authentication
             when (val result =
                 index(authenticationRepository.server.value!!, authenticationRepository.authData.value!!)) {
                 is Result.Success -> {
-                    synchronized(this) {
-                        albumDao.replaceAllAlbums(result.data)
+                    albumDao.replaceAll(result.data)
 
-                        uiThread {
-                            handler(Result.Success(Unit))
-                        }
+                    uiThread {
+                        handler(Result.Success(Unit))
                     }
                 }
                 is Result.Error -> uiThread {

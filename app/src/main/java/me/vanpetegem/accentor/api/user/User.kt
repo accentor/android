@@ -5,7 +5,6 @@ import me.vanpetegem.accentor.data.authentication.AuthenticationData
 import me.vanpetegem.accentor.data.users.User
 import me.vanpetegem.accentor.util.Result
 import me.vanpetegem.accentor.util.responseObject
-import java.util.Arrays.asList
 
 fun index(server: String, authenticationData: AuthenticationData): Result<List<User>> {
 
@@ -13,14 +12,14 @@ fun index(server: String, authenticationData: AuthenticationData): Result<List<U
     val results = ArrayList<User>()
 
     fun doFetch(): Result<List<User>> {
-        "$server/api/users".httpGet(asList(Pair("page", page)))
+        return "$server/api/users".httpGet(listOf(Pair("page", page)))
             .set("Accept", "application/json")
             .set("X-Secret", authenticationData.secret)
             .set("X-Device-Id", authenticationData.deviceId)
             .responseObject<List<User>>().third
             .fold(
                 { u: List<User> ->
-                    return if (u.isEmpty()) {
+                    if (u.isEmpty()) {
                         Result.Success(results)
                     } else {
                         results.addAll(u)
@@ -28,7 +27,7 @@ fun index(server: String, authenticationData: AuthenticationData): Result<List<U
                         doFetch()
                     }
                 },
-                { e: Throwable -> return Result.Error(Exception("Error getting users", e)) }
+                { e: Throwable -> Result.Error(Exception("Error getting users", e)) }
             )
     }
 

@@ -12,6 +12,7 @@ import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.material.navigation.NavigationView
 import me.vanpetegem.accentor.R
 import me.vanpetegem.accentor.ui.albums.AlbumsFragment
@@ -20,7 +21,8 @@ import me.vanpetegem.accentor.ui.home.HomeFragment
 import me.vanpetegem.accentor.ui.login.LoginActivity
 import org.jetbrains.anko.startActivity
 
-class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
+class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener,
+    SwipeRefreshLayout.OnRefreshListener {
 
     private lateinit var mainViewModel: MainViewModel
 
@@ -34,6 +36,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
         val navView: NavigationView = findViewById(R.id.nav_view)
+        val swipeRefreshLayout: SwipeRefreshLayout = findViewById(R.id.swipe_refresh_layout)
         val toggle = ActionBarDrawerToggle(
             this, drawerLayout, toolbar,
             R.string.navigation_drawer_open,
@@ -47,8 +50,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         toggle.setHomeAsUpIndicator(R.drawable.ic_menu_back)
         drawerLayout.addDrawerListener(toggle)
         toggle.syncState()
+        swipeRefreshLayout.setColorSchemeResources(R.color.colorAccent500)
 
         navView.setNavigationItemSelectedListener(this)
+        swipeRefreshLayout.setOnRefreshListener(this)
 
         mainViewModel = ViewModelProviders.of(this).get(MainViewModel::class.java)
         mainViewModel.loginState.observe(this@MainActivity, Observer {
@@ -98,6 +103,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             toggle.isDrawerIndicatorEnabled = !navState.showBack
             toggle.syncState()
         })
+
+        mainViewModel.isRefreshing.observe(this@MainActivity, Observer {
+            val refreshState = it ?: return@Observer
+
+            swipeRefreshLayout.isRefreshing = refreshState
+        })
     }
 
     override fun onBackPressed() {
@@ -110,19 +121,23 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.main, menu)
         return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         return when (item.itemId) {
             R.id.action_sign_out -> {
                 mainViewModel.logout()
                 true
+            }
+            R.id.action_refresh -> {
+                if (mainViewModel.isRefreshing.value == false) {
+                    mainViewModel.refresh()
+                    true
+                } else {
+                    false
+                }
             }
             else -> super.onOptionsItemSelected(item)
         }
@@ -133,5 +148,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
         drawerLayout.closeDrawer(GravityCompat.START)
         return true
+    }
+
+    override fun onRefresh() {
+        mainViewModel.refresh()
     }
 }

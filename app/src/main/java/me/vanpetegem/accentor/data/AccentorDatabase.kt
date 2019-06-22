@@ -11,14 +11,27 @@ import me.vanpetegem.accentor.data.albums.DbAlbumArtist
 import me.vanpetegem.accentor.data.albums.DbAlbumLabel
 import me.vanpetegem.accentor.data.artists.ArtistDao
 import me.vanpetegem.accentor.data.artists.DbArtist
+import me.vanpetegem.accentor.data.tracks.DbTrack
+import me.vanpetegem.accentor.data.tracks.DbTrackArtist
+import me.vanpetegem.accentor.data.tracks.DbTrackGenre
+import me.vanpetegem.accentor.data.tracks.TrackDao
 import me.vanpetegem.accentor.data.users.DbUser
 import me.vanpetegem.accentor.data.users.UserDao
 import me.vanpetegem.accentor.util.RoomTypeConverters
 
 @TypeConverters(RoomTypeConverters::class)
 @Database(
-    entities = [DbUser::class, DbAlbum::class, DbAlbumArtist::class, DbAlbumLabel::class, DbArtist::class],
-    version = 1
+    entities = [
+        DbUser::class,
+        DbAlbum::class,
+        DbAlbumArtist::class,
+        DbAlbumLabel::class,
+        DbArtist::class,
+        DbTrack::class,
+        DbTrackArtist::class,
+        DbTrackGenre::class
+    ],
+    version = 2
 )
 abstract class AccentorDatabase : RoomDatabase() {
 
@@ -45,4 +58,5 @@ abstract class AccentorDatabase : RoomDatabase() {
     abstract fun userDao(): UserDao
     abstract fun albumDao(): AlbumDao
     abstract fun artistDao(): ArtistDao
+    abstract fun trackDao(): TrackDao
 }
