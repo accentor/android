@@ -1,6 +1,11 @@
 package me.vanpetegem.accentor.data.authentication
 
 import android.content.Context
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
+import androidx.lifecycle.Observer
+import me.vanpetegem.accentor.util.intLiveData
+import me.vanpetegem.accentor.util.stringLiveData
 
 const val ID_KEY = "id"
 const val SERVER_KEY = "server"
@@ -12,50 +17,71 @@ class AuthenticationDataSource(context: Context) {
     private val sharedPreferences =
         context.getSharedPreferences("me.vanpetegem.accentor.authenticationData", Context.MODE_PRIVATE)
 
-    var authData: AuthenticationData?
-        get() {
-            if (sharedPreferences.contains(ID_KEY) &&
-                sharedPreferences.contains(USER_ID_KEY) &&
-                sharedPreferences.contains(DEVICE_ID_KEY) &&
-                sharedPreferences.contains(SECRET_KEY)
-            ) {
-                val deviceId = sharedPreferences.getString(DEVICE_ID_KEY, "") ?: return null
-                val secret = sharedPreferences.getString(SECRET_KEY, "") ?: return null
-                return AuthenticationData(
-                    sharedPreferences.getInt(ID_KEY, 0),
-                    sharedPreferences.getInt(USER_ID_KEY, 0),
-                    deviceId,
-                    secret
-                )
-            }
-            return null
-        }
-        set(value) {
-            if (value == null) {
-                sharedPreferences.edit()
-                    .remove(ID_KEY)
-                    .remove(USER_ID_KEY)
-                    .remove(DEVICE_ID_KEY)
-                    .remove(SECRET_KEY)
-                    .apply()
-            } else {
-                sharedPreferences.edit()
-                    .putInt(ID_KEY, value.id)
-                    .putInt(USER_ID_KEY, value.userId)
-                    .putString(DEVICE_ID_KEY, value.deviceId)
-                    .putString(SECRET_KEY, value.secret)
-                    .apply()
-            }
-        }
+    private val idData = sharedPreferences.intLiveData(ID_KEY)
+    private val userIdData = sharedPreferences.intLiveData(USER_ID_KEY)
+    private val deviceIdData = sharedPreferences.stringLiveData(DEVICE_ID_KEY)
+    private val secretData = sharedPreferences.stringLiveData(SECRET_KEY)
 
-    var server: String?
-        get() {
-            return sharedPreferences.getString(SERVER_KEY, null)
+    private val serverData = sharedPreferences.stringLiveData(SERVER_KEY)
+
+    val authData: LiveData<AuthenticationData>
+    val server: LiveData<String> = serverData
+
+    init {
+        authData = MediatorLiveData<AuthenticationData>().apply {
+            val observer: Observer<Any> = Observer {
+                val id: Int = idData.value.let {
+                    if (it != null) it else {
+                        if (value != null) value = null
+                        return@Observer
+                    }
+                }
+                val userId: Int = userIdData.value.let {
+                    if (it != null) it else {
+                        if (value != null) value = null
+                        return@Observer
+                    }
+                }
+                val deviceId: String = deviceIdData.value.let {
+                    if (it != null) it else {
+                        if (value != null) value = null
+                        return@Observer
+                    }
+                }
+                val secret: String = secretData.value.let {
+                    if (it != null) it else {
+                        if (value != null) value = null
+                        return@Observer
+                    }
+                }
+                val newVal = AuthenticationData(id, userId, deviceId, secret)
+                if (newVal != this.value) this.value = newVal
+            }
+
+            addSource(idData, observer)
+            addSource(userIdData, observer)
+            addSource(deviceIdData, observer)
+            addSource(secretData, observer)
         }
-        set(value) {
+    }
+
+    fun setAuthData(authData: AuthenticationData?) {
+        if (authData == null) {
             sharedPreferences.edit()
-                .putString(SERVER_KEY, value)
+                .remove(ID_KEY)
+                .remove(USER_ID_KEY)
+                .remove(DEVICE_ID_KEY)
+                .remove(SECRET_KEY)
+                .apply()
+        } else {
+            sharedPreferences.edit()
+                .putInt(ID_KEY, authData.id)
+                .putInt(USER_ID_KEY, authData.userId)
+                .putString(DEVICE_ID_KEY, authData.deviceId)
+                .putString(SECRET_KEY, authData.secret)
                 .apply()
         }
+    }
 
+    fun setServer(server: String?) = sharedPreferences.edit().putString(SERVER_KEY, server).apply()
 }

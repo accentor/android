@@ -13,6 +13,7 @@ import com.google.gson.reflect.TypeToken
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonToken
 import com.google.gson.stream.JsonWriter
+import me.vanpetegem.accentor.data.tracks.Role
 import me.vanpetegem.accentor.data.users.Permission
 import java.io.Reader
 import java.time.Instant
@@ -43,6 +44,16 @@ fun gsonObject(): Gson {
 
         override fun read(`in`: JsonReader): Permission {
             return Permission.valueOf(`in`.nextString().toUpperCase())
+        }
+    })
+
+    builder.registerTypeAdapter(Role::class.java, object : TypeAdapter<Role>() {
+        override fun write(out: JsonWriter, value: Role) {
+            out.value(value.name.toLowerCase())
+        }
+
+        override fun read(`in`: JsonReader): Role {
+            return Role.valueOf(`in`.nextString().toUpperCase())
         }
     })
 

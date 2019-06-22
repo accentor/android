@@ -11,8 +11,8 @@ import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 
 class UserRepository(private val userDao: UserDao, private val authenticationRepository: AuthenticationRepository) {
-    val allUsers: LiveData<List<User>> = userDao.getAllUsers()
-    val allUsersById = map(allUsers) {
+    val allUsers: LiveData<List<User>> = userDao.getAll()
+    val allUsersById: LiveData<SparseArray<User>> = map(allUsers) {
         val map = SparseArray<User>()
         it.forEach { u -> map.put(u.id, u) }
         map
@@ -28,12 +28,10 @@ class UserRepository(private val userDao: UserDao, private val authenticationRep
             when (val result =
                 index(authenticationRepository.server.value!!, authenticationRepository.authData.value!!)) {
                 is Result.Success -> {
-                    synchronized(this) {
-                        userDao.replaceUsers(result.data)
+                    userDao.replaceAll(result.data)
 
-                        uiThread {
-                            handler(Result.Success(Unit))
-                        }
+                    uiThread {
+                        handler(Result.Success(Unit))
                     }
                 }
                 is Result.Error -> uiThread { handler(Result.Error(result.exception)) }

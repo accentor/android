@@ -10,12 +10,12 @@ import androidx.room.Transaction
 @Dao
 abstract class UserDao {
 
-    open fun getAllUsers(): LiveData<List<User>> = map(getAllDbUsers()) { us ->
+    open fun getAll(): LiveData<List<User>> = map(getAllDbUsers()) { us ->
         us.map { User(it.id, it.name, it.permission) }
     }
 
     @Transaction
-    open fun replaceUsers(users: List<User>) {
+    open fun replaceAll(users: List<User>) {
         deleteAll()
         users.forEach { insert(DbUser(it.id, it.name, it.permission)) }
     }

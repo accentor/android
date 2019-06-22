@@ -10,12 +10,12 @@ import androidx.room.Transaction
 @Dao
 abstract class ArtistDao {
 
-    open fun getAllArtists(): LiveData<List<Artist>> = map(getAllDbArtists()) { list ->
+    open fun getAll(): LiveData<List<Artist>> = map(getAllDbArtists()) { list ->
         list.map { Artist(it.id, it.name, it.reviewComment, it.createdAt, it.updatedAt, it.image, it.imageType) }
     }
 
     @Transaction
-    open fun replaceArtists(artists: List<Artist>) {
+    open fun replaceAll(artists: List<Artist>) {
         deleteAll()
         artists.forEach { artist ->
             insert(

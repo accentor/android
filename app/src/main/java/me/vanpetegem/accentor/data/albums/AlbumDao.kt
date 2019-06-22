@@ -12,7 +12,7 @@ import androidx.room.Transaction
 @Dao
 abstract class AlbumDao {
 
-    open fun getAllAlbums(): LiveData<List<Album>> = switchMap(getAllDbAlbums()) { albums ->
+    open fun getAll(): LiveData<List<Album>> = switchMap(getAllDbAlbums()) { albums ->
         switchMap(albumArtistsByAlbumId()) { albumArtists ->
             map(albumLabelsByAlbumId()) { albumLabels ->
                 albums.map { a ->
@@ -36,7 +36,8 @@ abstract class AlbumDao {
 
     }
 
-    open fun albumLabelsByAlbumId(): LiveData<SparseArray<MutableList<AlbumLabel>>> = map(getAllAlbumLabels()) {
+    protected open fun albumLabelsByAlbumId(): LiveData<SparseArray<MutableList<AlbumLabel>>> =
+        map(getAllAlbumLabels()) {
         val map = SparseArray<MutableList<AlbumLabel>>()
         for (al in it) {
             val l = map.get(al.albumId, ArrayList())
@@ -46,7 +47,8 @@ abstract class AlbumDao {
         return@map map
     }
 
-    open fun albumArtistsByAlbumId(): LiveData<SparseArray<MutableList<AlbumArtist>>> = map(getAllAlbumArtists()) {
+    protected open fun albumArtistsByAlbumId(): LiveData<SparseArray<MutableList<AlbumArtist>>> =
+        map(getAllAlbumArtists()) {
         val map = SparseArray<MutableList<AlbumArtist>>()
         for (aa in it) {
             val l = map.get(aa.albumId, ArrayList())
@@ -57,7 +59,7 @@ abstract class AlbumDao {
     }
 
     @Transaction
-    open fun replaceAllAlbums(albums: List<Album>) {
+    open fun replaceAll(albums: List<Album>) {
         deleteAllAlbums()
         deleteAllAlbumArtists()
         deleteAllAlbumLabels()

@@ -1,24 +1,25 @@
-package me.vanpetegem.accentor.api.artist
+package me.vanpetegem.accentor.api.track
 
 import com.github.kittinunf.fuel.httpGet
-import me.vanpetegem.accentor.data.artists.Artist
 import me.vanpetegem.accentor.data.authentication.AuthenticationData
+import me.vanpetegem.accentor.data.tracks.Track
 import me.vanpetegem.accentor.util.Result
 import me.vanpetegem.accentor.util.responseObject
 
-fun index(server: String, authenticationData: AuthenticationData): Result<List<Artist>> {
+
+fun index(server: String, authenticationData: AuthenticationData): Result<List<Track>> {
 
     var page = 1
-    val results = ArrayList<Artist>()
+    val results = ArrayList<Track>()
 
-    fun doFetch(): Result<List<Artist>> {
-        return "$server/api/artists".httpGet(listOf(Pair("page", page)))
+    fun doFetch(): Result<List<Track>> {
+        return "$server/api/tracks".httpGet(listOf(Pair("page", page)))
             .set("Accept", "application/json")
             .set("X-Secret", authenticationData.secret)
             .set("X-Device-Id", authenticationData.deviceId)
-            .responseObject<List<Artist>>().third
+            .responseObject<List<Track>>().third
             .fold(
-                { a: List<Artist> ->
+                { a: List<Track> ->
                     if (a.isEmpty()) {
                         Result.Success(results)
                     } else {
@@ -27,7 +28,7 @@ fun index(server: String, authenticationData: AuthenticationData): Result<List<A
                         doFetch()
                     }
                 },
-                { e: Throwable -> Result.Error(Exception("Error getting artists", e)) }
+                { e: Throwable -> Result.Error(Exception("Error getting tracks", e)) }
             )
     }
 

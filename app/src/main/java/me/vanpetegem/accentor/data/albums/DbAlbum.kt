@@ -33,7 +33,7 @@ data class DbAlbum(
 
 @Entity(
     tableName = "album_artists",
-    primaryKeys = ["album_id", "artist_id"]
+    primaryKeys = ["album_id", "artist_id", "name"]
 )
 data class DbAlbumArtist(
     @ColumnInfo(name = "album_id")

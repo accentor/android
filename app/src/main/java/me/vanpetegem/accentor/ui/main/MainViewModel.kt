@@ -4,12 +4,14 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Transformations.map
 import me.vanpetegem.accentor.R
 import me.vanpetegem.accentor.data.AccentorDatabase
 import me.vanpetegem.accentor.data.albums.AlbumRepository
 import me.vanpetegem.accentor.data.artists.ArtistRepository
 import me.vanpetegem.accentor.data.authentication.AuthenticationDataSource
 import me.vanpetegem.accentor.data.authentication.AuthenticationRepository
+import me.vanpetegem.accentor.data.tracks.TrackRepository
 import me.vanpetegem.accentor.data.users.User
 import me.vanpetegem.accentor.data.users.UserRepository
 
@@ -18,6 +20,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val userRepository: UserRepository
     private val albumRepository: AlbumRepository
     private val artistRepository: ArtistRepository
+    private val trackRepository: TrackRepository
+
+    private val refreshing = MutableLiveData<Int>()
+    val isRefreshing: LiveData<Boolean> = map(refreshing) { if (it != null) it > 0 else false }
 
     val currentUser: LiveData<User?>
     val loginState: LiveData<Boolean> = authenticationRepository.isLoggedIn
@@ -28,7 +34,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         userRepository = UserRepository(database.userDao(), authenticationRepository)
         albumRepository = AlbumRepository(database.albumDao(), authenticationRepository)
         artistRepository = ArtistRepository(database.artistDao(), authenticationRepository)
+        trackRepository = TrackRepository(database.trackDao(), authenticationRepository)
         currentUser = userRepository.currentUser
+        refreshing.value = 0
     }
 
     private val _navState = MutableLiveData<NavState>()
@@ -40,9 +48,17 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun refresh() {
-        userRepository.refresh {}
-        albumRepository.refresh {}
-        artistRepository.refresh {}
+        refreshing.value?.let { refreshing.value = it + 1 }
+        userRepository.refresh { refreshing.value?.let { refreshing.value = it - 1 } }
+
+        refreshing.value?.let { refreshing.value = it + 1 }
+        albumRepository.refresh { refreshing.value?.let { refreshing.value = it - 1 } }
+
+        refreshing.value?.let { refreshing.value = it + 1 }
+        artistRepository.refresh { refreshing.value?.let { refreshing.value = it - 1 } }
+
+        refreshing.value?.let { refreshing.value = it + 1 }
+        trackRepository.refresh { refreshing.value?.let { refreshing.value = it - 1 } }
     }
 
     fun logout() {
@@ -50,6 +66,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         userRepository.clear()
         albumRepository.clear()
         artistRepository.clear()
+        trackRepository.clear()
     }
 
     fun navigate(item: Int) {
