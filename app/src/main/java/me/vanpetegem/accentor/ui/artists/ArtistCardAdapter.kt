@@ -5,12 +5,13 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.cardview.widget.CardView
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
-import com.squareup.picasso.Picasso
+import com.bumptech.glide.Glide
 import me.vanpetegem.accentor.R
 import me.vanpetegem.accentor.data.artists.Artist
 
-class ArtistCardAdapter : RecyclerView.Adapter<ArtistCardAdapter.ViewHolder>() {
+class ArtistCardAdapter(private val fragment: Fragment) : RecyclerView.Adapter<ArtistCardAdapter.ViewHolder>() {
     var items: List<Artist> = ArrayList()
         set(value) {
             field = value
@@ -38,9 +39,9 @@ class ArtistCardAdapter : RecyclerView.Adapter<ArtistCardAdapter.ViewHolder>() {
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.artistNameView.text = items[position].name
-        items[position].image ?: holder.artistImageView.setImageResource(R.drawable.ic_menu_artists)
-        items[position].image?.let {
-            Picasso.get().load(it).placeholder(R.drawable.ic_menu_artists).into(holder.artistImageView)
-        }
+        Glide.with(fragment)
+            .load(items[position].image)
+            .placeholder(R.drawable.ic_menu_artists)
+            .into(holder.artistImageView)
     }
 }

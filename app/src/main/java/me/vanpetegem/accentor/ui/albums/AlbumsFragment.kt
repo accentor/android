@@ -27,7 +27,7 @@ class AlbumsFragment : Fragment() {
         viewModel = ViewModelProviders.of(this).get(AlbumsViewModel::class.java)
 
         val cardView: RecyclerView = view!!.findViewById(R.id.album_card_recycler_view)
-        val viewAdapter = AlbumCardAdapter()
+        val viewAdapter = AlbumCardAdapter(this)
         cardView.apply {
             setHasFixedSize(true)
             layoutManager = GridLayoutManager(context, 2)

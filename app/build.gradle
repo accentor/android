@@ -59,8 +59,11 @@ dependencies {
     // ViewModel Kotlin support
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
 
-    // Picasso
-    implementation "com.squareup.picasso:picasso:$picasso_version"
+    // Glide
+    implementation ("com.github.bumptech.glide:glide:$glide_version") {
+        exclude group: "com.android.support"
+    }
+    kapt "com.github.bumptech.glide:compiler:$glide_version"
 
     // Fuel
     implementation "com.github.kittinunf.fuel:fuel:$fuel_version"

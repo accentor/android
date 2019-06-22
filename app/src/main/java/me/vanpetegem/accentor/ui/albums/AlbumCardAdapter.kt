@@ -5,12 +5,13 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.cardview.widget.CardView
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
-import com.squareup.picasso.Picasso
+import com.bumptech.glide.Glide
 import me.vanpetegem.accentor.R
 import me.vanpetegem.accentor.data.albums.Album
 
-class AlbumCardAdapter : RecyclerView.Adapter<AlbumCardAdapter.ViewHolder>() {
+class AlbumCardAdapter(private val fragment: Fragment) : RecyclerView.Adapter<AlbumCardAdapter.ViewHolder>() {
     var items: List<Album> = ArrayList()
         set(value) {
             field = value
@@ -37,9 +38,9 @@ class AlbumCardAdapter : RecyclerView.Adapter<AlbumCardAdapter.ViewHolder>() {
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.albumTitleView.text = items[position].title
-        items[position].image ?: holder.albumImageView.setImageResource(R.drawable.ic_menu_albums)
-        items[position].image?.let {
-            Picasso.get().load(it).placeholder(R.drawable.ic_menu_albums).into(holder.albumImageView)
-        }
+        Glide.with(fragment)
+            .load(items[position].image)
+            .placeholder(R.drawable.ic_menu_albums)
+            .into(holder.albumImageView)
     }
 }
