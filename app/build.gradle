@@ -47,8 +47,8 @@ dependencies {
     // AndroidX Room
     implementation "androidx.room:room-runtime:$room_version"
     implementation "androidx.room:room-ktx:$room_version"
-    implementation 'androidx.lifecycle:lifecycle-extensions:2.0.0'
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.0.0'
+    implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_version"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
     kapt "androidx.room:room-compiler:$room_version"
 
     // AndroidX Lifecycle
@@ -58,6 +58,9 @@ dependencies {
 
     // ViewModel Kotlin support
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
+
+    // Picasso
+    implementation "com.squareup.picasso:picasso:$picasso_version"
 
     // Fuel
     implementation "com.github.kittinunf.fuel:fuel:$fuel_version"
