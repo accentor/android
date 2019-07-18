@@ -27,7 +27,7 @@ class ArtistsFragment : Fragment() {
         viewModel = ViewModelProviders.of(this).get(ArtistsViewModel::class.java)
 
         val cardView: RecyclerView = view!!.findViewById(R.id.artist_card_recycler_view)
-        val viewAdapter = ArtistCardAdapter()
+        val viewAdapter = ArtistCardAdapter(this)
         cardView.apply {
             setHasFixedSize(true)
             layoutManager = GridLayoutManager(context, 2)

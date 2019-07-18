@@ -84,4 +84,7 @@ class AuthenticationDataSource(context: Context) {
     }
 
     fun setServer(server: String?) = sharedPreferences.edit().putString(SERVER_KEY, server).apply()
+    fun getServer(): String? = sharedPreferences.getString(SERVER_KEY, null)
+    fun getSecret(): String? = sharedPreferences.getString(SECRET_KEY, null)
+    fun getDeviceId(): String? = sharedPreferences.getString(DEVICE_ID_KEY, null)
 }

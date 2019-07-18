@@ -2,6 +2,7 @@ package me.vanpetegem.accentor.data.tracks
 
 import android.util.Log
 import android.util.SparseArray
+import androidx.core.util.valueIterator
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations.map
 import me.vanpetegem.accentor.api.track.index
@@ -16,6 +17,15 @@ class TrackRepository(private val trackDao: TrackDao, private val authentication
         val map = SparseArray<Track>()
         it.forEach { t -> map.put(t.id, t) }
         map
+    }
+    val allTracksByAlbumId: LiveData<SparseArray<MutableList<Track>>> = map(allTracks) {
+        val map = SparseArray<MutableList<Track>>()
+        it.forEach { t ->
+            val l = map.get(t.albumId, ArrayList())
+            l.add(t)
+            map.put(t.albumId, l)
+        }
+        map.also { m -> m.valueIterator().forEach { l -> l.sortBy { t -> t.number } } }
     }
 
     fun refresh(handler: (Result<Unit>) -> Unit) {

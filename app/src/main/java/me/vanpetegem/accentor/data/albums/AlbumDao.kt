@@ -33,30 +33,61 @@ abstract class AlbumDao {
                 }
             }
         }
-
     }
+
+    @Transaction
+    open fun getAlbumById(id: Int): Album? {
+        val dbAlbum = getDbAlbumById(id)
+        dbAlbum ?: return null
+        val albumArtists = getDbAlbumArtistsById(id)
+        val albumLabels = getDbAlbumLabelsById(id)
+
+        return Album(
+            dbAlbum.id,
+            dbAlbum.title,
+            dbAlbum.release,
+            dbAlbum.reviewComment,
+            dbAlbum.edition,
+            dbAlbum.editionDescription,
+            dbAlbum.createdAt,
+            dbAlbum.updatedAt,
+            dbAlbum.image,
+            dbAlbum.imageType,
+            albumLabels.map { AlbumLabel(it.labelId, it.catalogueNumber) },
+            albumArtists.map { AlbumArtist(it.artistId, it.name, it.order, it.join) }
+        )
+    }
+
+    @Query("SELECT * FROM albums WHERE id = :id")
+    protected abstract fun getDbAlbumById(id: Int): DbAlbum?
+
+    @Query("SELECT * FROM album_artists WHERE album_id = :id")
+    protected abstract fun getDbAlbumArtistsById(id: Int): List<DbAlbumArtist>
+
+    @Query("SELECT * FROM album_labels WHERE album_id = :id")
+    protected abstract fun getDbAlbumLabelsById(id: Int): List<DbAlbumLabel>
 
     protected open fun albumLabelsByAlbumId(): LiveData<SparseArray<MutableList<AlbumLabel>>> =
         map(getAllAlbumLabels()) {
-        val map = SparseArray<MutableList<AlbumLabel>>()
-        for (al in it) {
-            val l = map.get(al.albumId, ArrayList())
-            l.add(AlbumLabel(al.labelId, al.catalogueNumber))
-            map.put(al.albumId, l)
+            val map = SparseArray<MutableList<AlbumLabel>>()
+            for (al in it) {
+                val l = map.get(al.albumId, ArrayList())
+                l.add(AlbumLabel(al.labelId, al.catalogueNumber))
+                map.put(al.albumId, l)
+            }
+            return@map map
         }
-        return@map map
-    }
 
     protected open fun albumArtistsByAlbumId(): LiveData<SparseArray<MutableList<AlbumArtist>>> =
         map(getAllAlbumArtists()) {
-        val map = SparseArray<MutableList<AlbumArtist>>()
-        for (aa in it) {
-            val l = map.get(aa.albumId, ArrayList())
-            l.add(AlbumArtist(aa.artistId, aa.name, aa.order, aa.join))
-            map.put(aa.albumId, l)
+            val map = SparseArray<MutableList<AlbumArtist>>()
+            for (aa in it) {
+                val l = map.get(aa.albumId, ArrayList())
+                l.add(AlbumArtist(aa.artistId, aa.name, aa.order, aa.join))
+                map.put(aa.albumId, l)
+            }
+            return@map map
         }
-        return@map map
-    }
 
     @Transaction
     open fun replaceAll(albums: List<Album>) {
