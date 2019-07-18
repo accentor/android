@@ -10,8 +10,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import me.vanpetegem.accentor.R
 import me.vanpetegem.accentor.data.albums.Album
+import org.jetbrains.anko.sdk27.coroutines.onClick
 
-class AlbumCardAdapter(private val fragment: Fragment) : RecyclerView.Adapter<AlbumCardAdapter.ViewHolder>() {
+class AlbumCardAdapter(private val fragment: Fragment, private val clickHandler: (Album) -> Unit) :
+    RecyclerView.Adapter<AlbumCardAdapter.ViewHolder>() {
     var items: List<Album> = ArrayList()
         set(value) {
             field = value
@@ -19,10 +21,10 @@ class AlbumCardAdapter(private val fragment: Fragment) : RecyclerView.Adapter<Al
         }
 
     class ViewHolder(
-        gridView: CardView,
+        val cardView: CardView,
         val albumTitleView: TextView,
         val albumImageView: ImageView
-    ) : RecyclerView.ViewHolder(gridView)
+    ) : RecyclerView.ViewHolder(cardView)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val gridView = LayoutInflater.from(parent.context)
@@ -37,6 +39,7 @@ class AlbumCardAdapter(private val fragment: Fragment) : RecyclerView.Adapter<Al
     override fun getItemCount(): Int = items.size
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        holder.cardView.onClick { clickHandler(items[position]) }
         holder.albumTitleView.text = items[position].title
         Glide.with(fragment)
             .load(items[position].image)
