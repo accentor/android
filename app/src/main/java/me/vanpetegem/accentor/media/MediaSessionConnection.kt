@@ -65,8 +65,9 @@ class MediaSessionConnection(application: Application) : AndroidViewModel(applic
             mediaController.queue?.forEach {
                 mediaController.removeQueueItem(it.description)
             }
+            var base = 0
             tracks.forEach {
-                mediaController.addQueueItem(convertTrack(it))
+                mediaController.addQueueItem(convertTrack(it), base++)
             }
             if (tracks.isNotEmpty()) {
                 mediaController.transportControls.play()

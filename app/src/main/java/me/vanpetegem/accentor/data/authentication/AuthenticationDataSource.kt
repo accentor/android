@@ -32,25 +32,25 @@ class AuthenticationDataSource(context: Context) {
             val observer: Observer<Any> = Observer {
                 val id: Int = idData.value.let {
                     if (it != null) it else {
-                        if (value != null) value = null
+                        value = null
                         return@Observer
                     }
                 }
                 val userId: Int = userIdData.value.let {
                     if (it != null) it else {
-                        if (value != null) value = null
+                        value = null
                         return@Observer
                     }
                 }
                 val deviceId: String = deviceIdData.value.let {
                     if (it != null) it else {
-                        if (value != null) value = null
+                        value = null
                         return@Observer
                     }
                 }
                 val secret: String = secretData.value.let {
                     if (it != null) it else {
-                        if (value != null) value = null
+                        value = null
                         return@Observer
                     }
                 }

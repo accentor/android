@@ -81,19 +81,16 @@ class MusicService : MediaBrowserServiceCompat() {
                                 MediaSessionCompat.QueueItem(description, description.mediaId!!.toLong())
                             )
                             mediaSession.setQueue(queue)
-                            it.invalidateMediaSessionQueue()
                         }
 
                         override fun remove(position: Int) {
                             queue.removeAt(position)
                             mediaSession.setQueue(queue)
-                            it.invalidateMediaSessionQueue()
                         }
 
                         override fun move(from: Int, to: Int) {
                             queue.add(if (to > from) to - 1 else 0, queue.removeAt(from))
                             mediaSession.setQueue(queue)
-                            it.invalidateMediaSessionQueue()
                         }
                     },
                     object : TimelineQueueEditor.MediaSourceFactory {
