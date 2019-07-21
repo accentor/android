@@ -8,10 +8,12 @@ import androidx.cardview.widget.CardView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
 import me.vanpetegem.accentor.R
 import me.vanpetegem.accentor.data.artists.Artist
 
-class ArtistCardAdapter(private val fragment: Fragment) : RecyclerView.Adapter<ArtistCardAdapter.ViewHolder>() {
+class ArtistCardAdapter(private val fragment: Fragment) :
+    RecyclerView.Adapter<ArtistCardAdapter.ViewHolder>(), FastScrollRecyclerView.SectionedAdapter {
     var items: List<Artist> = ArrayList()
         set(value) {
             field = value
@@ -44,4 +46,6 @@ class ArtistCardAdapter(private val fragment: Fragment) : RecyclerView.Adapter<A
             .placeholder(R.drawable.ic_menu_artists)
             .into(holder.artistImageView)
     }
+
+    override fun getSectionName(position: Int): String = "${items[position].name[0].toUpperCase()}"
 }

@@ -1,9 +1,11 @@
 package me.vanpetegem.accentor.ui.albums
 
 import android.app.Application
+import android.os.Parcelable
 import android.util.SparseArray
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import me.vanpetegem.accentor.data.AccentorDatabase
 import me.vanpetegem.accentor.data.albums.Album
 import me.vanpetegem.accentor.data.albums.AlbumRepository
@@ -19,6 +21,8 @@ class AlbumsViewModel(application: Application) : AndroidViewModel(application) 
 
     val allAlbums: LiveData<List<Album>>
     val tracksByAlbumId: LiveData<SparseArray<MutableList<Track>>>
+    private val _scrollState = MutableLiveData<Parcelable>()
+    val scrollState: LiveData<Parcelable> = _scrollState
 
     init {
         val database = AccentorDatabase.getDatabase(application)
@@ -26,5 +30,9 @@ class AlbumsViewModel(application: Application) : AndroidViewModel(application) 
         trackRepository = TrackRepository(database.trackDao(), authenticationRepository)
         allAlbums = albumRepository.allAlbums
         tracksByAlbumId = trackRepository.allTracksByAlbumId
+    }
+
+    fun saveScrollState(state: Parcelable) {
+        _scrollState.value = state
     }
 }

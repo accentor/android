@@ -14,7 +14,9 @@
         <TextView
             android:id="@+id/album_card_title_view"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:ellipsize="end"
+            android:singleLine="true" />
 
     </LinearLayout>
 

@@ -36,6 +36,39 @@ abstract class TrackDao {
         }
     }
 
+    @Transaction
+    open fun getTrackById(id: Int): Track? {
+        val dbTrack = getDbTrackById(id)
+        dbTrack ?: return null
+        val trackArtists = getDbTrackArtistsById(id)
+        val trackGenres = getDbTrackGenresById(id)
+
+        return Track(
+            dbTrack.id,
+            dbTrack.title,
+            dbTrack.number,
+            dbTrack.albumId,
+            dbTrack.reviewComment,
+            dbTrack.createdAt,
+            dbTrack.updatedAt,
+            trackGenres.map { it.genreId },
+            trackArtists.map { TrackArtist(it.artistId, it.name, it.role, it.order) },
+            dbTrack.codecId,
+            dbTrack.length,
+            dbTrack.bitrate,
+            dbTrack.locationId
+        )
+    }
+
+    @Query("SELECT * FROM tracks WHERE id = :id")
+    protected abstract fun getDbTrackById(id: Int): DbTrack?
+
+    @Query("SELECT * FROM track_artists WHERE track_id = :id")
+    protected abstract fun getDbTrackArtistsById(id: Int): List<DbTrackArtist>
+
+    @Query("SELECT * FROM track_genres WHERE track_id = :id")
+    protected abstract fun getDbTrackGenresById(id: Int): List<DbTrackGenre>
+
     protected open fun trackArtistsByArtistId(): LiveData<SparseArray<MutableList<TrackArtist>>> =
         map(getAllTrackArtists()) {
             val map = SparseArray<MutableList<TrackArtist>>()

@@ -32,7 +32,7 @@ abstract class ArtistDao {
         }
     }
 
-    @Query("SELECT * FROM artists ORDER BY name ASC")
+    @Query("SELECT * FROM artists ORDER BY name COLLATE NOCASE ASC")
     protected abstract fun getAllDbArtists(): LiveData<List<DbArtist>>
 
     @Insert
