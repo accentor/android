@@ -86,6 +86,9 @@ dependencies {
     // Sliding up panel
     implementation 'com.sothree.slidinguppanel:library:3.4.0'
 
+    // Fast-scrolling recyclerview
+    implementation 'com.simplecityapps:recyclerview-fastscroll:2.0.0'
+
     // Tests
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.2.0'
