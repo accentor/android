@@ -33,7 +33,7 @@ class AlbumsFragment : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         viewModel = ViewModelProviders.of(activity!!).get(AlbumsViewModel::class.java)
-        mediaSessionConnection = ViewModelProviders.of(this).get(MediaSessionConnection::class.java)
+        mediaSessionConnection = ViewModelProviders.of(activity!!).get(MediaSessionConnection::class.java)
 
         val cardView: FastScrollRecyclerView = view!!.findViewById(R.id.album_card_recycler_view)
         val viewAdapter = AlbumCardAdapter(this) { clickedItem ->

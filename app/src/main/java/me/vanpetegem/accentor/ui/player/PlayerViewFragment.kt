@@ -19,6 +19,6 @@ class PlayerViewFragment : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
-        mediaSessionConnection = ViewModelProviders.of(this).get(MediaSessionConnection::class.java)
+        mediaSessionConnection = ViewModelProviders.of(activity!!).get(MediaSessionConnection::class.java)
     }
 }
