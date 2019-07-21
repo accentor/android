@@ -83,6 +83,7 @@ class MusicService : MediaBrowserServiceCompat() {
 
         mediaSession = MediaSessionCompat(baseContext, "MusicService").apply {
             setSessionActivity(packageManager?.getLaunchIntentForPackage(packageName)?.let { sessionIntent ->
+                sessionIntent.flags = sessionIntent.flags or Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
                 sessionIntent.putExtra(MainActivity.INTENT_EXTRA_OPEN_PLAYER, true)
                 PendingIntent.getActivity(this@MusicService, 0, sessionIntent, PendingIntent.FLAG_UPDATE_CURRENT)
             })

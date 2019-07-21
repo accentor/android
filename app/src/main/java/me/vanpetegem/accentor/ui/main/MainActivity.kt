@@ -1,5 +1,6 @@
 package me.vanpetegem.accentor.ui.main
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -147,8 +148,16 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         })
     }
 
-    override fun onStart() {
-        super.onStart()
+
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        if (intent?.hasExtra(INTENT_EXTRA_OPEN_PLAYER) == true) {
+            mainViewModel.setPlayerOpen(intent.getBooleanExtra(INTENT_EXTRA_OPEN_PLAYER, false))
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
         if (intent.hasExtra(INTENT_EXTRA_OPEN_PLAYER)) {
             mainViewModel.setPlayerOpen(intent.getBooleanExtra(INTENT_EXTRA_OPEN_PLAYER, false))
         }

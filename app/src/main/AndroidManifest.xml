@@ -24,6 +24,7 @@
         <activity
             android:name=".ui.main.MainActivity"
             android:label="@string/title_activity_main"
+            android:launchMode="singleInstance"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
