@@ -54,7 +54,7 @@ class ArtistsFragment : Fragment() {
             })
         }
 
-        viewModel.allArtists.observe(this@ArtistsFragment, Observer {
+        viewModel.allArtists.observe(viewLifecycleOwner, Observer {
             cardView.apply {
                 viewAdapter.items = it
             }

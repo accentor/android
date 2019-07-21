@@ -75,7 +75,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         swipeRefreshLayout.setOnRefreshListener(this)
 
         mainViewModel = ViewModelProviders.of(this).get(MainViewModel::class.java)
-        mainViewModel.loginState.observe(this@MainActivity, Observer {
+        mainViewModel.loginState.observe(this, Observer {
             val loggedIn = it ?: return@Observer
             if (!loggedIn) {
                 startActivity<LoginActivity>()
@@ -85,7 +85,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
         })
 
-        mainViewModel.currentUser.observe(this@MainActivity, Observer {
+        mainViewModel.currentUser.observe(this, Observer {
             if (it == null) {
                 usernameText.text = ""
             } else {
@@ -93,7 +93,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
         })
 
-        mainViewModel.serverURL.observe(this@MainActivity, Observer {
+        mainViewModel.serverURL.observe(this, Observer {
             if (it == null) {
                 serverURLText.text = ""
             } else {
@@ -101,7 +101,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
         })
 
-        mainViewModel.navState.observe(this@MainActivity, Observer {
+        mainViewModel.navState.observe(this, Observer {
             val navState = it ?: return@Observer
 
             val transaction = supportFragmentManager.beginTransaction()
@@ -123,13 +123,13 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             toggle.syncState()
         })
 
-        mainViewModel.isRefreshing.observe(this@MainActivity, Observer {
+        mainViewModel.isRefreshing.observe(this, Observer {
             val refreshState = it ?: return@Observer
 
             swipeRefreshLayout.isRefreshing = refreshState
         })
 
-        mainViewModel.isPlayerOpen.observe(this@MainActivity, Observer {
+        mainViewModel.isPlayerOpen.observe(this, Observer {
             val open = it ?: return@Observer
             if (open) {
                 slidingUpPanelLayout.panelState = SlidingUpPanelLayout.PanelState.EXPANDED

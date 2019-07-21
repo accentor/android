@@ -38,7 +38,7 @@ class BottomBarFragment : Fragment() {
             .apply { setOnClickListener { mediaSessionConnection.next() } }
 
 
-        mediaSessionConnection.currentAlbum.observe(this, Observer {
+        mediaSessionConnection.currentAlbum.observe(viewLifecycleOwner, Observer {
             albumTitle.text = it?.title ?: ""
             Glide.with(this)
                 .load(it?.image)
@@ -46,11 +46,11 @@ class BottomBarFragment : Fragment() {
                 .into(imageView)
         })
 
-        mediaSessionConnection.currentTrack.observe(this, Observer {
+        mediaSessionConnection.currentTrack.observe(viewLifecycleOwner, Observer {
             trackTitle.text = it?.title ?: ""
         })
 
-        mediaSessionConnection.playing.observe(this, Observer {
+        mediaSessionConnection.playing.observe(viewLifecycleOwner, Observer {
             if (it != null && it) {
                 play.visibility = View.GONE
                 pause.visibility = View.VISIBLE
