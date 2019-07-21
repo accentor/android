@@ -25,6 +25,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val refreshing = MutableLiveData<Int>()
     val isRefreshing: LiveData<Boolean> = map(refreshing) { if (it != null) it > 0 else false }
 
+    private val playerOpen = MutableLiveData<Boolean>().apply { value = false }
+    val isPlayerOpen: LiveData<Boolean> = playerOpen
+
     val currentUser: LiveData<User?>
     val loginState: LiveData<Boolean> = authenticationRepository.isLoggedIn
     val serverURL = authenticationRepository.server
@@ -41,7 +44,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private val _navState = MutableLiveData<NavState>()
     val navState: LiveData<NavState> = _navState
-
 
     init {
         _navState.value = NavState(R.id.nav_home, false)
@@ -71,5 +73,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun navigate(item: Int) {
         _navState.value = NavState(item, false)
+    }
+
+    fun setPlayerOpen(value: Boolean) {
+        playerOpen.value = value
     }
 }

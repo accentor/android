@@ -6,10 +6,14 @@ import android.content.Context
 import android.net.Uri
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaDescriptionCompat
+import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaControllerCompat
+import android.support.v4.media.session.PlaybackStateCompat
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import me.vanpetegem.accentor.data.AccentorDatabase
+import me.vanpetegem.accentor.data.albums.Album
 import me.vanpetegem.accentor.data.albums.AlbumDao
 import me.vanpetegem.accentor.data.authentication.AuthenticationDataSource
 import me.vanpetegem.accentor.data.tracks.Track
@@ -22,8 +26,20 @@ class MediaSessionConnection(application: Application) : AndroidViewModel(applic
     private val trackDao: TrackDao
     private val albumDao: AlbumDao
 
-    val isConnected = MutableLiveData<Boolean>().apply { postValue(false) }
-    val networkFailure = MutableLiveData<Boolean>().apply { postValue(false) }
+    private val _connected = MutableLiveData<Boolean>().apply { postValue(false) }
+    val connected: LiveData<Boolean> = _connected
+
+    private val _networkFailure = MutableLiveData<Boolean>().apply { postValue(false) }
+    val networkFailure: LiveData<Boolean> = _networkFailure
+
+    private val _currentTrack = MutableLiveData<Track>().apply { postValue(null) }
+    val currentTrack: LiveData<Track> = _currentTrack
+
+    private val _currentAlbum = MutableLiveData<Album>().apply { postValue(null) }
+    val currentAlbum: LiveData<Album> = _currentAlbum
+
+    private val _playing = MutableLiveData<Boolean>().apply { postValue(false) }
+    val playing: LiveData<Boolean> = _playing
 
     private val mediaBrowserConnectionCallback = MediaBrowserConnectionCallback(application)
     private val mediaBrowser = MediaBrowserCompat(
@@ -75,23 +91,63 @@ class MediaSessionConnection(application: Application) : AndroidViewModel(applic
         }
     }
 
+    private fun onMetadataChanged(metadata: MediaMetadataCompat?) {
+        if (metadata == null) {
+            _currentTrack.postValue(null)
+            _currentAlbum.postValue(null)
+            return
+        }
+        doAsync {
+            val track = trackDao.getTrackById(metadata.getString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID).toInt())
+            _currentTrack.postValue(track)
+            _currentAlbum.postValue(track?.let { albumDao.getAlbumById(it.albumId) })
+        }
+    }
+
+    fun previous() {
+        mediaController.transportControls.skipToPrevious()
+    }
+
+    fun pause() {
+        mediaController.transportControls.pause()
+    }
+
+    fun play() {
+        mediaController.transportControls.play()
+    }
+
+    fun next() {
+        mediaController.transportControls.skipToNext()
+    }
+
     private inner class MediaBrowserConnectionCallback(private val context: Context) :
         MediaBrowserCompat.ConnectionCallback() {
         override fun onConnected() {
             mediaController = MediaControllerCompat(context, mediaBrowser.sessionToken).apply {
                 registerCallback(MediaControllerCallback())
+                onMetadataChanged(metadata)
             }
 
-            isConnected.postValue(true)
+            _connected.postValue(true)
         }
 
-        override fun onConnectionSuspended() =
-            isConnected.postValue(false)
+        override fun onConnectionSuspended() = _connected.postValue(false)
 
-        override fun onConnectionFailed() = isConnected.postValue(false)
+        override fun onConnectionFailed() = _connected.postValue(false)
     }
 
-    private inner class MediaControllerCallback : MediaControllerCompat.Callback()
+    private inner class MediaControllerCallback : MediaControllerCompat.Callback() {
+        override fun onMetadataChanged(metadata: MediaMetadataCompat?) {
+            this@MediaSessionConnection.onMetadataChanged(metadata)
+        }
+
+        override fun onPlaybackStateChanged(state: PlaybackStateCompat?) {
+            when (state?.state) {
+                PlaybackStateCompat.STATE_PLAYING, PlaybackStateCompat.STATE_BUFFERING -> _playing.postValue(true)
+                else -> _playing.postValue(false)
+            }
+        }
+    }
 }
 
 fun String?.toUri(): Uri = this?.let { Uri.parse(it) } ?: Uri.EMPTY

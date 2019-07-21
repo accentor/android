@@ -41,6 +41,7 @@ import com.google.android.exoplayer2.upstream.cache.CacheDataSink
 import com.google.android.exoplayer2.upstream.cache.CacheDataSource
 import com.google.android.exoplayer2.upstream.cache.LeastRecentlyUsedCacheEvictor
 import com.google.android.exoplayer2.upstream.cache.SimpleCache
+import me.vanpetegem.accentor.ui.main.MainActivity
 import me.vanpetegem.accentor.userAgent
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
@@ -84,7 +85,8 @@ class MusicService : MediaBrowserServiceCompat() {
 
         mediaSession = MediaSessionCompat(baseContext, "MusicService").apply {
             setSessionActivity(packageManager?.getLaunchIntentForPackage(packageName)?.let { sessionIntent ->
-                PendingIntent.getActivity(this@MusicService, 0, sessionIntent, 0)
+                sessionIntent.putExtra(MainActivity.INTENT_EXTRA_OPEN_PLAYER, true)
+                PendingIntent.getActivity(this@MusicService, 0, sessionIntent, PendingIntent.FLAG_UPDATE_CURRENT)
             })
             isActive = true
         }
@@ -186,6 +188,7 @@ class MusicService : MediaBrowserServiceCompat() {
                 val builder = MediaMetadataCompat.Builder()
                 if (player.currentWindowIndex < queue.size) {
                     val item = queue[player.currentWindowIndex].description
+                    builder.putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, item.mediaId)
                     builder.putString(MediaMetadataCompat.METADATA_KEY_TITLE, item.title.toString())
                     builder.putString(MediaMetadataCompat.METADATA_KEY_ALBUM, item.subtitle.toString())
                     if (item.iconUri != null) {
@@ -302,12 +305,12 @@ class MusicService : MediaBrowserServiceCompat() {
 
             when (state.state) {
                 PlaybackStateCompat.STATE_BUFFERING, PlaybackStateCompat.STATE_PLAYING, PlaybackStateCompat.STATE_CONNECTING -> {
-                    wakeLock.acquire()
-                    wifiLock.acquire()
+                    if (!wakeLock.isHeld) wakeLock.acquire()
+                    if (!wifiLock.isHeld) wifiLock.acquire()
                 }
                 else -> {
-                    wakeLock.release()
-                    wifiLock.release()
+                    if (wakeLock.isHeld) wakeLock.release()
+                    if (wifiLock.isHeld) wifiLock.release()
                 }
             }
         }

@@ -75,7 +75,6 @@ dependencies {
     implementation "com.google.android.exoplayer:extension-mediasession:$exoplayer_version"
     implementation "com.google.android.exoplayer:extension-okhttp:$exoplayer_version"
 
-
     // Fuel
     implementation "com.github.kittinunf.fuel:fuel:$fuel_version"
     implementation "com.github.kittinunf.fuel:fuel-android:$fuel_version"
@@ -83,6 +82,9 @@ dependencies {
 
     // Material
     implementation 'com.google.android.material:material:1.0.0'
+
+    // Sliding up panel
+    implementation 'com.sothree.slidinguppanel:library:3.4.0'
 
     // Tests
     testImplementation 'junit:junit:4.12'
