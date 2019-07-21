@@ -20,7 +20,7 @@ abstract class UserDao {
         users.forEach { insert(DbUser(it.id, it.name, it.permission)) }
     }
 
-    @Query("SELECT * FROM users ORDER BY id ASC")
+    @Query("SELECT * FROM users ORDER BY name COLLATE NOCASE ASC")
     protected abstract fun getAllDbUsers(): LiveData<List<DbUser>>
 
     @Insert
