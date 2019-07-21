@@ -17,7 +17,7 @@ class BottomBarFragment : Fragment() {
     private lateinit var mediaSessionConnection: MediaSessionConnection
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.bottom_bar_fragment, container, false)
+        return inflater.inflate(R.layout.fragment_bottom_bar, container, false)
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {

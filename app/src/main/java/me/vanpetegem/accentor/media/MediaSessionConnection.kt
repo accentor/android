@@ -8,16 +8,23 @@ import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaDescriptionCompat
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaControllerCompat
+import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
+import android.util.SparseArray
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Transformations.map
+import androidx.lifecycle.Transformations.switchMap
 import me.vanpetegem.accentor.data.AccentorDatabase
 import me.vanpetegem.accentor.data.albums.Album
 import me.vanpetegem.accentor.data.albums.AlbumDao
+import me.vanpetegem.accentor.data.albums.AlbumRepository
 import me.vanpetegem.accentor.data.authentication.AuthenticationDataSource
+import me.vanpetegem.accentor.data.authentication.AuthenticationRepository
 import me.vanpetegem.accentor.data.tracks.Track
 import me.vanpetegem.accentor.data.tracks.TrackDao
+import me.vanpetegem.accentor.data.tracks.TrackRepository
 import org.jetbrains.anko.doAsync
 
 class MediaSessionConnection(application: Application) : AndroidViewModel(application) {
@@ -25,21 +32,6 @@ class MediaSessionConnection(application: Application) : AndroidViewModel(applic
     private val authenticationDataSource = AuthenticationDataSource(application)
     private val trackDao: TrackDao
     private val albumDao: AlbumDao
-
-    private val _connected = MutableLiveData<Boolean>().apply { postValue(false) }
-    val connected: LiveData<Boolean> = _connected
-
-    private val _networkFailure = MutableLiveData<Boolean>().apply { postValue(false) }
-    val networkFailure: LiveData<Boolean> = _networkFailure
-
-    private val _currentTrack = MutableLiveData<Track>().apply { postValue(null) }
-    val currentTrack: LiveData<Track> = _currentTrack
-
-    private val _currentAlbum = MutableLiveData<Album>().apply { postValue(null) }
-    val currentAlbum: LiveData<Album> = _currentAlbum
-
-    private val _playing = MutableLiveData<Boolean>().apply { postValue(false) }
-    val playing: LiveData<Boolean> = _playing
 
     private val mediaBrowserConnectionCallback = MediaBrowserConnectionCallback(application)
     private val mediaBrowser = MediaBrowserCompat(
@@ -49,13 +41,35 @@ class MediaSessionConnection(application: Application) : AndroidViewModel(applic
         null
     ).apply { connect() }
     private val mediaDescBuilder = MediaDescriptionCompat.Builder()
+    private lateinit var mediaController: MediaControllerCompat
 
-    lateinit var mediaController: MediaControllerCompat
+    private val currentTrackId = MutableLiveData<Int>().apply { postValue(null) }
+    val currentTrack: LiveData<Track?> = switchMap(currentTrackId) { id ->
+        map(tracksById) { id?.let { id -> it[id] } }
+    }
+    val currentAlbum: LiveData<Album?> = switchMap(currentTrack) { t ->
+        map(albumsById) { t?.let { t -> it[t.albumId] } }
+    }
+
+    private val _playing = MutableLiveData<Boolean>().apply { postValue(false) }
+    val playing: LiveData<Boolean> = _playing
+
+    private val _queue = MutableLiveData<List<Int>>().apply { postValue(ArrayList()) }
+    val queue: LiveData<List<Track>> = switchMap(_queue) { q ->
+        map(tracksById) { q.map { id -> it[id] } }
+    }
+
+    private val albumsById: LiveData<SparseArray<Album>>
+    private val tracksById: LiveData<SparseArray<Track>>
 
     init {
         val database = AccentorDatabase.getDatabase(application)
         trackDao = database.trackDao()
         albumDao = database.albumDao()
+        val albumRepository = AlbumRepository(albumDao, AuthenticationRepository(authenticationDataSource))
+        albumsById = albumRepository.allAlbumsById
+        val trackRepository = TrackRepository(trackDao, AuthenticationRepository(authenticationDataSource))
+        tracksById = trackRepository.allTracksById
     }
 
     private fun convertTrack(track: Track): MediaDescriptionCompat {
@@ -91,20 +105,6 @@ class MediaSessionConnection(application: Application) : AndroidViewModel(applic
         }
     }
 
-    private fun onMetadataChanged(metadata: MediaMetadataCompat?) {
-        if (metadata == null) {
-            _currentTrack.postValue(null)
-            _currentAlbum.postValue(null)
-            return
-        }
-        doAsync {
-            val track = metadata.getString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID)?.toInt()
-                ?.let { trackDao.getTrackById(it) }
-            _currentTrack.postValue(track)
-            _currentAlbum.postValue(track?.let { albumDao.getAlbumById(it.albumId) })
-        }
-    }
-
     fun previous() {
         mediaController.transportControls.skipToPrevious()
     }
@@ -125,27 +125,34 @@ class MediaSessionConnection(application: Application) : AndroidViewModel(applic
         MediaBrowserCompat.ConnectionCallback() {
         override fun onConnected() {
             mediaController = MediaControllerCompat(context, mediaBrowser.sessionToken).apply {
-                registerCallback(MediaControllerCallback())
-                onMetadataChanged(metadata)
+                val callback = MediaControllerCallback()
+                registerCallback(callback)
+                callback.onMetadataChanged(metadata)
+                callback.onPlaybackStateChanged(playbackState)
+                callback.onQueueChanged(queue)
             }
-
-            _connected.postValue(true)
         }
-
-        override fun onConnectionSuspended() = _connected.postValue(false)
-
-        override fun onConnectionFailed() = _connected.postValue(false)
     }
 
     private inner class MediaControllerCallback : MediaControllerCompat.Callback() {
         override fun onMetadataChanged(metadata: MediaMetadataCompat?) {
-            this@MediaSessionConnection.onMetadataChanged(metadata)
+            currentTrackId.postValue(metadata?.getString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID)?.toInt())
         }
 
         override fun onPlaybackStateChanged(state: PlaybackStateCompat?) {
             when (state?.state) {
                 PlaybackStateCompat.STATE_PLAYING, PlaybackStateCompat.STATE_BUFFERING -> _playing.postValue(true)
                 else -> _playing.postValue(false)
+            }
+        }
+
+        override fun onQueueChanged(queue: MutableList<MediaSessionCompat.QueueItem>?) {
+            if (queue == null) {
+                _queue.postValue(null)
+                return
+            }
+            doAsync {
+                _queue.postValue(queue.map { it.description.mediaId!!.toInt() })
             }
         }
     }

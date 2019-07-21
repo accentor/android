@@ -13,7 +13,7 @@ class PlayerViewFragment : Fragment() {
     private lateinit var mediaSessionConnection: MediaSessionConnection
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.player_view_fragment, container, false)
+        return inflater.inflate(R.layout.fragment_player_view, container, false)
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
