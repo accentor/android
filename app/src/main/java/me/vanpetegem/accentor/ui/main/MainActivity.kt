@@ -165,10 +165,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     override fun onBackPressed() {
         val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
-        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
-            drawerLayout.closeDrawer(GravityCompat.START)
-        } else {
-            super.onBackPressed()
+        val slidingUpPanelLayout: SlidingUpPanelLayout = findViewById(R.id.sliding_layout)
+        when {
+            slidingUpPanelLayout.panelState == SlidingUpPanelLayout.PanelState.EXPANDED -> slidingUpPanelLayout.panelState =
+                SlidingUpPanelLayout.PanelState.COLLAPSED
+            drawerLayout.isDrawerOpen(GravityCompat.START) -> drawerLayout.closeDrawer(GravityCompat.START)
+            else -> super.onBackPressed()
         }
     }
 
