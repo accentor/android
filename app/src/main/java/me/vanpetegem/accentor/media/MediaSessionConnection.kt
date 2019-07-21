@@ -98,7 +98,8 @@ class MediaSessionConnection(application: Application) : AndroidViewModel(applic
             return
         }
         doAsync {
-            val track = trackDao.getTrackById(metadata.getString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID).toInt())
+            val track = metadata.getString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID)?.toInt()
+                ?.let { trackDao.getTrackById(it) }
             _currentTrack.postValue(track)
             _currentAlbum.postValue(track?.let { albumDao.getAlbumById(it.albumId) })
         }
