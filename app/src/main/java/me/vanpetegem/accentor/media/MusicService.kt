@@ -27,10 +27,8 @@ import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.audio.AudioAttributes
 import com.google.android.exoplayer2.database.ExoDatabaseProvider
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
-import com.google.android.exoplayer2.ext.mediasession.TimelineQueueEditor
 import com.google.android.exoplayer2.ext.mediasession.TimelineQueueNavigator
 import com.google.android.exoplayer2.source.ConcatenatingMediaSource
-import com.google.android.exoplayer2.source.MediaSource
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.upstream.DataSource
@@ -92,7 +90,7 @@ class MusicService : MediaBrowserServiceCompat() {
         }
         sessionToken = mediaSession.sessionToken
 
-        mediaController = MediaControllerCompat(this, mediaSession).also {
+        mediaController = MediaControllerCompat(this, mediaSession.sessionToken).also {
             it.registerCallback(MediaControllerCallback())
         }
 
@@ -105,58 +103,65 @@ class MusicService : MediaBrowserServiceCompat() {
         mediaSessionConnector = MediaSessionConnector(mediaSession).also {
             it.setPlayer(exoPlayer)
             it.setQueueEditor(
-                TimelineQueueEditor(
-                    mediaController,
-                    mediaSource,
-                    object : TimelineQueueEditor.QueueDataAdapter {
-                        override fun add(position: Int, description: MediaDescriptionCompat) {
-                            queue.add(
-                                position,
-                                MediaSessionCompat.QueueItem(description, description.mediaId!!.toLong())
+                object : MediaSessionConnector.QueueEditor {
+                    var count: Long = 0
+                    val factory =
+                        ProgressiveMediaSource.Factory(object : DataSource.Factory {
+                            val base = DefaultDataSourceFactory(
+                                this@MusicService.application,
+                                DefaultHttpDataSourceFactory(userAgent, 0, 0, false)
                             )
-                            mediaSession.setQueue(queue)
-                        }
 
-                        override fun remove(position: Int) {
-                            queue.removeAt(position)
-                            mediaSession.setQueue(queue)
-                        }
+                            val cache = SimpleCache(
+                                File(this@MusicService.application.cacheDir, "audio"),
+                                LeastRecentlyUsedCacheEvictor(10L * 1024L * 1024L * 1024L),
+                                ExoDatabaseProvider(this@MusicService.application)
+                            )
 
-                        override fun move(from: Int, to: Int) {
-                            queue.add(if (to > from) to - 1 else 0, queue.removeAt(from))
-                            mediaSession.setQueue(queue)
-                        }
-                    },
-                    object : TimelineQueueEditor.MediaSourceFactory {
-                        val factory =
-                            ProgressiveMediaSource.Factory(object : DataSource.Factory {
-                                val base = DefaultDataSourceFactory(
-                                    this@MusicService.application,
-                                    DefaultHttpDataSourceFactory(userAgent, 0, 0, false)
+                            override fun createDataSource(): DataSource {
+                                return CacheDataSource(
+                                    cache,
+                                    base.createDataSource(),
+                                    FileDataSource(),
+                                    CacheDataSink(cache, C.LENGTH_UNSET.toLong()),
+                                    (CacheDataSource.FLAG_BLOCK_ON_CACHE or CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR),
+                                    null
                                 )
+                            }
+                        })
 
-                                val cache = SimpleCache(
-                                    File(this@MusicService.application.cacheDir, "audio"),
-                                    LeastRecentlyUsedCacheEvictor(10L * 1024L * 1024L * 1024L),
-                                    ExoDatabaseProvider(this@MusicService.application)
-                                )
+                    override fun onRemoveQueueItem(player: Player, description: MediaDescriptionCompat) {
+                        for (i in 0..queue.size) {
+                            if (queue[i].description.mediaId == description.mediaId) {
+                                queue.removeAt(i)
+                                mediaSession.setQueue(queue)
+                                mediaSource.removeMediaSource(i)
+                                return
+                            }
+                        }
+                    }
 
-                                override fun createDataSource(): DataSource {
-                                    return CacheDataSource(
-                                        cache,
-                                        base.createDataSource(),
-                                        FileDataSource(),
-                                        CacheDataSink(cache, C.LENGTH_UNSET.toLong()),
-                                        (CacheDataSource.FLAG_BLOCK_ON_CACHE or CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR),
-                                        null
-                                    )
-                                }
-                            })
+                    override fun onAddQueueItem(player: Player, description: MediaDescriptionCompat) {
+                        onAddQueueItem(player, description, queue.size)
+                    }
 
-                        override fun createMediaSource(description: MediaDescriptionCompat): MediaSource =
-                            factory.createMediaSource(description.mediaUri)
-                    })
-            )
+                    override fun onAddQueueItem(player: Player, description: MediaDescriptionCompat, index: Int) {
+                        mediaSource.addMediaSource(factory.createMediaSource(description.mediaUri))
+                        queue.add(
+                            index,
+                            MediaSessionCompat.QueueItem(description, count++)
+                        )
+                        mediaSession.setQueue(queue)
+                    }
+
+                    override fun onCommand(
+                        player: Player,
+                        controlDispatcher: ControlDispatcher,
+                        command: String,
+                        extras: Bundle,
+                        cb: ResultReceiver
+                    ): Boolean = false
+                })
             it.setPlaybackPreparer(object : MediaSessionConnector.PlaybackPreparer {
                 override fun onCommand(
                     player: Player?,
@@ -211,7 +216,7 @@ class MusicService : MediaBrowserServiceCompat() {
                 }
                 builder.build()
             }
-            it.setQueueNavigator(object : TimelineQueueNavigator(mediaSession) {
+            it.setQueueNavigator(object : TimelineQueueNavigator(mediaSession, Int.MAX_VALUE) {
                 override fun getMediaDescription(player: Player?, windowIndex: Int): MediaDescriptionCompat =
                     queue[windowIndex].description
             })

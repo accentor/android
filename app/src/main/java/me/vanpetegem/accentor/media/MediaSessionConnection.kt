@@ -55,8 +55,16 @@ class MediaSessionConnection(application: Application) : AndroidViewModel(applic
     val playing: LiveData<Boolean> = _playing
 
     private val _queue = MutableLiveData<List<Int>>().apply { postValue(ArrayList()) }
-    val queue: LiveData<List<Track>> = switchMap(_queue) { q ->
-        map(tracksById) { q.map { id -> it[id] } }
+    val queue: LiveData<List<Pair<Track, Album>>> = switchMap(_queue) { q ->
+        switchMap(tracksById) { tracks ->
+            map(albumsById) { albums ->
+                q.map { id ->
+                    val track = tracks[id]
+                    val album = albums[track.albumId]
+                    Pair(track, album)
+                }
+            }
+        }
     }
 
     private val albumsById: LiveData<SparseArray<Album>>
@@ -147,13 +155,7 @@ class MediaSessionConnection(application: Application) : AndroidViewModel(applic
         }
 
         override fun onQueueChanged(queue: MutableList<MediaSessionCompat.QueueItem>?) {
-            if (queue == null) {
-                _queue.postValue(null)
-                return
-            }
-            doAsync {
-                _queue.postValue(queue.map { it.description.mediaId!!.toInt() })
-            }
+            _queue.postValue(queue?.map { it.description.mediaId!!.toInt() } ?: ArrayList())
         }
     }
 }
