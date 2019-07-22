@@ -90,7 +90,7 @@ class MediaSessionConnection(application: Application) : AndroidViewModel(applic
         val extras = Bundle()
         extras.putString(
             Track.ALBUMARTIST,
-            album.albumArtists.sortedBy { aa -> aa.order }.fold("") { acc, aa -> acc + aa.name + (aa.join ?: "") })
+            album.albumArtists.sortedBy { aa -> aa.order }.fold("") { acc, aa -> acc + aa.name + (aa.separator ?: "") })
         extras.putString(
             Track.ARTIST,
             track.trackArtists.sortedBy { ta -> ta.order }.joinToString(" / ") { ta -> ta.name }

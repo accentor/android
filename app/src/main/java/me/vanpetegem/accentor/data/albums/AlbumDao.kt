@@ -54,7 +54,7 @@ abstract class AlbumDao {
             dbAlbum.image,
             dbAlbum.imageType,
             albumLabels.map { AlbumLabel(it.labelId, it.catalogueNumber) },
-            albumArtists.map { AlbumArtist(it.artistId, it.name, it.order, it.join) }
+            albumArtists.map { AlbumArtist(it.artistId, it.name, it.order, it.separator) }
         )
     }
 
@@ -83,7 +83,7 @@ abstract class AlbumDao {
             val map = SparseArray<MutableList<AlbumArtist>>()
             for (aa in it) {
                 val l = map.get(aa.albumId, ArrayList())
-                l.add(AlbumArtist(aa.artistId, aa.name, aa.order, aa.join))
+                l.add(AlbumArtist(aa.artistId, aa.name, aa.order, aa.separator))
                 map.put(aa.albumId, l)
             }
             return@map map
@@ -113,7 +113,7 @@ abstract class AlbumDao {
                 insert(DbAlbumLabel(album.id, al.labelId, al.catalogueNumber))
             }
             for (al: AlbumArtist in album.albumArtists) {
-                insert(DbAlbumArtist(album.id, al.artistId, al.name, al.order, al.join))
+                insert(DbAlbumArtist(album.id, al.artistId, al.name, al.order, al.separator))
             }
         }
     }

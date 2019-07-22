@@ -5,6 +5,8 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import me.vanpetegem.accentor.data.albums.AlbumDao
 import me.vanpetegem.accentor.data.albums.DbAlbum
 import me.vanpetegem.accentor.data.albums.DbAlbumArtist
@@ -31,7 +33,7 @@ import me.vanpetegem.accentor.util.RoomTypeConverters
         DbTrackArtist::class,
         DbTrackGenre::class
     ],
-    version = 2
+    version = 3
 )
 abstract class AccentorDatabase : RoomDatabase() {
 
@@ -47,7 +49,20 @@ abstract class AccentorDatabase : RoomDatabase() {
                         AccentorDatabase::class.java,
                         "accentor_database"
                     )
-                        .fallbackToDestructiveMigration()
+                        .addMigrations(object : Migration(2, 3) {
+                            override fun migrate(database: SupportSQLiteDatabase) {
+                                database.beginTransaction()
+                                try {
+                                    database.execSQL("ALTER TABLE `album_artists` RENAME TO `album_artists_old`")
+                                    database.execSQL("CREATE TABLE `album_artists` (`album_id` INTEGER NOT NULL, `artist_id` INTEGER NOT NULL, `name` TEXT NOT NULL, `order` INTEGER NOT NULL, `separator` TEXT, PRIMARY KEY(`album_id`, `artist_id`, `name`))")
+                                    database.execSQL("INSERT INTO `album_artists` (`album_id`, `artist_id`, `name`, `order`, `separator`) SELECT `album_id`, `artist_id`, `name`, `order`, `join` AS `separator` FROM `album_artists_old`")
+                                    database.execSQL("DROP TABLE `album_artists_old`")
+                                    database.setTransactionSuccessful()
+                                } finally {
+                                    database.endTransaction()
+                                }
+                            }
+                        })
                         .build()
                 INSTANCE = instance
                 instance

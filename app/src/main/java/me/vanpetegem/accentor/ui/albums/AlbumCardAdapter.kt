@@ -25,6 +25,7 @@ class AlbumCardAdapter(private val fragment: Fragment, private val clickHandler:
     class ViewHolder(
         val cardView: CardView,
         val albumTitleView: TextView,
+        val albumSubtitleView: TextView,
         val albumImageView: ImageView
     ) : RecyclerView.ViewHolder(cardView)
 
@@ -33,9 +34,10 @@ class AlbumCardAdapter(private val fragment: Fragment, private val clickHandler:
             .inflate(R.layout.album_card_view, parent, false) as CardView
 
         val albumTitleView: TextView = gridView.findViewById(R.id.album_card_title_view)
+        val albumSubtitleView: TextView = gridView.findViewById(R.id.album_card_subtitle_view)
         val imageView: ImageView = gridView.findViewById(R.id.album_card_image_view)
 
-        return ViewHolder(gridView, albumTitleView, imageView)
+        return ViewHolder(gridView, albumTitleView, albumSubtitleView, imageView)
     }
 
     override fun getItemCount(): Int = items.size
@@ -43,6 +45,9 @@ class AlbumCardAdapter(private val fragment: Fragment, private val clickHandler:
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.cardView.onClick { clickHandler(items[position]) }
         holder.albumTitleView.text = items[position].title
+        holder.albumSubtitleView.text =
+            items[position].albumArtists.sortedBy { it.order }
+                .fold("") { acc, aa -> acc + aa.name + (aa.separator ?: "") }
         Glide.with(fragment)
             .load(items[position].image)
             .placeholder(R.drawable.ic_menu_albums)

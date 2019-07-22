@@ -22,7 +22,7 @@ data class AlbumArtist(
     val artistId: Int,
     val name: String,
     val order: Int,
-    val join: String?
+    val separator: String?
 )
 
 data class AlbumLabel(
