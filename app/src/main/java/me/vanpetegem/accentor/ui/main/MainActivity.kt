@@ -63,7 +63,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         val playerToolbar = findViewById<Toolbar>(R.id.player_toolbar).apply {
             setNavigationIcon(R.drawable.ic_menu_back)
-            slidingUpPanelLayout.panelState = SlidingUpPanelLayout.PanelState.COLLAPSED
+            setNavigationOnClickListener { slidingUpPanelLayout.panelState = SlidingUpPanelLayout.PanelState.COLLAPSED }
         }
 
         toggle.setHomeAsUpIndicator(R.drawable.ic_menu_back)
@@ -111,7 +111,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 R.id.nav_albums -> AlbumsFragment { c -> swipeRefreshLayout.setOnChildScrollUpCallback(c) }
                 R.id.nav_artists -> ArtistsFragment { c -> swipeRefreshLayout.setOnChildScrollUpCallback(c) }
                 else -> HomeFragment { c -> swipeRefreshLayout.setOnChildScrollUpCallback(c) }
-
             }
 
             transaction.replace(R.id.main_fragment_container, fragment)
