@@ -110,7 +110,7 @@ class MediaSessionConnection(application: Application) : AndroidViewModel(applic
     fun play(tracks: List<Pair<Track, Album>>) {
         stop()
         clearQueue()
-        addTracksToQueue(tracks)
+        addTracksToQueue(tracks, 0)
         play()
     }
 
@@ -121,7 +121,11 @@ class MediaSessionConnection(application: Application) : AndroidViewModel(applic
     }
 
     fun addTracksToQueue(tracks: List<Pair<Track, Album>>) {
-        var base = _queue.value?.size ?: 0
+        addTracksToQueue(tracks, _queue.value?.size ?: 0)
+    }
+
+    fun addTracksToQueue(tracks: List<Pair<Track, Album>>, index: Int) {
+        var base = index
         tracks.forEach {
             mediaController.addQueueItem(convertTrack(it.first, it.second), base++)
         }

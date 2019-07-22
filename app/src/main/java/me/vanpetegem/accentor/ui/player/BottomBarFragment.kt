@@ -27,7 +27,7 @@ class BottomBarFragment : Fragment() {
 
         val imageView: SquaredImageView = view!!.findViewById(R.id.album_cover_image_view)
         val trackTitle: TextView = view!!.findViewById(R.id.track_title)
-        val albumTitle: TextView = view!!.findViewById(R.id.album_title)
+        val trackArtists: TextView = view!!.findViewById(R.id.track_artists)
         val pause = view!!.findViewById<SquaredImageView>(R.id.bottom_bar_pause)
             .apply { setOnClickListener { mediaSessionConnection.pause() } }
         val play = view!!.findViewById<SquaredImageView>(R.id.bottom_bar_play)
@@ -39,7 +39,6 @@ class BottomBarFragment : Fragment() {
 
 
         mediaSessionConnection.currentAlbum.observe(viewLifecycleOwner, Observer {
-            albumTitle.text = it?.title ?: ""
             Glide.with(this)
                 .load(it?.image)
                 .placeholder(R.drawable.ic_menu_albums)
@@ -48,6 +47,8 @@ class BottomBarFragment : Fragment() {
 
         mediaSessionConnection.currentTrack.observe(viewLifecycleOwner, Observer {
             trackTitle.text = it?.title ?: ""
+            trackArtists.text =
+                it?.trackArtists?.sortedBy { ta -> ta.order }?.joinToString(" / ") { ta -> ta.name } ?: ""
         })
 
         mediaSessionConnection.playing.observe(viewLifecycleOwner, Observer {

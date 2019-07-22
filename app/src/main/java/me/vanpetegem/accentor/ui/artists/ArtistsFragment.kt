@@ -52,7 +52,6 @@ class ArtistsFragment(callback: (SwipeRefreshLayout.OnChildScrollUpCallback?) ->
                 }
 
                 override fun onFastScrollStart() {}
-
             })
         }
 

@@ -65,7 +65,6 @@ class AlbumsFragment(callback: (SwipeRefreshLayout.OnChildScrollUpCallback?) -> 
                 }
 
                 override fun onFastScrollStart() {}
-
             })
         }
         viewModel.allAlbums.observe(viewLifecycleOwner, Observer {
