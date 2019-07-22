@@ -151,15 +151,18 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
-        if (intent?.hasExtra(INTENT_EXTRA_OPEN_PLAYER) == true) {
-            mainViewModel.setPlayerOpen(intent.getBooleanExtra(INTENT_EXTRA_OPEN_PLAYER, false))
-        }
+        intent?.let { checkIntent(it) }
     }
 
     override fun onResume() {
         super.onResume()
+        checkIntent(intent)
+    }
+
+    private fun checkIntent(intent: Intent) {
         if (intent.hasExtra(INTENT_EXTRA_OPEN_PLAYER)) {
             mainViewModel.setPlayerOpen(intent.getBooleanExtra(INTENT_EXTRA_OPEN_PLAYER, false))
+            intent.removeExtra(INTENT_EXTRA_OPEN_PLAYER)
         }
     }
 
