@@ -46,8 +46,8 @@ class AlbumCardAdapter(private val fragment: Fragment, private val clickHandler:
         holder.cardView.onClick { clickHandler(items[position]) }
         holder.albumTitleView.text = items[position].title
         holder.albumSubtitleView.text =
-            items[position].albumArtists.sortedBy { it.order }
-                .fold("") { acc, aa -> acc + aa.name + (aa.separator ?: "") }
+            items[position].stringifyAlbumArtists()
+                .let { if (it.isEmpty()) fragment.getString(R.string.various_artists) else it }
         Glide.with(fragment)
             .load(items[position].image)
             .placeholder(R.drawable.ic_menu_albums)

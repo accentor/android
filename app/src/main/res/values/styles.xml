@@ -28,13 +28,13 @@
         <item name="android:singleLine">true</item>
         <item name="android:paddingHorizontal">4dp</item>
         <item name="android:paddingTop">2dp</item>
-        <item name="android:paddingBottom">1dp</item>
+        <item name="android:paddingBottom">2dp</item>
         <item name="android:textColor">@color/colorBlack</item>
         <item name="android:textSize">16sp</item>
     </style>
 
     <style name="CardTitleStyle.Subtitle">
-        <item name="android:paddingTop">0dp</item>
+        <item name="android:paddingTop">-1dp</item>
         <item name="android:paddingBottom">2dp</item>
         <item name="android:textColor">@color/colorGrey</item>
         <item name="android:textSize">12sp</item>

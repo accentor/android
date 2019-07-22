@@ -25,4 +25,6 @@
     <string name="notification_skip_to_next">Skip to next track</string>
     <string name="notification_channel">Now playing</string>
     <string name="notification_channel_description">Shows what music is currently playing in Accentor</string>
+
+    <string name="various_artists">Various Artists</string>
 </resources>

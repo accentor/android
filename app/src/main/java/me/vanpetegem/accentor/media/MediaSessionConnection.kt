@@ -17,6 +17,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations.map
 import androidx.lifecycle.Transformations.switchMap
+import me.vanpetegem.accentor.R
 import me.vanpetegem.accentor.data.AccentorDatabase
 import me.vanpetegem.accentor.data.albums.Album
 import me.vanpetegem.accentor.data.albums.AlbumDao
@@ -88,13 +89,13 @@ class MediaSessionConnection(application: Application) : AndroidViewModel(applic
                     "&codec_conversion_id=1").toUri()
 
         val extras = Bundle()
-        extras.putString(
-            Track.ALBUMARTIST,
-            album.albumArtists.sortedBy { aa -> aa.order }.fold("") { acc, aa -> acc + aa.name + (aa.separator ?: "") })
-        extras.putString(
-            Track.ARTIST,
-            track.trackArtists.sortedBy { ta -> ta.order }.joinToString(" / ") { ta -> ta.name }
-        )
+        extras.putString(Track.ALBUMARTIST, album.stringifyAlbumArtists().let {
+            if (it.isEmpty())
+                this.getApplication<Application>().getString(R.string.various_artists)
+            else
+                it
+        })
+        extras.putString(Track.ARTIST, track.stringifyTrackArtists())
         extras.putString(Track.YEAR, album.release.toString())
 
         return mediaDescBuilder

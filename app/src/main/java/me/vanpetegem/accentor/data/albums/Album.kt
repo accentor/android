@@ -16,7 +16,10 @@ data class Album(
     val imageType: String?,
     val albumLabels: List<AlbumLabel>,
     val albumArtists: List<AlbumArtist>
-)
+) {
+    fun stringifyAlbumArtists() =
+        albumArtists.sortedBy { aa -> aa.order }.fold("") { acc, aa -> acc + aa.name + (aa.separator ?: "") }
+}
 
 data class AlbumArtist(
     val artistId: Int,

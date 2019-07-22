@@ -17,6 +17,8 @@ data class Track(
     val bitrate: Int?,
     val locationId: Int?
 ) {
+    fun stringifyTrackArtists() = trackArtists.sortedBy { ta -> ta.order }.joinToString(" / ") { ta -> ta.name }
+
     companion object {
         const val ALBUMARTIST = "me.vanpetegem.accentor.data.tracks.Track.ALBUMARTIST"
         const val ARTIST = "me.vanpetegem.accentor.data.tracks.Track.ARTIST"
