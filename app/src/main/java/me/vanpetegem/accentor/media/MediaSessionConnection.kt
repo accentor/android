@@ -3,6 +3,7 @@ package me.vanpetegem.accentor.media
 import android.app.Application
 import android.content.ComponentName
 import android.content.Context
+import android.media.session.MediaSession
 import android.net.Uri
 import android.os.Bundle
 import android.support.v4.media.MediaBrowserCompat
@@ -55,8 +56,9 @@ class MediaSessionConnection(application: Application) : AndroidViewModel(applic
     private val _playing = MutableLiveData<Boolean>().apply { postValue(false) }
     val playing: LiveData<Boolean> = _playing
 
-    private val _queue = MutableLiveData<List<Int>>().apply { postValue(ArrayList()) }
-    val queue: LiveData<List<Pair<Track, Album>>> = switchMap(_queue) { q ->
+    private val _queue = MutableLiveData<List<MediaSessionCompat.QueueItem>>().apply { postValue(ArrayList()) }
+    private val _queueIds: LiveData<List<Int>> = map(_queue) { it.map { item -> item.description.mediaId!!.toInt() } }
+    val queue: LiveData<List<Pair<Track, Album>>> = switchMap(_queueIds) { q ->
         switchMap(tracksById) { tracks ->
             map(albumsById) { albums ->
                 q.map { id ->
@@ -65,6 +67,22 @@ class MediaSessionConnection(application: Application) : AndroidViewModel(applic
                     Pair(track, album)
                 }
             }
+        }
+    }
+
+    private val activeQueueItemId = MutableLiveData<Long>().apply {
+        postValue(MediaSession.QueueItem.UNKNOWN_ID.toLong())
+    }
+
+    val queuePosition: LiveData<Int> = switchMap(_queue) { q ->
+        map(activeQueueItemId) {
+            q.indexOfFirst { item -> item.queueId == it } + 1
+        }
+    }
+
+    val queuePosStr: LiveData<String> = switchMap(_queue) { q ->
+        map(queuePosition) {
+            "$it/${q.size}"
         }
     }
 
@@ -175,10 +193,12 @@ class MediaSessionConnection(application: Application) : AndroidViewModel(applic
                 PlaybackStateCompat.STATE_PLAYING, PlaybackStateCompat.STATE_BUFFERING -> _playing.postValue(true)
                 else -> _playing.postValue(false)
             }
+
+            state?.activeQueueItemId?.let { activeQueueItemId.postValue(it) }
         }
 
         override fun onQueueChanged(queue: MutableList<MediaSessionCompat.QueueItem>?) {
-            _queue.postValue(queue?.map { it.description.mediaId!!.toInt() } ?: ArrayList())
+            _queue.postValue(queue ?: ArrayList())
         }
     }
 }

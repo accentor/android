@@ -18,6 +18,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.material.navigation.NavigationView
 import com.sothree.slidinguppanel.SlidingUpPanelLayout
 import me.vanpetegem.accentor.R
+import me.vanpetegem.accentor.media.MediaSessionConnection
 import me.vanpetegem.accentor.ui.albums.AlbumsFragment
 import me.vanpetegem.accentor.ui.artists.ArtistsFragment
 import me.vanpetegem.accentor.ui.home.HomeFragment
@@ -35,6 +36,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     private lateinit var mainViewModel: MainViewModel
+    private lateinit var mediaSessionConnection: MediaSessionConnection
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -64,6 +66,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val playerToolbar = findViewById<Toolbar>(R.id.player_toolbar).apply {
             setNavigationIcon(R.drawable.ic_menu_back)
             setNavigationOnClickListener { slidingUpPanelLayout.panelState = SlidingUpPanelLayout.PanelState.COLLAPSED }
+            setTitle(R.string.now_playing)
+            subtitle = "0/0"
         }
 
         toggle.setHomeAsUpIndicator(R.drawable.ic_menu_back)
@@ -144,6 +148,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 supportActionBar?.apply { setDisplayShowTitleEnabled(true) }
                 toggle.syncState()
             }
+        })
+
+        mediaSessionConnection = ViewModelProviders.of(this).get(MediaSessionConnection::class.java)
+        mediaSessionConnection.queuePosStr.observe(this, Observer {
+            playerToolbar.subtitle = it ?: "0/0"
         })
     }
 
