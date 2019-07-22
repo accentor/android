@@ -107,10 +107,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
             val transaction = supportFragmentManager.beginTransaction()
             val fragment = when (navState.fragmentId) {
-                R.id.nav_home -> HomeFragment()
-                R.id.nav_albums -> AlbumsFragment()
-                R.id.nav_artists -> ArtistsFragment()
-                else -> HomeFragment()
+                R.id.nav_home -> HomeFragment { c -> swipeRefreshLayout.setOnChildScrollUpCallback(c) }
+                R.id.nav_albums -> AlbumsFragment { c -> swipeRefreshLayout.setOnChildScrollUpCallback(c) }
+                R.id.nav_artists -> ArtistsFragment { c -> swipeRefreshLayout.setOnChildScrollUpCallback(c) }
+                else -> HomeFragment { c -> swipeRefreshLayout.setOnChildScrollUpCallback(c) }
 
             }
 
