@@ -16,7 +16,13 @@ data class Track(
     val length: Int?,
     val bitrate: Int?,
     val locationId: Int?
-)
+) {
+    companion object {
+        const val ALBUMARTIST = "me.vanpetegem.accentor.data.tracks.Track.ALBUMARTIST"
+        const val ARTIST = "me.vanpetegem.accentor.data.tracks.Track.ARTIST"
+        const val YEAR = "me.vanpetegem.accentor.data.tracks.Track.YEAR"
+    }
+}
 
 data class TrackArtist(
     val artistId: Int,

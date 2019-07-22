@@ -49,7 +49,6 @@ class ArtistsFragment(callback: (SwipeRefreshLayout.OnChildScrollUpCallback?) ->
             setOnFastScrollStateChangeListener(object : OnFastScrollStateChangeListener {
                 override fun onFastScrollStop() {
                     cardView.layoutManager?.onSaveInstanceState()?.let { viewModel.saveScrollState(it) }
-
                 }
 
                 override fun onFastScrollStart() {}

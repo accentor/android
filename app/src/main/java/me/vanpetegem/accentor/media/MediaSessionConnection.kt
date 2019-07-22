@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.ComponentName
 import android.content.Context
 import android.net.Uri
+import android.os.Bundle
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaDescriptionCompat
 import android.support.v4.media.MediaMetadataCompat
@@ -25,7 +26,6 @@ import me.vanpetegem.accentor.data.authentication.AuthenticationRepository
 import me.vanpetegem.accentor.data.tracks.Track
 import me.vanpetegem.accentor.data.tracks.TrackDao
 import me.vanpetegem.accentor.data.tracks.TrackRepository
-import org.jetbrains.anko.doAsync
 
 class MediaSessionConnection(application: Application) : AndroidViewModel(application) {
 
@@ -80,36 +80,50 @@ class MediaSessionConnection(application: Application) : AndroidViewModel(applic
         tracksById = trackRepository.allTracksById
     }
 
-    private fun convertTrack(track: Track): MediaDescriptionCompat {
-        val album = albumDao.getAlbumById(track.albumId)
+    private fun convertTrack(track: Track, album: Album): MediaDescriptionCompat {
         val mediaUri =
             ("${authenticationDataSource.getServer()}/api/tracks/${track.id}/audio" +
                     "?secret=${authenticationDataSource.getSecret()}" +
                     "&device_id=${authenticationDataSource.getDeviceId()}" +
                     "&codec_conversion_id=1").toUri()
 
+        val extras = Bundle()
+        extras.putString(
+            Track.ALBUMARTIST,
+            album.albumArtists.sortedBy { aa -> aa.order }.fold("") { acc, aa -> acc + aa.name + (aa.join ?: "") })
+        extras.putString(
+            Track.ARTIST,
+            track.trackArtists.sortedBy { ta -> ta.order }.joinToString(" / ") { ta -> ta.name }
+        )
+        extras.putString(Track.YEAR, album.release.toString())
+
         return mediaDescBuilder
             .setTitle(track.title)
-            .setSubtitle(album?.title ?: "")
-            .setIconUri(album?.image?.toUri())
+            .setSubtitle(album.title)
+            .setIconUri(album.image?.toUri())
             .setMediaUri(mediaUri)
             .setMediaId(track.id.toString())
+            .setExtras(extras)
             .build()
     }
 
-    fun play(tracks: List<Track>) {
-        doAsync {
-            mediaController.transportControls.stop()
-            mediaController.queue?.forEach {
-                mediaController.removeQueueItem(it.description)
-            }
-            var base = 0
-            tracks.forEach {
-                mediaController.addQueueItem(convertTrack(it), base++)
-            }
-            if (tracks.isNotEmpty()) {
-                mediaController.transportControls.play()
-            }
+    fun play(tracks: List<Pair<Track, Album>>) {
+        stop()
+        clearQueue()
+        addTracksToQueue(tracks)
+        play()
+    }
+
+    fun clearQueue() {
+        mediaController.queue?.forEach {
+            mediaController.removeQueueItem(it.description)
+        }
+    }
+
+    fun addTracksToQueue(tracks: List<Pair<Track, Album>>) {
+        var base = _queue.value?.size ?: 0
+        tracks.forEach {
+            mediaController.addQueueItem(convertTrack(it.first, it.second), base++)
         }
     }
 
@@ -123,6 +137,10 @@ class MediaSessionConnection(application: Application) : AndroidViewModel(applic
 
     fun play() {
         mediaController.transportControls.play()
+    }
+
+    fun stop() {
+        mediaController.transportControls.stop()
     }
 
     fun next() {

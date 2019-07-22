@@ -42,7 +42,7 @@ class AlbumsFragment(callback: (SwipeRefreshLayout.OnChildScrollUpCallback?) -> 
                 allTracksByAlbumId.get(
                     clickedItem.id,
                     ArrayList()
-                )
+                ).map { Pair(it, clickedItem) }
             )
         }
         val lm = GridLayoutManager(

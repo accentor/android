@@ -39,6 +39,7 @@ import com.google.android.exoplayer2.upstream.cache.CacheDataSink
 import com.google.android.exoplayer2.upstream.cache.CacheDataSource
 import com.google.android.exoplayer2.upstream.cache.LeastRecentlyUsedCacheEvictor
 import com.google.android.exoplayer2.upstream.cache.SimpleCache
+import me.vanpetegem.accentor.data.tracks.Track
 import me.vanpetegem.accentor.ui.main.MainActivity
 import me.vanpetegem.accentor.userAgent
 import org.jetbrains.anko.doAsync
@@ -194,9 +195,16 @@ class MusicService : MediaBrowserServiceCompat() {
                 val builder = MediaMetadataCompat.Builder()
                 if (player.currentWindowIndex < queue.size) {
                     val item = queue[player.currentWindowIndex].description
+                    val extras = item.extras!!
                     builder.putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, item.mediaId)
                     builder.putString(MediaMetadataCompat.METADATA_KEY_TITLE, item.title.toString())
                     builder.putString(MediaMetadataCompat.METADATA_KEY_ALBUM, item.subtitle.toString())
+                    builder.putString(
+                        MediaMetadataCompat.METADATA_KEY_ALBUM_ARTIST,
+                        extras.getString(Track.ALBUMARTIST)
+                    )
+                    builder.putString(MediaMetadataCompat.METADATA_KEY_ARTIST, extras.getString(Track.ARTIST))
+                    builder.putString(MediaMetadataCompat.METADATA_KEY_DATE, extras.getString(Track.YEAR))
                     if (item.iconUri != null) {
                         try {
                             builder.putBitmap(
