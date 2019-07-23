@@ -58,17 +58,7 @@ class MediaSessionConnection(application: Application) : AndroidViewModel(applic
 
     private val _queue = MutableLiveData<List<MediaSessionCompat.QueueItem>>().apply { postValue(ArrayList()) }
     private val _queueIds: LiveData<List<Int>> = map(_queue) { it.map { item -> item.description.mediaId!!.toInt() } }
-    val queue: LiveData<List<Pair<Track, Album>>> = switchMap(_queueIds) { q ->
-        switchMap(tracksById) { tracks ->
-            map(albumsById) { albums ->
-                q.map { id ->
-                    val track = tracks[id]
-                    val album = albums[track.albumId]
-                    Pair(track, album)
-                }
-            }
-        }
-    }
+    val queue: LiveData<List<Triple<Boolean, Track, Album>>>
 
     private val activeQueueItemId = MutableLiveData<Long>().apply {
         postValue(MediaSession.QueueItem.UNKNOWN_ID.toLong())
@@ -97,6 +87,18 @@ class MediaSessionConnection(application: Application) : AndroidViewModel(applic
         albumsById = albumRepository.allAlbumsById
         val trackRepository = TrackRepository(trackDao, AuthenticationRepository(authenticationDataSource))
         tracksById = trackRepository.allTracksById
+        queue = switchMap(tracksById) { tracks ->
+            switchMap(albumsById) { albums ->
+                switchMap(_queueIds) { q ->
+                    map(queuePosition) { qPos ->
+                        q.mapIndexed { pos, id ->
+                            val track = tracks[id]
+                            Triple(qPos == pos + 1, track, albums[track.albumId])
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private fun convertTrack(track: Track, album: Album): MediaDescriptionCompat {
