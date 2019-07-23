@@ -10,6 +10,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import me.vanpetegem.accentor.R
 import me.vanpetegem.accentor.media.MediaSessionConnection
+import me.vanpetegem.accentor.ui.main.MainActivity
 
 class PlayerViewFragment : Fragment() {
     private lateinit var mediaSessionConnection: MediaSessionConnection
@@ -26,6 +27,7 @@ class PlayerViewFragment : Fragment() {
         val listView = view!!.findViewById<ListView>(R.id.queue_list_view)
         val adapter = PlayQueueAdapter()
         listView.adapter = adapter
+        (activity as MainActivity).slidingUpPanelLayout.setScrollableView(listView)
 
         mediaSessionConnection.queue.observe(viewLifecycleOwner, Observer {
             adapter.items = it ?: ArrayList()

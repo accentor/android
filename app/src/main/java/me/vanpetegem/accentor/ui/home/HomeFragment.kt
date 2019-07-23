@@ -4,12 +4,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import me.vanpetegem.accentor.R
-import me.vanpetegem.accentor.ui.BaseMainFragment
 
-class HomeFragment(callback: (SwipeRefreshLayout.OnChildScrollUpCallback?) -> Unit) : BaseMainFragment(callback) {
+class HomeFragment : Fragment() {
 
     private lateinit var viewModel: HomeViewModel
 

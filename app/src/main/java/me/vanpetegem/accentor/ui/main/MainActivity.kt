@@ -27,7 +27,6 @@ import me.vanpetegem.accentor.ui.player.BottomBarFragment
 import me.vanpetegem.accentor.ui.player.PlayerViewFragment
 import org.jetbrains.anko.startActivity
 
-
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener,
     SwipeRefreshLayout.OnRefreshListener, SlidingUpPanelLayout.PanelSlideListener {
 
@@ -37,6 +36,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private lateinit var mainViewModel: MainViewModel
     private lateinit var mediaSessionConnection: MediaSessionConnection
+    private lateinit var swipeRefreshLayout: SwipeRefreshLayout
+    lateinit var slidingUpPanelLayout: SlidingUpPanelLayout
+    lateinit var playerToolbar: Toolbar
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,15 +48,22 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val mainToolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(mainToolbar)
 
-        val slidingUpPanelLayout: SlidingUpPanelLayout = findViewById(R.id.sliding_layout)
+        slidingUpPanelLayout = findViewById(R.id.sliding_layout)
         val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
         val navView: NavigationView = findViewById(R.id.nav_view)
-        val swipeRefreshLayout: SwipeRefreshLayout = findViewById(R.id.swipe_refresh_layout)
+        swipeRefreshLayout = findViewById(R.id.swipe_refresh_layout)
         val toggle = ActionBarDrawerToggle(
             this, drawerLayout, mainToolbar,
             R.string.navigation_drawer_open,
             R.string.navigation_drawer_close
         )
+
+        playerToolbar = findViewById<Toolbar>(R.id.player_toolbar).apply {
+            setNavigationIcon(R.drawable.ic_menu_back)
+            setNavigationOnClickListener { slidingUpPanelLayout.panelState = SlidingUpPanelLayout.PanelState.COLLAPSED }
+            setTitle(R.string.now_playing)
+            subtitle = "0/0"
+        }
 
         val headerView: View = navView.getHeaderView(0)
         val usernameText: TextView = headerView.findViewById(R.id.nav_header_username)
@@ -62,13 +71,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val bottomBarFragmentHolder: FrameLayout = findViewById(R.id.bottom_bar)
         supportFragmentManager.beginTransaction().add(R.id.bottom_bar, BottomBarFragment()).commit()
         supportFragmentManager.beginTransaction().add(R.id.player_view, PlayerViewFragment()).commit()
-
-        val playerToolbar = findViewById<Toolbar>(R.id.player_toolbar).apply {
-            setNavigationIcon(R.drawable.ic_menu_back)
-            setNavigationOnClickListener { slidingUpPanelLayout.panelState = SlidingUpPanelLayout.PanelState.COLLAPSED }
-            setTitle(R.string.now_playing)
-            subtitle = "0/0"
-        }
 
         toggle.setHomeAsUpIndicator(R.drawable.ic_menu_back)
         drawerLayout.addDrawerListener(toggle)
@@ -111,10 +113,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
             val transaction = supportFragmentManager.beginTransaction()
             val fragment = when (navState.fragmentId) {
-                R.id.nav_home -> HomeFragment { c -> swipeRefreshLayout.setOnChildScrollUpCallback(c) }
-                R.id.nav_albums -> AlbumsFragment { c -> swipeRefreshLayout.setOnChildScrollUpCallback(c) }
-                R.id.nav_artists -> ArtistsFragment { c -> swipeRefreshLayout.setOnChildScrollUpCallback(c) }
-                else -> HomeFragment { c -> swipeRefreshLayout.setOnChildScrollUpCallback(c) }
+                R.id.nav_home -> HomeFragment()
+                R.id.nav_albums -> AlbumsFragment()
+                R.id.nav_artists -> ArtistsFragment()
+                else -> HomeFragment()
             }
 
             transaction.replace(R.id.main_fragment_container, fragment)
@@ -233,4 +235,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             mainViewModel.setPlayerOpen(true)
         }
     }
+
+    fun setCanChildScrollUpCallback(callback: SwipeRefreshLayout.OnChildScrollUpCallback?) =
+        swipeRefreshLayout.setOnChildScrollUpCallback(callback)
 }

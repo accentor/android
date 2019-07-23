@@ -6,6 +6,7 @@ import android.util.SparseArray
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.GridLayoutManager
@@ -17,10 +18,10 @@ import me.vanpetegem.accentor.R
 import me.vanpetegem.accentor.data.albums.Album
 import me.vanpetegem.accentor.data.tracks.Track
 import me.vanpetegem.accentor.media.MediaSessionConnection
-import me.vanpetegem.accentor.ui.BaseMainFragment
+import me.vanpetegem.accentor.ui.main.MainActivity
 import kotlin.math.max
 
-class AlbumsFragment(callback: (SwipeRefreshLayout.OnChildScrollUpCallback?) -> Unit) : BaseMainFragment(callback) {
+class AlbumsFragment : Fragment() {
 
     private lateinit var viewModel: AlbumsViewModel
     private lateinit var mediaSessionConnection: MediaSessionConnection
@@ -73,7 +74,7 @@ class AlbumsFragment(callback: (SwipeRefreshLayout.OnChildScrollUpCallback?) -> 
             context,
             if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) 2 else 4
         )
-        scrollCallback(SwipeRefreshLayout.OnChildScrollUpCallback { _, _ -> lm.findFirstCompletelyVisibleItemPosition() > 0 })
+        (activity as MainActivity).setCanChildScrollUpCallback(SwipeRefreshLayout.OnChildScrollUpCallback { _, _ -> lm.findFirstCompletelyVisibleItemPosition() > 0 })
         cardView.apply {
             setHasFixedSize(true)
             layoutManager = lm
@@ -104,6 +105,6 @@ class AlbumsFragment(callback: (SwipeRefreshLayout.OnChildScrollUpCallback?) -> 
 
     override fun onDestroyView() {
         super.onDestroyView()
-        scrollCallback(null)
+        (activity as MainActivity).setCanChildScrollUpCallback(null)
     }
 }
