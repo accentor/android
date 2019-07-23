@@ -148,7 +148,7 @@ class MusicService : MediaBrowserServiceCompat() {
                     }
 
                     override fun onAddQueueItem(player: Player, description: MediaDescriptionCompat, index: Int) {
-                        mediaSource.addMediaSource(factory.createMediaSource(description.mediaUri))
+                        mediaSource.addMediaSource(index, factory.createMediaSource(description.mediaUri))
                         queue.add(
                             index,
                             MediaSessionCompat.QueueItem(description, count++)

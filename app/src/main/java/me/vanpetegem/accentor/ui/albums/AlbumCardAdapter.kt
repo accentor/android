@@ -1,8 +1,11 @@
 package me.vanpetegem.accentor.ui.albums
 
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.ImageView
+import android.widget.PopupMenu
 import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.fragment.app.Fragment
@@ -13,7 +16,13 @@ import me.vanpetegem.accentor.R
 import me.vanpetegem.accentor.data.albums.Album
 import org.jetbrains.anko.sdk27.coroutines.onClick
 
-class AlbumCardAdapter(private val fragment: Fragment, private val clickHandler: (Album) -> Unit) :
+interface AlbumActionListener {
+    fun play(album: Album)
+    fun playNext(album: Album)
+    fun playLast(album: Album)
+}
+
+class AlbumCardAdapter(private val fragment: Fragment, private val actionListener: AlbumActionListener) :
     RecyclerView.Adapter<AlbumCardAdapter.ViewHolder>(), FastScrollRecyclerView.SectionedAdapter {
 
     var items: List<Album> = ArrayList()
@@ -23,10 +32,11 @@ class AlbumCardAdapter(private val fragment: Fragment, private val clickHandler:
         }
 
     class ViewHolder(
-        val cardView: CardView,
+        cardView: CardView,
         val albumTitleView: TextView,
         val albumSubtitleView: TextView,
-        val albumImageView: ImageView
+        val albumImageView: ImageView,
+        val menu: PopupMenu
     ) : RecyclerView.ViewHolder(cardView)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -36,14 +46,16 @@ class AlbumCardAdapter(private val fragment: Fragment, private val clickHandler:
         val albumTitleView: TextView = gridView.findViewById(R.id.album_card_title_view)
         val albumSubtitleView: TextView = gridView.findViewById(R.id.album_card_subtitle_view)
         val imageView: ImageView = gridView.findViewById(R.id.album_card_image_view)
+        val menuButton: ImageButton = gridView.findViewById(R.id.album_card_menu_button)
+        val menu = PopupMenu(fragment.context, menuButton, Gravity.END).apply { inflate(R.menu.album_card_menu) }
+        menuButton.onClick { menu.show() }
 
-        return ViewHolder(gridView, albumTitleView, albumSubtitleView, imageView)
+        return ViewHolder(gridView, albumTitleView, albumSubtitleView, imageView, menu)
     }
 
     override fun getItemCount(): Int = items.size
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.cardView.onClick { clickHandler(items[position]) }
         holder.albumTitleView.text = items[position].title
         holder.albumSubtitleView.text =
             items[position].stringifyAlbumArtists()
@@ -52,6 +64,23 @@ class AlbumCardAdapter(private val fragment: Fragment, private val clickHandler:
             .load(items[position].image)
             .placeholder(R.drawable.ic_menu_albums)
             .into(holder.albumImageView)
+        holder.menu.setOnMenuItemClickListener {
+            when (it.itemId) {
+                R.id.album_play_now -> {
+                    actionListener.play(items[position])
+                    true
+                }
+                R.id.album_play_next -> {
+                    actionListener.playNext(items[position])
+                    true
+                }
+                R.id.album_play_last -> {
+                    actionListener.playLast(items[position])
+                    true
+                }
+                else -> false
+            }
+        }
     }
 
     override fun getSectionName(position: Int): String = "${items[position].title[0].toUpperCase()}"

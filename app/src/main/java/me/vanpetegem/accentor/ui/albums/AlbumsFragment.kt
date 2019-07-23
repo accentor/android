@@ -14,9 +14,11 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.simplecityapps.recyclerview_fastscroll.interfaces.OnFastScrollStateChangeListener
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
 import me.vanpetegem.accentor.R
+import me.vanpetegem.accentor.data.albums.Album
 import me.vanpetegem.accentor.data.tracks.Track
 import me.vanpetegem.accentor.media.MediaSessionConnection
 import me.vanpetegem.accentor.ui.BaseMainFragment
+import kotlin.math.max
 
 class AlbumsFragment(callback: (SwipeRefreshLayout.OnChildScrollUpCallback?) -> Unit) : BaseMainFragment(callback) {
 
@@ -37,14 +39,36 @@ class AlbumsFragment(callback: (SwipeRefreshLayout.OnChildScrollUpCallback?) -> 
         mediaSessionConnection = ViewModelProviders.of(activity!!).get(MediaSessionConnection::class.java)
 
         val cardView: FastScrollRecyclerView = view!!.findViewById(R.id.album_card_recycler_view)
-        val viewAdapter = AlbumCardAdapter(this) { clickedItem ->
-            mediaSessionConnection.play(
-                allTracksByAlbumId.get(
-                    clickedItem.id,
-                    ArrayList()
-                ).map { Pair(it, clickedItem) }
-            )
-        }
+        val viewAdapter = AlbumCardAdapter(this, object : AlbumActionListener {
+            override fun play(album: Album) {
+                mediaSessionConnection.play(
+                    allTracksByAlbumId.get(
+                        album.id,
+                        ArrayList()
+                    ).map { Pair(it, album) }
+                )
+            }
+
+            override fun playNext(album: Album) {
+                mediaSessionConnection.addTracksToQueue(
+                    allTracksByAlbumId.get(
+                        album.id,
+                        ArrayList()
+                    ).map { Pair(it, album) },
+                    max(0, (mediaSessionConnection.queuePosition.value ?: 0) - 1)
+                )
+            }
+
+            override fun playLast(album: Album) {
+                mediaSessionConnection.addTracksToQueue(
+                    allTracksByAlbumId.get(
+                        album.id,
+                        ArrayList()
+                    ).map { Pair(it, album) }
+                )
+            }
+
+        })
         val lm = GridLayoutManager(
             context,
             if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) 2 else 4

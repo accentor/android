@@ -28,4 +28,8 @@
 
     <string name="various_artists">Various Artists</string>
     <string name="now_playing">Now Playing</string>
+    <string name="album_menu_button">Album Actions</string>
+    <string name="play_next">Play next</string>
+    <string name="play_last">Play last</string>
+    <string name="play_now">Play now</string>
 </resources>
