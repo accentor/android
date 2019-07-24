@@ -24,7 +24,7 @@ import me.vanpetegem.accentor.ui.artists.ArtistsFragment
 import me.vanpetegem.accentor.ui.home.HomeFragment
 import me.vanpetegem.accentor.ui.login.LoginActivity
 import me.vanpetegem.accentor.ui.player.BottomBarFragment
-import me.vanpetegem.accentor.ui.player.PlayerViewFragment
+import me.vanpetegem.accentor.ui.player.PlayerFragment
 import org.jetbrains.anko.startActivity
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener,
@@ -61,6 +61,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         playerToolbar = findViewById<Toolbar>(R.id.player_toolbar).apply {
             setNavigationIcon(R.drawable.ic_menu_back)
             setNavigationOnClickListener { slidingUpPanelLayout.panelState = SlidingUpPanelLayout.PanelState.COLLAPSED }
+            menuInflater.inflate(R.menu.player_toolbar_menu, menu)
             setTitle(R.string.now_playing)
             subtitle = "0/0"
         }
@@ -70,7 +71,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val serverURLText: TextView = headerView.findViewById(R.id.nav_header_server_url)
         val bottomBarFragmentHolder: FrameLayout = findViewById(R.id.bottom_bar)
         supportFragmentManager.beginTransaction().add(R.id.bottom_bar, BottomBarFragment()).commit()
-        supportFragmentManager.beginTransaction().add(R.id.player_view, PlayerViewFragment()).commit()
+        supportFragmentManager.beginTransaction().add(R.id.player_view, PlayerFragment()).commit()
 
         toggle.setHomeAsUpIndicator(R.drawable.ic_menu_back)
         drawerLayout.addDrawerListener(toggle)
@@ -138,12 +139,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         mainViewModel.isPlayerOpen.observe(this, Observer {
             val open = it ?: return@Observer
             if (open) {
+                slidingUpPanelLayout.setDragView(playerToolbar)
                 slidingUpPanelLayout.panelState = SlidingUpPanelLayout.PanelState.EXPANDED
                 bottomBarFragmentHolder.visibility = View.GONE
                 playerToolbar.visibility = View.VISIBLE
 
                 toggle.syncState()
             } else {
+                slidingUpPanelLayout.setDragView(bottomBarFragmentHolder)
                 slidingUpPanelLayout.panelState = SlidingUpPanelLayout.PanelState.COLLAPSED
                 bottomBarFragmentHolder.visibility = View.VISIBLE
                 playerToolbar.visibility = View.GONE
@@ -188,7 +191,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.main, menu)
+        menuInflater.inflate(R.menu.main_toolbar_menu, menu)
         return true
     }
 

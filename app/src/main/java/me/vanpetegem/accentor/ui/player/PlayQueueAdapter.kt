@@ -1,52 +1,55 @@
 package me.vanpetegem.accentor.ui.player
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.BaseAdapter
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
 import me.vanpetegem.accentor.R
 import me.vanpetegem.accentor.data.albums.Album
 import me.vanpetegem.accentor.data.tracks.Track
+import me.vanpetegem.accentor.util.formatTrackLength
+import org.jetbrains.anko.sdk27.coroutines.onClick
 
-class PlayQueueAdapter : BaseAdapter() {
+class PlayQueueAdapter(val clickHandler: (Track) -> Unit) : RecyclerView.Adapter<PlayQueueAdapter.ViewHolder>() {
+
+    class ViewHolder(
+        val root: View,
+        val trackTitleView: TextView,
+        val trackArtistsView: TextView,
+        val trackLengthView: TextView,
+        val playingIndicator: ImageView
+    ) : RecyclerView.ViewHolder(root)
 
     var items: List<Triple<Boolean, Track, Album>> = ArrayList()
         set(value) {
             field = value
+            Log.d("PLAYQUEUE", "Queue length: ${value.size}")
             notifyDataSetChanged()
         }
 
-    override fun getItem(position: Int): Triple<Boolean, Track, Album> = items[position]
+    override fun getItemCount(): Int = items.size
 
-    override fun getItemId(position: Int) = position.toLong()
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val root = LayoutInflater.from(parent.context).inflate(R.layout.queue_list_item, parent, false)
 
-    override fun getCount(): Int = items.size
+        val trackTitleView = root.findViewById<TextView>(R.id.track_title)
+        val trackArtistsView = root.findViewById<TextView>(R.id.track_artists)
+        val trackLengthView = root.findViewById<TextView>(R.id.track_length)
+        val playingIndicator = root.findViewById<ImageView>(R.id.playing_indicator)
 
-    override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-        val view = convertView ?: LayoutInflater.from(parent.context).inflate(R.layout.queue_list_item, parent, false)
+        return ViewHolder(root, trackTitleView, trackArtistsView, trackLengthView, playingIndicator)
+    }
 
-        val trackTitleView = view.findViewById<TextView>(R.id.track_title)
-        trackTitleView.text = items[position].second.title
-
-        val trackArtistsView = view.findViewById<TextView>(R.id.track_artists)
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        holder.root.onClick { clickHandler(items[position].second) }
+        holder.trackTitleView.text = items[position].second.title
         val trackArtists = items[position].second.stringifyTrackArtists()
-        trackArtistsView.text = if (trackArtists.isEmpty()) items[position].second.title else trackArtists
-
-        val trackLengthView = view.findViewById<TextView>(R.id.track_length)
-        trackLengthView.text = items[position].second.length.formatTrackLength()
-
-        val playingIndicator = view.findViewById<ImageView>(R.id.playing_indicator)
-        playingIndicator.visibility = if (items[position].first) View.VISIBLE else View.GONE
-
-        return view
+        holder.trackArtistsView.text = if (trackArtists.isEmpty()) items[position].second.title else trackArtists
+        holder.trackLengthView.text = items[position].second.length.formatTrackLength()
+        holder.playingIndicator.visibility = if (items[position].first) View.VISIBLE else View.GONE
     }
 
 }
-
-private fun Int?.formatTrackLength(): String? =
-    if (this == null)
-        "0:00"
-    else
-        "${this / 60}:${(this % 60).toString().padStart(2, '0')}"

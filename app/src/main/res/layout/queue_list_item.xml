@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:padding="4dp">
 
@@ -40,7 +40,7 @@
     <android.widget.Space
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="100" />
+        android:layout_weight="1" />
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -54,9 +54,9 @@
 
         <TextView
             android:id="@+id/track_length"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:ellipsize="end"
+            android:ellipsize="none"
             android:singleLine="true"
             android:textColor="@color/colorGrey"
             android:textSize="14sp" />

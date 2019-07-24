@@ -28,6 +28,7 @@ import me.vanpetegem.accentor.data.authentication.AuthenticationRepository
 import me.vanpetegem.accentor.data.tracks.Track
 import me.vanpetegem.accentor.data.tracks.TrackDao
 import me.vanpetegem.accentor.data.tracks.TrackRepository
+import me.vanpetegem.accentor.media.extensions.currentPlayBackPosition
 
 class MediaSessionConnection(application: Application) : AndroidViewModel(application) {
 
@@ -43,7 +44,7 @@ class MediaSessionConnection(application: Application) : AndroidViewModel(applic
         null
     ).apply { connect() }
     private val mediaDescBuilder = MediaDescriptionCompat.Builder()
-    private lateinit var mediaController: MediaControllerCompat
+    private var mediaController: MediaControllerCompat? = null
 
     private val currentTrackId = MutableLiveData<Int>().apply { postValue(null) }
     val currentTrack: LiveData<Track?> = switchMap(currentTrackId) { id ->
@@ -52,9 +53,22 @@ class MediaSessionConnection(application: Application) : AndroidViewModel(applic
     val currentAlbum: LiveData<Album?> = switchMap(currentTrack) { t ->
         map(albumsById) { t?.let { t -> it[t.albumId] } }
     }
+    private val _currentPosition = MutableLiveData<Long>()
+    val currentPosition: LiveData<Int> = map(_currentPosition) {
+        (it / 1000).toInt()
+    }
 
     private val _playing = MutableLiveData<Boolean>().apply { postValue(false) }
     val playing: LiveData<Boolean> = _playing
+
+    private val _buffering = MutableLiveData<Boolean>().apply { postValue(false) }
+    val buffering: LiveData<Boolean> = _buffering
+
+    private val _repeatMode = MutableLiveData<Int>()
+    val repeatMode: LiveData<Int> = _repeatMode
+
+    private val _shuffleMode = MutableLiveData<Int>()
+    val shuffleMode: LiveData<Int> = _shuffleMode
 
     private val _queue = MutableLiveData<List<MediaSessionCompat.QueueItem>>().apply { postValue(ArrayList()) }
     private val _queueIds: LiveData<List<Int>> = map(_queue) { it.map { item -> item.description.mediaId!!.toInt() } }
@@ -106,7 +120,7 @@ class MediaSessionConnection(application: Application) : AndroidViewModel(applic
             ("${authenticationDataSource.getServer()}/api/tracks/${track.id}/audio" +
                     "?secret=${authenticationDataSource.getSecret()}" +
                     "&device_id=${authenticationDataSource.getDeviceId()}" +
-                    "&codec_conversion_id=1").toUri()
+                    "&codec_conversion_id=4").toUri()
 
         val extras = Bundle()
         extras.putString(Track.ALBUMARTIST, album.stringifyAlbumArtists().let {
@@ -135,41 +149,63 @@ class MediaSessionConnection(application: Application) : AndroidViewModel(applic
         play()
     }
 
-    fun clearQueue() {
-        mediaController.queue?.forEach {
-            mediaController.removeQueueItem(it.description)
-        }
-    }
+    fun clearQueue() = mediaController?.queue?.forEach { mediaController?.removeQueueItem(it.description) }
 
-    fun addTracksToQueue(tracks: List<Pair<Track, Album>>) {
-        addTracksToQueue(tracks, _queue.value?.size ?: 0)
-    }
+    fun addTracksToQueue(tracks: List<Pair<Track, Album>>) = addTracksToQueue(tracks, _queue.value?.size ?: 0)
 
     fun addTracksToQueue(tracks: List<Pair<Track, Album>>, index: Int) {
         var base = index
         tracks.forEach {
-            mediaController.addQueueItem(convertTrack(it.first, it.second), base++)
+            mediaController?.addQueueItem(convertTrack(it.first, it.second), base++)
         }
     }
 
-    fun previous() {
-        mediaController.transportControls.skipToPrevious()
+    fun previous() = mediaController?.transportControls?.skipToPrevious()
+
+
+    fun pause() = mediaController?.transportControls?.pause()
+
+
+    fun play() = mediaController?.transportControls?.play()
+
+
+    fun stop() = mediaController?.transportControls?.stop()
+
+
+    fun next() = mediaController?.transportControls?.skipToNext()
+
+
+    fun seekTo(time: Int) = mediaController?.transportControls?.seekTo(time.toLong() * 1000)
+
+
+    fun setRepeatMode(repeatMode: Int) = mediaController?.transportControls?.setRepeatMode(repeatMode)
+
+
+    fun setShuffleMode(shuffleMode: Int) = mediaController?.transportControls?.setShuffleMode(shuffleMode)
+
+    fun updateCurrentPosition() {
+        mediaController?.playbackState?.currentPlayBackPosition?.let { _currentPosition.postValue(it) }
     }
 
-    fun pause() {
-        mediaController.transportControls.pause()
+    fun skipTo(track: Track) {
+        _queue.value?.find { it.description.mediaId == track.id.toString() }?.queueId?.let {
+            mediaController?.transportControls?.skipToQueueItem(it)
+        }
     }
 
-    fun play() {
-        mediaController.transportControls.play()
+    fun move(track: Track, newPosition: Int) {
+        val oldPosition = _queue.value?.indexOfFirst { it.description.mediaId == track.id.toString() } ?: return
+
+        val argsBundle = Bundle()
+        argsBundle.putInt(MusicService.MOVE_COMMAND_FROM, oldPosition)
+        argsBundle.putInt(MusicService.MOVE_COMMAND_TO, newPosition)
+        mediaController?.sendCommand(MusicService.MOVE_COMMAND, argsBundle, null)
     }
 
-    fun stop() {
-        mediaController.transportControls.stop()
-    }
-
-    fun next() {
-        mediaController.transportControls.skipToNext()
+    fun removeFromQueue(track: Track) {
+        _queue.value?.find { it.description.mediaId == track.id.toString() }?.description?.let {
+            mediaController?.removeQueueItem(it)
+        }
     }
 
     private inner class MediaBrowserConnectionCallback(private val context: Context) :
@@ -181,6 +217,8 @@ class MediaSessionConnection(application: Application) : AndroidViewModel(applic
                 callback.onMetadataChanged(metadata)
                 callback.onPlaybackStateChanged(playbackState)
                 callback.onQueueChanged(queue)
+                callback.onRepeatModeChanged(repeatMode)
+                callback.onShuffleModeChanged(shuffleMode)
             }
         }
     }
@@ -192,15 +230,34 @@ class MediaSessionConnection(application: Application) : AndroidViewModel(applic
 
         override fun onPlaybackStateChanged(state: PlaybackStateCompat?) {
             when (state?.state) {
-                PlaybackStateCompat.STATE_PLAYING, PlaybackStateCompat.STATE_BUFFERING -> _playing.postValue(true)
-                else -> _playing.postValue(false)
+                PlaybackStateCompat.STATE_PLAYING -> {
+                    _playing.postValue(true)
+                    _buffering.postValue(false)
+                }
+                PlaybackStateCompat.STATE_BUFFERING -> {
+                    _playing.postValue(true)
+                    _buffering.postValue(true)
+                }
+                else -> {
+                    _playing.postValue(false)
+                    _buffering.postValue(false)
+                }
             }
 
             state?.activeQueueItemId?.let { activeQueueItemId.postValue(it) }
+            state?.currentPlayBackPosition?.let { _currentPosition.postValue(it) }
         }
 
         override fun onQueueChanged(queue: MutableList<MediaSessionCompat.QueueItem>?) {
             _queue.postValue(queue ?: ArrayList())
+        }
+
+        override fun onRepeatModeChanged(repeatMode: Int) {
+            _repeatMode.postValue(repeatMode)
+        }
+
+        override fun onShuffleModeChanged(shuffleMode: Int) {
+            _shuffleMode.postValue(shuffleMode)
         }
     }
 }

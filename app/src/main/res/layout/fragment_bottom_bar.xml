@@ -47,31 +47,46 @@
         android:orientation="horizontal">
 
         <me.vanpetegem.accentor.components.SquaredImageView
+            android:background="@null"
             android:id="@+id/bottom_bar_previous"
-            style="@style/ExoMediaButton.Previous"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            android:clickable="true"
+            android:contentDescription="@string/exo_controls_previous_description"
+            android:scaleType="fitXY"
+            android:src="@drawable/exo_controls_previous"
             custom:direction="horizontal" />
 
         <me.vanpetegem.accentor.components.SquaredImageView
+            android:background="@null"
             android:id="@+id/bottom_bar_pause"
-            style="@style/ExoMediaButton.Pause"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            android:clickable="true"
+            android:contentDescription="@string/exo_controls_pause_description"
+            android:scaleType="fitXY"
+            android:src="@drawable/exo_controls_pause"
             custom:direction="horizontal" />
 
         <me.vanpetegem.accentor.components.SquaredImageView
+            android:background="@null"
             android:id="@+id/bottom_bar_play"
-            style="@style/ExoMediaButton.Play"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            android:clickable="true"
+            android:contentDescription="@string/exo_controls_play_description"
+            android:scaleType="fitXY"
+            android:src="@drawable/exo_controls_play"
             custom:direction="horizontal" />
 
         <me.vanpetegem.accentor.components.SquaredImageView
+            android:background="@null"
             android:id="@+id/bottom_bar_next"
-            style="@style/ExoMediaButton.Next"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            android:clickable="true"
+            android:contentDescription="@string/exo_controls_next_description"
+            android:src="@drawable/exo_controls_next"
             custom:direction="horizontal" />
     </LinearLayout>
 

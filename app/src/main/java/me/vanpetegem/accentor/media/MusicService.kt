@@ -28,6 +28,7 @@ import com.google.android.exoplayer2.audio.AudioAttributes
 import com.google.android.exoplayer2.database.ExoDatabaseProvider
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 import com.google.android.exoplayer2.ext.mediasession.TimelineQueueNavigator
+import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory
 import com.google.android.exoplayer2.source.ConcatenatingMediaSource
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
@@ -47,6 +48,12 @@ import org.jetbrains.anko.uiThread
 import java.io.File
 
 class MusicService : MediaBrowserServiceCompat() {
+    companion object {
+        const val MOVE_COMMAND = "me.vanpetegem.accentor.media.MusicService.MOVE"
+        const val MOVE_COMMAND_FROM = "me.vanpetegem.accentor.media.MusicService.MOVE_FROM"
+        const val MOVE_COMMAND_TO = "me.vanpetegem.accentor.media.MusicService.MOVE_TO"
+    }
+
     private lateinit var becomingNoisyReceiver: BecomingNoisyReceiver
     private lateinit var notificationManager: NotificationManagerCompat
     private lateinit var notificationBuilder: NotificationBuilder
@@ -130,7 +137,7 @@ class MusicService : MediaBrowserServiceCompat() {
                                     null
                                 )
                             }
-                        })
+                        }, DefaultExtractorsFactory().setConstantBitrateSeekingEnabled(true))
 
                     override fun onRemoveQueueItem(player: Player, description: MediaDescriptionCompat) {
                         for (i in 0..queue.size) {
@@ -160,9 +167,19 @@ class MusicService : MediaBrowserServiceCompat() {
                         player: Player,
                         controlDispatcher: ControlDispatcher,
                         command: String,
-                        extras: Bundle,
-                        cb: ResultReceiver
-                    ): Boolean = false
+                        extras: Bundle?,
+                        cb: ResultReceiver?
+                    ): Boolean {
+                        if (command == MOVE_COMMAND) {
+                            val from = extras!!.getInt(MOVE_COMMAND_FROM)
+                            val to = extras.getInt(MOVE_COMMAND_TO)
+                            val item = queue.removeAt(from)
+                            queue.add(if (from > to) to else to - 1, item)
+                            mediaSession.setQueue(queue)
+                            return true
+                        }
+                        return false
+                    }
                 })
             it.setPlaybackPreparer(object : MediaSessionConnector.PlaybackPreparer {
                 override fun onCommand(

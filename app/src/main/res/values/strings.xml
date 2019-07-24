@@ -32,4 +32,7 @@
     <string name="play_next">Play next</string>
     <string name="play_last">Play last</string>
     <string name="play_now">Play now</string>
+    <string name="album_cover_of_current_track">Album cover of current track</string>
+    <string name="toggle_queue">Toggle queue</string>
+    <string name="clear_queue">Clear queue</string>
 </resources>
