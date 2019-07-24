@@ -11,11 +11,15 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.simplecityapps.recyclerview_fastscroll.interfaces.OnFastScrollStateChangeListener
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
 import me.vanpetegem.accentor.R
+import me.vanpetegem.accentor.data.albums.Album
 import me.vanpetegem.accentor.data.tracks.Track
 import me.vanpetegem.accentor.media.MediaSessionConnection
+import me.vanpetegem.accentor.ui.main.MainActivity
+import kotlin.math.max
 
 class AlbumsFragment : Fragment() {
 
@@ -36,28 +40,44 @@ class AlbumsFragment : Fragment() {
         mediaSessionConnection = ViewModelProviders.of(activity!!).get(MediaSessionConnection::class.java)
 
         val cardView: FastScrollRecyclerView = view!!.findViewById(R.id.album_card_recycler_view)
-        val viewAdapter = AlbumCardAdapter(this) { clickedItem ->
-            mediaSessionConnection.play(
-                allTracksByAlbumId.get(
-                    clickedItem.id,
-                    ArrayList()
+        val viewAdapter = AlbumCardAdapter(this, object : AlbumActionListener {
+            override fun play(album: Album) {
+                mediaSessionConnection.play(
+                    allTracksByAlbumId.get(
+                        album.id,
+                        ArrayList()
+                    ).map { Pair(it, album) }
                 )
-            )
-        }
+            }
+
+            override fun playNext(album: Album) {
+                mediaSessionConnection.addTracksToQueue(
+                    allTracksByAlbumId.get(
+                        album.id,
+                        ArrayList()
+                    ).map { Pair(it, album) },
+                    max(0, (mediaSessionConnection.queuePosition.value ?: 0) - 1)
+                )
+            }
+
+            override fun playLast(album: Album) {
+                mediaSessionConnection.addTracksToQueue(
+                    allTracksByAlbumId.get(
+                        album.id,
+                        ArrayList()
+                    ).map { Pair(it, album) }
+                )
+            }
+
+        })
+        val lm = GridLayoutManager(
+            context,
+            if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) 2 else 4
+        )
+        (activity as MainActivity).setCanChildScrollUpCallback(SwipeRefreshLayout.OnChildScrollUpCallback { _, _ -> lm.findFirstCompletelyVisibleItemPosition() > 0 })
         cardView.apply {
             setHasFixedSize(true)
-            layoutManager = GridLayoutManager(
-                context,
-                if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) 2 else 4
-            )
-            adapter = viewAdapter
-        }
-        cardView.run {
-            setHasFixedSize(true)
-            layoutManager = GridLayoutManager(
-                context,
-                if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) 2 else 4
-            )
+            layoutManager = lm
             adapter = viewAdapter
             addOnScrollListener(object : RecyclerView.OnScrollListener() {
                 override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
@@ -67,11 +87,9 @@ class AlbumsFragment : Fragment() {
             setOnFastScrollStateChangeListener(object : OnFastScrollStateChangeListener {
                 override fun onFastScrollStop() {
                     cardView.layoutManager?.onSaveInstanceState()?.let { viewModel.saveScrollState(it) }
-
                 }
 
                 override fun onFastScrollStart() {}
-
             })
         }
         viewModel.allAlbums.observe(viewLifecycleOwner, Observer {
@@ -83,5 +101,10 @@ class AlbumsFragment : Fragment() {
         viewModel.scrollState.observe(viewLifecycleOwner, Observer {
             it?.let { cardView.layoutManager?.onRestoreInstanceState(it) }
         })
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        (activity as MainActivity).setCanChildScrollUpCallback(null)
     }
 }

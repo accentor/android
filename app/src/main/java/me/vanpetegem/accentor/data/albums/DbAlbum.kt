@@ -44,8 +44,8 @@ data class DbAlbumArtist(
     val name: String,
     @ColumnInfo(name = "order")
     val order: Int,
-    @ColumnInfo(name = "join")
-    val join: String?
+    @ColumnInfo(name = "separator")
+    val separator: String?
 )
 
 @Entity(

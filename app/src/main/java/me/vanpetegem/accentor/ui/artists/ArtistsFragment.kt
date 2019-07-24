@@ -10,9 +10,11 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.simplecityapps.recyclerview_fastscroll.interfaces.OnFastScrollStateChangeListener
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
 import me.vanpetegem.accentor.R
+import me.vanpetegem.accentor.ui.main.MainActivity
 
 class ArtistsFragment : Fragment() {
 
@@ -31,12 +33,14 @@ class ArtistsFragment : Fragment() {
 
         val cardView: FastScrollRecyclerView = view!!.findViewById(R.id.artist_card_recycler_view)
         val viewAdapter = ArtistCardAdapter(this)
+        val lm = GridLayoutManager(
+            context,
+            if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) 2 else 4
+        )
+        (activity as MainActivity).setCanChildScrollUpCallback(SwipeRefreshLayout.OnChildScrollUpCallback { _, _ -> lm.findFirstCompletelyVisibleItemPosition() > 0 })
         cardView.apply {
             setHasFixedSize(true)
-            layoutManager = GridLayoutManager(
-                context,
-                if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) 2 else 4
-            )
+            layoutManager = lm
             adapter = viewAdapter
             addOnScrollListener(object : RecyclerView.OnScrollListener() {
                 override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
@@ -46,11 +50,9 @@ class ArtistsFragment : Fragment() {
             setOnFastScrollStateChangeListener(object : OnFastScrollStateChangeListener {
                 override fun onFastScrollStop() {
                     cardView.layoutManager?.onSaveInstanceState()?.let { viewModel.saveScrollState(it) }
-
                 }
 
                 override fun onFastScrollStart() {}
-
             })
         }
 
@@ -64,4 +66,8 @@ class ArtistsFragment : Fragment() {
         })
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        (activity as MainActivity).setCanChildScrollUpCallback(null)
+    }
 }

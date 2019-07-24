@@ -25,4 +25,14 @@
     <string name="notification_skip_to_next">Skip to next track</string>
     <string name="notification_channel">Now playing</string>
     <string name="notification_channel_description">Shows what music is currently playing in Accentor</string>
+
+    <string name="various_artists">Various Artists</string>
+    <string name="now_playing">Now Playing</string>
+    <string name="album_menu_button">Album Actions</string>
+    <string name="play_next">Play next</string>
+    <string name="play_last">Play last</string>
+    <string name="play_now">Play now</string>
+    <string name="album_cover_of_current_track">Album cover of current track</string>
+    <string name="toggle_queue">Toggle queue</string>
+    <string name="clear_queue">Clear queue</string>
 </resources>

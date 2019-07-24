@@ -18,14 +18,14 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.material.navigation.NavigationView
 import com.sothree.slidinguppanel.SlidingUpPanelLayout
 import me.vanpetegem.accentor.R
+import me.vanpetegem.accentor.media.MediaSessionConnection
 import me.vanpetegem.accentor.ui.albums.AlbumsFragment
 import me.vanpetegem.accentor.ui.artists.ArtistsFragment
 import me.vanpetegem.accentor.ui.home.HomeFragment
 import me.vanpetegem.accentor.ui.login.LoginActivity
 import me.vanpetegem.accentor.ui.player.BottomBarFragment
-import me.vanpetegem.accentor.ui.player.PlayerViewFragment
+import me.vanpetegem.accentor.ui.player.PlayerFragment
 import org.jetbrains.anko.startActivity
-
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener,
     SwipeRefreshLayout.OnRefreshListener, SlidingUpPanelLayout.PanelSlideListener {
@@ -35,6 +35,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     private lateinit var mainViewModel: MainViewModel
+    private lateinit var mediaSessionConnection: MediaSessionConnection
+    private lateinit var swipeRefreshLayout: SwipeRefreshLayout
+    lateinit var slidingUpPanelLayout: SlidingUpPanelLayout
+    lateinit var playerToolbar: Toolbar
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,27 +48,30 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val mainToolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(mainToolbar)
 
-        val slidingUpPanelLayout: SlidingUpPanelLayout = findViewById(R.id.sliding_layout)
+        slidingUpPanelLayout = findViewById(R.id.sliding_layout)
         val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
         val navView: NavigationView = findViewById(R.id.nav_view)
-        val swipeRefreshLayout: SwipeRefreshLayout = findViewById(R.id.swipe_refresh_layout)
+        swipeRefreshLayout = findViewById(R.id.swipe_refresh_layout)
         val toggle = ActionBarDrawerToggle(
             this, drawerLayout, mainToolbar,
             R.string.navigation_drawer_open,
             R.string.navigation_drawer_close
         )
 
+        playerToolbar = findViewById<Toolbar>(R.id.player_toolbar).apply {
+            setNavigationIcon(R.drawable.ic_menu_back)
+            setNavigationOnClickListener { slidingUpPanelLayout.panelState = SlidingUpPanelLayout.PanelState.COLLAPSED }
+            menuInflater.inflate(R.menu.player_toolbar_menu, menu)
+            setTitle(R.string.now_playing)
+            subtitle = "0/0"
+        }
+
         val headerView: View = navView.getHeaderView(0)
         val usernameText: TextView = headerView.findViewById(R.id.nav_header_username)
         val serverURLText: TextView = headerView.findViewById(R.id.nav_header_server_url)
         val bottomBarFragmentHolder: FrameLayout = findViewById(R.id.bottom_bar)
         supportFragmentManager.beginTransaction().add(R.id.bottom_bar, BottomBarFragment()).commit()
-        supportFragmentManager.beginTransaction().add(R.id.player_view, PlayerViewFragment()).commit()
-
-        val playerToolbar = findViewById<Toolbar>(R.id.player_toolbar).apply {
-            setNavigationIcon(R.drawable.ic_menu_back)
-            slidingUpPanelLayout.panelState = SlidingUpPanelLayout.PanelState.COLLAPSED
-        }
+        supportFragmentManager.beginTransaction().add(R.id.player_view, PlayerFragment()).commit()
 
         toggle.setHomeAsUpIndicator(R.drawable.ic_menu_back)
         drawerLayout.addDrawerListener(toggle)
@@ -111,7 +118,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 R.id.nav_albums -> AlbumsFragment()
                 R.id.nav_artists -> ArtistsFragment()
                 else -> HomeFragment()
-
             }
 
             transaction.replace(R.id.main_fragment_container, fragment)
@@ -133,12 +139,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         mainViewModel.isPlayerOpen.observe(this, Observer {
             val open = it ?: return@Observer
             if (open) {
+                slidingUpPanelLayout.setDragView(playerToolbar)
                 slidingUpPanelLayout.panelState = SlidingUpPanelLayout.PanelState.EXPANDED
                 bottomBarFragmentHolder.visibility = View.GONE
                 playerToolbar.visibility = View.VISIBLE
 
                 toggle.syncState()
             } else {
+                slidingUpPanelLayout.setDragView(bottomBarFragmentHolder)
                 slidingUpPanelLayout.panelState = SlidingUpPanelLayout.PanelState.COLLAPSED
                 bottomBarFragmentHolder.visibility = View.VISIBLE
                 playerToolbar.visibility = View.GONE
@@ -146,34 +154,44 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 toggle.syncState()
             }
         })
+
+        mediaSessionConnection = ViewModelProviders.of(this).get(MediaSessionConnection::class.java)
+        mediaSessionConnection.queuePosStr.observe(this, Observer {
+            playerToolbar.subtitle = it ?: "0/0"
+        })
     }
 
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
-        if (intent?.hasExtra(INTENT_EXTRA_OPEN_PLAYER) == true) {
-            mainViewModel.setPlayerOpen(intent.getBooleanExtra(INTENT_EXTRA_OPEN_PLAYER, false))
-        }
+        intent?.let { checkIntent(it) }
     }
 
     override fun onResume() {
         super.onResume()
+        checkIntent(intent)
+    }
+
+    private fun checkIntent(intent: Intent) {
         if (intent.hasExtra(INTENT_EXTRA_OPEN_PLAYER)) {
             mainViewModel.setPlayerOpen(intent.getBooleanExtra(INTENT_EXTRA_OPEN_PLAYER, false))
+            intent.removeExtra(INTENT_EXTRA_OPEN_PLAYER)
         }
     }
 
     override fun onBackPressed() {
         val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
-        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
-            drawerLayout.closeDrawer(GravityCompat.START)
-        } else {
-            super.onBackPressed()
+        val slidingUpPanelLayout: SlidingUpPanelLayout = findViewById(R.id.sliding_layout)
+        when {
+            slidingUpPanelLayout.panelState == SlidingUpPanelLayout.PanelState.EXPANDED -> slidingUpPanelLayout.panelState =
+                SlidingUpPanelLayout.PanelState.COLLAPSED
+            drawerLayout.isDrawerOpen(GravityCompat.START) -> drawerLayout.closeDrawer(GravityCompat.START)
+            else -> super.onBackPressed()
         }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.main, menu)
+        menuInflater.inflate(R.menu.main_toolbar_menu, menu)
         return true
     }
 
@@ -220,4 +238,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             mainViewModel.setPlayerOpen(true)
         }
     }
+
+    fun setCanChildScrollUpCallback(callback: SwipeRefreshLayout.OnChildScrollUpCallback?) =
+        swipeRefreshLayout.setOnChildScrollUpCallback(callback)
 }

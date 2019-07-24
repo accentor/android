@@ -28,6 +28,7 @@ import com.google.android.exoplayer2.audio.AudioAttributes
 import com.google.android.exoplayer2.database.ExoDatabaseProvider
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 import com.google.android.exoplayer2.ext.mediasession.TimelineQueueNavigator
+import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory
 import com.google.android.exoplayer2.source.ConcatenatingMediaSource
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
@@ -39,6 +40,7 @@ import com.google.android.exoplayer2.upstream.cache.CacheDataSink
 import com.google.android.exoplayer2.upstream.cache.CacheDataSource
 import com.google.android.exoplayer2.upstream.cache.LeastRecentlyUsedCacheEvictor
 import com.google.android.exoplayer2.upstream.cache.SimpleCache
+import me.vanpetegem.accentor.data.tracks.Track
 import me.vanpetegem.accentor.ui.main.MainActivity
 import me.vanpetegem.accentor.userAgent
 import org.jetbrains.anko.doAsync
@@ -46,6 +48,12 @@ import org.jetbrains.anko.uiThread
 import java.io.File
 
 class MusicService : MediaBrowserServiceCompat() {
+    companion object {
+        const val MOVE_COMMAND = "me.vanpetegem.accentor.media.MusicService.MOVE"
+        const val MOVE_COMMAND_FROM = "me.vanpetegem.accentor.media.MusicService.MOVE_FROM"
+        const val MOVE_COMMAND_TO = "me.vanpetegem.accentor.media.MusicService.MOVE_TO"
+    }
+
     private lateinit var becomingNoisyReceiver: BecomingNoisyReceiver
     private lateinit var notificationManager: NotificationManagerCompat
     private lateinit var notificationBuilder: NotificationBuilder
@@ -129,7 +137,7 @@ class MusicService : MediaBrowserServiceCompat() {
                                     null
                                 )
                             }
-                        })
+                        }, DefaultExtractorsFactory().setConstantBitrateSeekingEnabled(true))
 
                     override fun onRemoveQueueItem(player: Player, description: MediaDescriptionCompat) {
                         for (i in 0..queue.size) {
@@ -147,7 +155,7 @@ class MusicService : MediaBrowserServiceCompat() {
                     }
 
                     override fun onAddQueueItem(player: Player, description: MediaDescriptionCompat, index: Int) {
-                        mediaSource.addMediaSource(factory.createMediaSource(description.mediaUri))
+                        mediaSource.addMediaSource(index, factory.createMediaSource(description.mediaUri))
                         queue.add(
                             index,
                             MediaSessionCompat.QueueItem(description, count++)
@@ -159,9 +167,19 @@ class MusicService : MediaBrowserServiceCompat() {
                         player: Player,
                         controlDispatcher: ControlDispatcher,
                         command: String,
-                        extras: Bundle,
-                        cb: ResultReceiver
-                    ): Boolean = false
+                        extras: Bundle?,
+                        cb: ResultReceiver?
+                    ): Boolean {
+                        if (command == MOVE_COMMAND) {
+                            val from = extras!!.getInt(MOVE_COMMAND_FROM)
+                            val to = extras.getInt(MOVE_COMMAND_TO)
+                            val item = queue.removeAt(from)
+                            queue.add(if (from > to) to else to - 1, item)
+                            mediaSession.setQueue(queue)
+                            return true
+                        }
+                        return false
+                    }
                 })
             it.setPlaybackPreparer(object : MediaSessionConnector.PlaybackPreparer {
                 override fun onCommand(
@@ -194,9 +212,16 @@ class MusicService : MediaBrowserServiceCompat() {
                 val builder = MediaMetadataCompat.Builder()
                 if (player.currentWindowIndex < queue.size) {
                     val item = queue[player.currentWindowIndex].description
+                    val extras = item.extras!!
                     builder.putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, item.mediaId)
                     builder.putString(MediaMetadataCompat.METADATA_KEY_TITLE, item.title.toString())
                     builder.putString(MediaMetadataCompat.METADATA_KEY_ALBUM, item.subtitle.toString())
+                    builder.putString(
+                        MediaMetadataCompat.METADATA_KEY_ALBUM_ARTIST,
+                        extras.getString(Track.ALBUMARTIST)
+                    )
+                    builder.putString(MediaMetadataCompat.METADATA_KEY_ARTIST, extras.getString(Track.ARTIST))
+                    builder.putString(MediaMetadataCompat.METADATA_KEY_DATE, extras.getString(Track.YEAR))
                     if (item.iconUri != null) {
                         try {
                             builder.putBitmap(
