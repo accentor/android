@@ -11,7 +11,20 @@ import androidx.room.Transaction
 abstract class ArtistDao {
 
     open fun getAll(): LiveData<List<Artist>> = map(getAllDbArtists()) { list ->
-        list.map { Artist(it.id, it.name, it.reviewComment, it.createdAt, it.updatedAt, it.image, it.imageType) }
+        list.map {
+            Artist(
+                it.id,
+                it.name,
+                it.reviewComment,
+                it.createdAt,
+                it.updatedAt,
+                it.image,
+                it.image500,
+                it.image250,
+                it.image100,
+                it.imageType
+            )
+        }
     }
 
     @Transaction
@@ -26,6 +39,9 @@ abstract class ArtistDao {
                     artist.createdAt,
                     artist.updatedAt,
                     artist.image,
+                    artist.image500,
+                    artist.image250,
+                    artist.image100,
                     artist.imageType
                 )
             )

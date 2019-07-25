@@ -42,7 +42,7 @@ class ArtistCardAdapter(private val fragment: Fragment) :
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.artistNameView.text = items[position].name
         Glide.with(fragment)
-            .load(items[position].image)
+            .load(items[position].image500)
             .placeholder(R.drawable.ic_menu_artists)
             .into(holder.artistImageView)
     }

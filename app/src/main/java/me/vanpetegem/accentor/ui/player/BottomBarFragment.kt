@@ -40,7 +40,7 @@ class BottomBarFragment : Fragment() {
 
         mediaSessionConnection.currentAlbum.observe(viewLifecycleOwner, Observer {
             Glide.with(this)
-                .load(it?.image)
+                .load(it?.image500)
                 .placeholder(R.drawable.ic_menu_albums)
                 .into(imageView)
         })

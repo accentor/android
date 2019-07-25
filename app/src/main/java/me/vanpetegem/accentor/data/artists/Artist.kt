@@ -9,5 +9,8 @@ data class Artist(
     val createdAt: Instant,
     val updatedAt: Instant,
     val image: String?,
+    val image500: String?,
+    val image250: String?,
+    val image100: String?,
     val imageType: String?
 )

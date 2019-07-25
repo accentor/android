@@ -26,6 +26,9 @@ abstract class AlbumDao {
                         a.createdAt,
                         a.updatedAt,
                         a.image,
+                        a.image500,
+                        a.image250,
+                        a.image100,
                         a.imageType,
                         albumLabels.get(a.id, ArrayList()),
                         albumArtists.get(a.id, ArrayList())
@@ -52,6 +55,9 @@ abstract class AlbumDao {
             dbAlbum.createdAt,
             dbAlbum.updatedAt,
             dbAlbum.image,
+            dbAlbum.image500,
+            dbAlbum.image250,
+            dbAlbum.image100,
             dbAlbum.imageType,
             albumLabels.map { AlbumLabel(it.labelId, it.catalogueNumber) },
             albumArtists.map { AlbumArtist(it.artistId, it.name, it.order, it.separator) }
@@ -106,6 +112,9 @@ abstract class AlbumDao {
                     album.createdAt,
                     album.updatedAt,
                     album.image,
+                    album.image500,
+                    album.image250,
+                    album.image100,
                     album.imageType
                 )
             )

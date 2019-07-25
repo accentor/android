@@ -33,7 +33,7 @@ import me.vanpetegem.accentor.util.RoomTypeConverters
         DbTrackArtist::class,
         DbTrackGenre::class
     ],
-    version = 3
+    version = 4
 )
 abstract class AccentorDatabase : RoomDatabase() {
 
@@ -57,6 +57,22 @@ abstract class AccentorDatabase : RoomDatabase() {
                                     database.execSQL("CREATE TABLE `album_artists` (`album_id` INTEGER NOT NULL, `artist_id` INTEGER NOT NULL, `name` TEXT NOT NULL, `order` INTEGER NOT NULL, `separator` TEXT, PRIMARY KEY(`album_id`, `artist_id`, `name`))")
                                     database.execSQL("INSERT INTO `album_artists` (`album_id`, `artist_id`, `name`, `order`, `separator`) SELECT `album_id`, `artist_id`, `name`, `order`, `join` AS `separator` FROM `album_artists_old`")
                                     database.execSQL("DROP TABLE `album_artists_old`")
+                                    database.setTransactionSuccessful()
+                                } finally {
+                                    database.endTransaction()
+                                }
+                            }
+                        })
+                        .addMigrations(object : Migration(3, 4) {
+                            override fun migrate(database: SupportSQLiteDatabase) {
+                                database.beginTransaction()
+                                try {
+                                    database.execSQL("ALTER TABLE `albums` ADD COLUMN `image_500` TEXT")
+                                    database.execSQL("ALTER TABLE `albums` ADD COLUMN `image_250` TEXT")
+                                    database.execSQL("ALTER TABLE `albums` ADD COLUMN `image_100` TEXT")
+                                    database.execSQL("ALTER TABLE `artists` ADD COLUMN `image_500` TEXT")
+                                    database.execSQL("ALTER TABLE `artists` ADD COLUMN `image_250` TEXT")
+                                    database.execSQL("ALTER TABLE `artists` ADD COLUMN `image_100` TEXT")
                                     database.setTransactionSuccessful()
                                 } finally {
                                     database.endTransaction()

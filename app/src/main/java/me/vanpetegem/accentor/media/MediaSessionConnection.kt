@@ -135,7 +135,7 @@ class MediaSessionConnection(application: Application) : AndroidViewModel(applic
         return mediaDescBuilder
             .setTitle(track.title)
             .setSubtitle(album.title)
-            .setIconUri(album.image?.toUri())
+            .setIconUri(album.image500?.toUri())
             .setMediaUri(mediaUri)
             .setMediaId(track.id.toString())
             .setExtras(extras)

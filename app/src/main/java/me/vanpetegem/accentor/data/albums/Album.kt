@@ -13,6 +13,9 @@ data class Album(
     val createdAt: Instant,
     val updatedAt: Instant,
     val image: String?,
+    val image500: String?,
+    val image250: String?,
+    val image100: String?,
     val imageType: String?,
     val albumLabels: List<AlbumLabel>,
     val albumArtists: List<AlbumArtist>
