@@ -175,6 +175,7 @@ class MusicService : MediaBrowserServiceCompat() {
                             val to = extras.getInt(MOVE_COMMAND_TO)
                             val item = queue.removeAt(from)
                             queue.add(if (from > to) to else to - 1, item)
+                            mediaSource.moveMediaSource(from, to)
                             mediaSession.setQueue(queue)
                             return true
                         }
