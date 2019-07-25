@@ -105,6 +105,7 @@ class NotificationBuilder(private val context: Context) {
         )
             .apply {
                 description = context.getString(R.string.notification_channel_description)
+                setShowBadge(false)
             }
 
         platformNotificationManager.createNotificationChannel(notificationChannel)
