@@ -8,7 +8,6 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.media.AudioManager
 import android.net.Uri
-import android.net.wifi.WifiManager
 import android.os.Bundle
 import android.os.PowerManager
 import android.os.ResultReceiver
@@ -25,27 +24,29 @@ import androidx.media.MediaBrowserServiceCompat
 import com.bumptech.glide.Glide
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.audio.AudioAttributes
-import com.google.android.exoplayer2.database.ExoDatabaseProvider
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 import com.google.android.exoplayer2.ext.mediasession.TimelineQueueNavigator
-import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory
+import com.google.android.exoplayer2.offline.DownloadRequest
+import com.google.android.exoplayer2.offline.DownloadService
 import com.google.android.exoplayer2.source.ConcatenatingMediaSource
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
-import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.upstream.DataSource
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory
 import com.google.android.exoplayer2.upstream.FileDataSource
 import com.google.android.exoplayer2.upstream.cache.CacheDataSink
 import com.google.android.exoplayer2.upstream.cache.CacheDataSource
-import com.google.android.exoplayer2.upstream.cache.LeastRecentlyUsedCacheEvictor
-import com.google.android.exoplayer2.upstream.cache.SimpleCache
+import com.google.android.exoplayer2.upstream.cache.CacheKeyFactory
+import com.google.android.exoplayer2.upstream.cache.CacheUtil
+import me.vanpetegem.accentor.audioCache
 import me.vanpetegem.accentor.data.tracks.Track
 import me.vanpetegem.accentor.ui.main.MainActivity
 import me.vanpetegem.accentor.userAgent
+import me.vanpetegem.accentor.media.extensions.isCached
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
-import java.io.File
+import java.util.*
+import kotlin.collections.ArrayList
 
 class MusicService : MediaBrowserServiceCompat() {
     companion object {
@@ -71,15 +72,7 @@ class MusicService : MediaBrowserServiceCompat() {
         .build()
 
     private val exoPlayer: ExoPlayer by lazy {
-        SimpleExoPlayer.Builder(this).setLoadControl(
-            // TODO: This is ugly and should be done in a better way. See https://github.com/google/ExoPlayer/issues/6204
-            DefaultLoadControl.Builder().setBufferDurationsMs(
-                Int.MAX_VALUE,
-                Int.MAX_VALUE,
-                DefaultLoadControl.DEFAULT_BUFFER_FOR_PLAYBACK_MS,
-                DefaultLoadControl.DEFAULT_BUFFER_FOR_PLAYBACK_AFTER_REBUFFER_MS
-            ).createDefaultLoadControl()
-        ).build().apply {
+        SimpleExoPlayer.Builder(this).build().apply {
             setAudioAttributes(accentorAudioAttributes, true)
         }
     }
@@ -91,7 +84,12 @@ class MusicService : MediaBrowserServiceCompat() {
             setSessionActivity(packageManager?.getLaunchIntentForPackage(packageName)?.let { sessionIntent ->
                 sessionIntent.flags = sessionIntent.flags or Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
                 sessionIntent.putExtra(MainActivity.INTENT_EXTRA_OPEN_PLAYER, true)
-                PendingIntent.getActivity(this@MusicService, 0, sessionIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+                PendingIntent.getActivity(
+                    this@MusicService,
+                    0,
+                    sessionIntent,
+                    PendingIntent.FLAG_UPDATE_CURRENT
+                )
             })
             isActive = true
         }
@@ -112,32 +110,28 @@ class MusicService : MediaBrowserServiceCompat() {
             it.setQueueEditor(
                 object : MediaSessionConnector.QueueEditor {
                     var count: Long = 0
-                    val factory =
-                        ProgressiveMediaSource.Factory(object : DataSource.Factory {
-                            val base = DefaultDataSourceFactory(
-                                this@MusicService.application,
-                                DefaultHttpDataSourceFactory(userAgent, 0, 0, false)
+                    val dataSourceFactory: DataSource.Factory = object : DataSource.Factory {
+                        val base = DefaultDataSourceFactory(
+                            this@MusicService.application,
+                            DefaultHttpDataSourceFactory(userAgent, 0, 0, false)
+                        )
+
+                        override fun createDataSource(): DataSource {
+                            return CacheDataSource(
+                                audioCache,
+                                base.createDataSource(),
+                                FileDataSource(),
+                                null,
+                                (CacheDataSource.FLAG_BLOCK_ON_CACHE or CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR),
+                                null
                             )
+                        }
+                    }
 
-                            val cache = SimpleCache(
-                                File(this@MusicService.application.cacheDir, "audio"),
-                                LeastRecentlyUsedCacheEvictor(10L * 1024L * 1024L * 1024L),
-                                ExoDatabaseProvider(this@MusicService.application)
-                            )
-
-                            override fun createDataSource(): DataSource {
-                                return CacheDataSource(
-                                    cache,
-                                    base.createDataSource(),
-                                    FileDataSource(),
-                                    CacheDataSink(cache, C.LENGTH_UNSET.toLong()),
-                                    (CacheDataSource.FLAG_BLOCK_ON_CACHE or CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR),
-                                    null
-                                )
-                            }
-                        }, DefaultExtractorsFactory().setConstantBitrateSeekingEnabled(true))
-
-                    override fun onRemoveQueueItem(player: Player, description: MediaDescriptionCompat) {
+                    override fun onRemoveQueueItem(
+                        player: Player,
+                        description: MediaDescriptionCompat
+                    ) {
                         for (i in 0..queue.size) {
                             if (queue[i].description.mediaId == description.mediaId) {
                                 queue.removeAt(i)
@@ -148,12 +142,24 @@ class MusicService : MediaBrowserServiceCompat() {
                         }
                     }
 
-                    override fun onAddQueueItem(player: Player, description: MediaDescriptionCompat) {
+                    override fun onAddQueueItem(
+                        player: Player,
+                        description: MediaDescriptionCompat
+                    ) {
                         onAddQueueItem(player, description, queue.size)
                     }
 
-                    override fun onAddQueueItem(player: Player, description: MediaDescriptionCompat, index: Int) {
-                        mediaSource.addMediaSource(index, factory.createMediaSource(description.mediaUri))
+                    override fun onAddQueueItem(
+                        player: Player,
+                        description: MediaDescriptionCompat,
+                        index: Int
+                    ) {
+                        mediaSource.addMediaSource(
+                            index,
+                            ProgressiveMediaSource.Factory(dataSourceFactory)
+                                .setCustomCacheKey(description.mediaId)
+                                .createMediaSource(description.mediaUri)
+                        )
                         queue.add(
                             index,
                             MediaSessionCompat.QueueItem(description, count++)
@@ -214,18 +220,29 @@ class MusicService : MediaBrowserServiceCompat() {
                     val extras = item.extras!!
                     builder.putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, item.mediaId)
                     builder.putString(MediaMetadataCompat.METADATA_KEY_TITLE, item.title.toString())
-                    builder.putString(MediaMetadataCompat.METADATA_KEY_ALBUM, item.subtitle.toString())
+                    builder.putString(
+                        MediaMetadataCompat.METADATA_KEY_ALBUM,
+                        item.subtitle.toString()
+                    )
                     builder.putString(
                         MediaMetadataCompat.METADATA_KEY_ALBUM_ARTIST,
                         extras.getString(Track.ALBUMARTIST)
                     )
-                    builder.putString(MediaMetadataCompat.METADATA_KEY_ARTIST, extras.getString(Track.ARTIST))
-                    builder.putString(MediaMetadataCompat.METADATA_KEY_DATE, extras.getString(Track.YEAR))
+                    builder.putString(
+                        MediaMetadataCompat.METADATA_KEY_ARTIST,
+                        extras.getString(Track.ARTIST)
+                    )
+                    builder.putString(
+                        MediaMetadataCompat.METADATA_KEY_DATE,
+                        extras.getString(Track.YEAR)
+                    )
                     if (item.iconUri != null) {
                         try {
                             builder.putBitmap(
                                 MediaMetadataCompat.METADATA_KEY_ALBUM_ART,
-                                Glide.with(this@MusicService).load(item.iconUri).onlyRetrieveFromCache(true).submit().get().toBitmap()
+                                Glide.with(this@MusicService).load(item.iconUri).onlyRetrieveFromCache(
+                                    true
+                                ).submit().get().toBitmap()
                             )
                         } catch (e: Exception) {
                             doAsync {
@@ -235,8 +252,6 @@ class MusicService : MediaBrowserServiceCompat() {
                                 }
                             }
                         }
-                    } else {
-
                     }
                 }
                 builder.build()
@@ -258,39 +273,92 @@ class MusicService : MediaBrowserServiceCompat() {
         super.onDestroy()
     }
 
-    override fun onGetRoot(clientPackageName: String, clientUid: Int, rootHints: Bundle?): BrowserRoot? =
+    override fun onGetRoot(
+        clientPackageName: String,
+        clientUid: Int,
+        rootHints: Bundle?
+    ): BrowserRoot? =
         BrowserRoot("empty", null)
 
-    override fun onLoadChildren(parentId: String, result: Result<MutableList<MediaBrowserCompat.MediaItem>>) =
+    override fun onLoadChildren(
+        parentId: String,
+        result: Result<MutableList<MediaBrowserCompat.MediaItem>>
+    ) =
         result.sendResult(null)
 
     private fun removeNotification() = notificationManager.cancel(NOW_PLAYING_NOTIFICATION)
 
     private inner class MediaControllerCallback : MediaControllerCompat.Callback() {
 
-        val wifiManager = getSystemService(Context.WIFI_SERVICE) as WifiManager
         val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
-        val wifiLock: WifiManager.WifiLock =
-            wifiManager.createWifiLock(WifiManager.WIFI_MODE_FULL_HIGH_PERF, "Accentor:WifiLock")
         val wakeLock: PowerManager.WakeLock =
             powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Accentor:WakeLock")
+        var activeQueueItemId: Long? = null
 
         override fun onMetadataChanged(metadata: MediaMetadataCompat?) {
             mediaController.playbackState?.let { updateNotification(it) }
         }
 
+        override fun onQueueChanged(queue: MutableList<MediaSessionCompat.QueueItem>?) {
+            resetDownloader()
+        }
+
         override fun onPlaybackStateChanged(state: PlaybackStateCompat?) {
             state?.let { updateNotification(it) }
             state?.let { updateLocks(it) }
+            state?.let {
+                if (activeQueueItemId != it.activeQueueItemId) {
+                    resetDownloader()
+                    activeQueueItemId = it.activeQueueItemId
+                }
+            }
+        }
+
+        private fun resetDownloader() {
+            DownloadService.sendRemoveAllDownloads(
+                this@MusicService,
+                PlayQueueDownloadService::class.java,
+                true
+            )
+            mediaController.queue ?: return
+            var currentPos = mediaController.queue.indexOfFirst { it.queueId == activeQueueItemId }
+            if (currentPos == -1) {
+                currentPos = 0
+            }
+            for (i in currentPos until mediaController.queue.size) {
+                addDownload(mediaController.queue[i].description)
+            }
+            for (i in 0 until currentPos) {
+                addDownload(mediaController.queue[i].description)
+            }
+        }
+
+        private fun addDownload(description: MediaDescriptionCompat) {
+            if (!isCached(description.mediaId!!)) {
+                DownloadService.sendAddDownload(
+                    this@MusicService,
+                    PlayQueueDownloadService::class.java,
+                    DownloadRequest(
+                        description.mediaId!!,
+                        DownloadRequest.TYPE_PROGRESSIVE,
+                        description.mediaUri!!,
+                        Collections.emptyList(),
+                        description.mediaId,
+                        null
+                    ),
+                    true
+                )
+            }
         }
 
         private fun updateNotification(state: PlaybackStateCompat) {
             val updatedState = state.state
 
-            val notification = if (mediaController.metadata != null && updatedState != PlaybackStateCompat.STATE_NONE)
-                notificationBuilder.buildNotification(mediaSession.sessionToken)
-            else
-                null
+            val notification =
+                if (mediaController.metadata != null && updatedState != PlaybackStateCompat.STATE_NONE)
+                    notificationBuilder.buildNotification(mediaSession.sessionToken)
+                else
+                    null
 
             when (updatedState) {
                 PlaybackStateCompat.STATE_BUFFERING, PlaybackStateCompat.STATE_PLAYING -> {
@@ -332,15 +400,12 @@ class MusicService : MediaBrowserServiceCompat() {
 
         @SuppressLint("WakelockTimeout", "Wakelock")
         private fun updateLocks(state: PlaybackStateCompat) {
-
             when (state.state) {
                 PlaybackStateCompat.STATE_BUFFERING, PlaybackStateCompat.STATE_PLAYING, PlaybackStateCompat.STATE_CONNECTING -> {
                     if (!wakeLock.isHeld) wakeLock.acquire()
-                    if (!wifiLock.isHeld) wifiLock.acquire()
                 }
                 else -> {
                     if (wakeLock.isHeld) wakeLock.release()
-                    if (wifiLock.isHeld) wifiLock.release()
                 }
             }
         }

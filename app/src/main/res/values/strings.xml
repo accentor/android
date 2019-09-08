@@ -32,4 +32,11 @@
     <string name="play">Play</string>
     <string name="next">Next</string>
     <string name="shuffle">Shuffle</string>
+    <string name="play_queue_download_notification_channel_name">Play queue downloads</string>
+    <string name="play_queue_download_notification_channel_description">Shows when accentor is downloading tracks for the current play queue</string>
+    <string name="downloading_play_queue">Downloading play queue</string>
+    <plurals name="downloading_n_tracks">
+        <item quantity="one">Downloading %d track</item>
+        <item quantity="other">Downloading %d tracks</item>
+    </plurals>
 </resources>
