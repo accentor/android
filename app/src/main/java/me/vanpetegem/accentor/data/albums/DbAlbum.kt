@@ -27,6 +27,12 @@ data class DbAlbum(
     val updatedAt: Instant,
     @ColumnInfo(name = "image")
     val image: String?,
+    @ColumnInfo(name = "image_500")
+    val image500: String?,
+    @ColumnInfo(name = "image_250")
+    val image250: String?,
+    @ColumnInfo(name = "image_100")
+    val image100: String?,
     @ColumnInfo(name = "image_type")
     val imageType: String?
 )

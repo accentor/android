@@ -61,7 +61,7 @@ class AlbumCardAdapter(private val fragment: Fragment, private val actionListene
             items[position].stringifyAlbumArtists()
                 .let { if (it.isEmpty()) fragment.getString(R.string.various_artists) else it }
         Glide.with(fragment)
-            .load(items[position].image)
+            .load(items[position].image500)
             .placeholder(R.drawable.ic_menu_albums)
             .into(holder.albumImageView)
         holder.menu.setOnMenuItemClickListener {

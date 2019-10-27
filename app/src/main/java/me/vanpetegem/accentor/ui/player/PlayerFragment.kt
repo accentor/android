@@ -159,7 +159,7 @@ class PlayerFragment : Fragment() {
 
         mediaSessionConnection.currentAlbum.observe(viewLifecycleOwner, Observer {
             Glide.with(this@PlayerFragment)
-                .load(it?.image)
+                .load(it?.image500)
                 .placeholder(R.drawable.ic_menu_albums)
                 .into(albumCoverImageView)
 

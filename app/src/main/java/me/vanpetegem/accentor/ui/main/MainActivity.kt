@@ -70,8 +70,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val usernameText: TextView = headerView.findViewById(R.id.nav_header_username)
         val serverURLText: TextView = headerView.findViewById(R.id.nav_header_server_url)
         val bottomBarFragmentHolder: FrameLayout = findViewById(R.id.bottom_bar)
-        supportFragmentManager.beginTransaction().add(R.id.bottom_bar, BottomBarFragment()).commit()
-        supportFragmentManager.beginTransaction().add(R.id.player_view, PlayerFragment()).commit()
+        supportFragmentManager.beginTransaction().replace(R.id.bottom_bar, BottomBarFragment()).commit()
+        supportFragmentManager.beginTransaction().replace(R.id.player_view, PlayerFragment()).commit()
 
         toggle.setHomeAsUpIndicator(R.drawable.ic_menu_back)
         drawerLayout.addDrawerListener(toggle)
