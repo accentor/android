@@ -46,11 +46,11 @@ dependencies {
     implementation 'androidx.annotation:annotation:1.1.0'
 
     // AndroidX Room
-    implementation "androidx.room:room-runtime:2.1.0"
-    implementation "androidx.room:room-ktx:2.1.0"
+    implementation "androidx.room:room-runtime:2.2.1"
+    implementation "androidx.room:room-ktx:2.2.1"
     implementation "androidx.lifecycle:lifecycle-extensions:2.1.0"
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.1.0"
-    kapt "androidx.room:room-compiler:2.1.0"
+    kapt "androidx.room:room-compiler:2.2.1"
 
     // AndroidX Lifecycle
     implementation "androidx.lifecycle:lifecycle-extensions:2.1.0"
