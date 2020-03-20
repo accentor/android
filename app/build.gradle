@@ -49,7 +49,7 @@ dependencies {
     implementation "androidx.room:room-ktx:2.2.3"
     implementation "androidx.lifecycle:lifecycle-extensions:2.1.0"
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0"
-    kapt "androidx.room:room-compiler:2.2.3"
+    kapt "androidx.room:room-compiler:2.2.5"
 
     // AndroidX Lifecycle
     implementation "androidx.lifecycle:lifecycle-extensions:2.1.0"
