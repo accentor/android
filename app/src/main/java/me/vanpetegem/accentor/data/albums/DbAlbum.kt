@@ -64,5 +64,5 @@ data class DbAlbumLabel(
     @ColumnInfo(name = "label_id")
     val labelId: Int,
     @ColumnInfo(name = "catalogue_number")
-    val catalogueNumber: String
+    val catalogueNumber: String?
 )

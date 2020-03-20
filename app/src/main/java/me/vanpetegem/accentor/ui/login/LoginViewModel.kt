@@ -27,7 +27,7 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
             _loginResult.value = when (result) {
                 is Result.Success -> LoginResult()
                 is Result.Error -> {
-                    Log.e("LOGIN", "login failed", result.exception)
+                    Log.e("Accentor", "login failed", result.exception)
                     LoginResult(error = R.string.login_failed)
                 }
             }

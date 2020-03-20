@@ -70,7 +70,7 @@
             android:layout_width="wrap_content"
             android:layout_height="36dp"
             android:background="@null"
-            android:contentDescription="@string/exo_controls_repeat_off_description"
+            android:contentDescription="@string/repeat_off"
             android:src="@drawable/ic_repeat_off"
             custom:direction="horizontal" />
 
@@ -85,7 +85,7 @@
             android:layout_height="36dp"
             android:background="@null"
             android:clickable="true"
-            android:contentDescription="@string/exo_controls_previous_description"
+            android:contentDescription="@string/previous"
             android:src="@drawable/ic_previous"
             custom:direction="horizontal" />
 
@@ -95,7 +95,7 @@
             android:layout_height="48dp"
             android:background="@null"
             android:clickable="true"
-            android:contentDescription="@string/exo_controls_pause_description"
+            android:contentDescription="@string/pause"
             android:src="@drawable/ic_pause"
             custom:direction="horizontal" />
 
@@ -105,7 +105,7 @@
             android:layout_height="48dp"
             android:background="@null"
             android:clickable="true"
-            android:contentDescription="@string/exo_controls_play_description"
+            android:contentDescription="@string/play"
             android:src="@drawable/ic_play"
             custom:direction="horizontal" />
 
@@ -115,7 +115,7 @@
             android:layout_height="36dp"
             android:background="@null"
             android:clickable="true"
-            android:contentDescription="@string/exo_controls_next_description"
+            android:contentDescription="@string/next"
             android:src="@drawable/ic_next"
             custom:direction="horizontal" />
 
@@ -130,7 +130,7 @@
             android:layout_height="36dp"
             android:background="@null"
             android:clickable="true"
-            android:contentDescription="@string/exo_controls_shuffle_description"
+            android:contentDescription="@string/shuffle"
             android:src="@drawable/ic_shuffle_none"
             custom:direction="horizontal" />
 

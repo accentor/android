@@ -184,9 +184,9 @@ class MusicService : MediaBrowserServiceCompat() {
                 })
             it.setPlaybackPreparer(object : MediaSessionConnector.PlaybackPreparer {
                 override fun onCommand(
-                    player: Player?,
-                    controlDispatcher: ControlDispatcher?,
-                    command: String?,
+                    player: Player,
+                    controlDispatcher: ControlDispatcher,
+                    command: String,
                     extras: Bundle?,
                     cb: ResultReceiver?
                 ): Boolean {
@@ -196,16 +196,16 @@ class MusicService : MediaBrowserServiceCompat() {
                 override fun getSupportedPrepareActions(): Long =
                     PlaybackStateCompat.ACTION_PREPARE
 
-                override fun onPrepareFromMediaId(mediaId: String?, extras: Bundle?) {
+                override fun onPrepareFromMediaId(mediaId: String, playWhenReady: Boolean, extras: Bundle) {
                 }
 
-                override fun onPrepareFromUri(uri: Uri?, extras: Bundle?) {
+                override fun onPrepareFromUri(uri: Uri, playWhenReady: Boolean, extras: Bundle) {
                 }
 
-                override fun onPrepareFromSearch(query: String?, extras: Bundle?) {
+                override fun onPrepareFromSearch(query: String, playWhenReady: Boolean, extras: Bundle) {
                 }
 
-                override fun onPrepare() {
+                override fun onPrepare(playWhenReady: Boolean) {
                     exoPlayer.prepare(mediaSource)
                 }
             })
@@ -244,7 +244,7 @@ class MusicService : MediaBrowserServiceCompat() {
                 builder.build()
             }
             it.setQueueNavigator(object : TimelineQueueNavigator(mediaSession, Int.MAX_VALUE) {
-                override fun getMediaDescription(player: Player?, windowIndex: Int): MediaDescriptionCompat =
+                override fun getMediaDescription(player: Player, windowIndex: Int): MediaDescriptionCompat =
                     queue[windowIndex].description
             })
         }

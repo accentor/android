@@ -33,5 +33,5 @@ data class AlbumArtist(
 
 data class AlbumLabel(
     val labelId: Int,
-    val catalogueNumber: String
+    val catalogueNumber: String?
 )

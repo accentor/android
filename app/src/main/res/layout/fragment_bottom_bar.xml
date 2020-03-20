@@ -52,7 +52,7 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:clickable="true"
-            android:contentDescription="@string/exo_controls_previous_description"
+            android:contentDescription="@string/previous"
             android:scaleType="fitXY"
             android:src="@drawable/exo_controls_previous"
             custom:direction="horizontal" />
@@ -63,7 +63,7 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:clickable="true"
-            android:contentDescription="@string/exo_controls_pause_description"
+            android:contentDescription="@string/pause"
             android:scaleType="fitXY"
             android:src="@drawable/exo_controls_pause"
             custom:direction="horizontal" />
@@ -74,7 +74,7 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:clickable="true"
-            android:contentDescription="@string/exo_controls_play_description"
+            android:contentDescription="@string/play"
             android:scaleType="fitXY"
             android:src="@drawable/exo_controls_play"
             custom:direction="horizontal" />
@@ -85,7 +85,7 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:clickable="true"
-            android:contentDescription="@string/exo_controls_next_description"
+            android:contentDescription="@string/next"
             android:src="@drawable/exo_controls_next"
             custom:direction="horizontal" />
     </LinearLayout>

@@ -3,10 +3,10 @@ package me.vanpetegem.accentor.components
 import android.content.Context
 import android.content.res.TypedArray
 import android.util.AttributeSet
-import android.widget.ImageView
+import androidx.appcompat.widget.AppCompatImageView
 import me.vanpetegem.accentor.R
 
-class SquaredImageView : ImageView {
+class SquaredImageView : AppCompatImageView {
     val direction: String
 
     constructor(context: Context) : super(context) {

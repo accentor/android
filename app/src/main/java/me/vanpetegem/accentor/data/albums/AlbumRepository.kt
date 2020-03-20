@@ -24,6 +24,7 @@ class AlbumRepository(private val albumDao: AlbumDao, private val authentication
             when (val result =
                 index(authenticationRepository.server.value!!, authenticationRepository.authData.value!!)) {
                 is Result.Success -> {
+
                     albumDao.replaceAll(result.data)
 
                     uiThread {
@@ -31,7 +32,7 @@ class AlbumRepository(private val albumDao: AlbumDao, private val authentication
                     }
                 }
                 is Result.Error -> uiThread {
-                    Log.e("ALBUMS", "error getting albums", result.exception)
+                    Log.e("Accentor", "error getting albums", result.exception)
                     handler(Result.Error(result.exception))
                 }
             }
