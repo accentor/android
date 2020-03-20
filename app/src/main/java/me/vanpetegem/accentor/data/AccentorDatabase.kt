@@ -33,7 +33,7 @@ import me.vanpetegem.accentor.util.RoomTypeConverters
         DbTrackArtist::class,
         DbTrackGenre::class
     ],
-    version = 4
+    version = 5
 )
 abstract class AccentorDatabase : RoomDatabase() {
 
@@ -78,6 +78,21 @@ abstract class AccentorDatabase : RoomDatabase() {
                                     database.endTransaction()
                                 }
                             }
+                        })
+                        .addMigrations(object: Migration(4, 5) {
+                            override fun migrate(database: SupportSQLiteDatabase) {
+                                database.beginTransaction()
+                                try {
+                                    database.execSQL("ALTER TABLE `album_labels` RENAME TO `album_labels_old`")
+                                    database.execSQL("CREATE TABLE `album_labels` (`album_id` INTEGER NOT NULL, `label_id` INTEGER NOT NULL, `catalogue_number` TEXT, PRIMARY KEY(`album_id`, `label_id`))")
+                                    database.execSQL("INSERT INTO `album_labels` (`album_id`, `label_id`, `catalogue_number`) SELECT `album_id`, `label_id`, `catalogue_number` FROM `album_labels_old`")
+                                    database.execSQL("DROP TABLE `album_labels_old`")
+                                    database.setTransactionSuccessful()
+                                } finally {
+                                    database.endTransaction()
+                                }
+                            }
+
                         })
                         .build()
                 INSTANCE = instance

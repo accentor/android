@@ -28,12 +28,12 @@ class ArtistRepository(
                 is Result.Success -> {
                     artistDao.replaceAll(result.data)
 
-                        uiThread {
-                            handler(Result.Success(Unit))
-                        }
+                    uiThread {
+                        handler(Result.Success(Unit))
+                    }
                 }
                 is Result.Error -> uiThread {
-                    Log.e("ALBUMS", "error getting artists", result.exception)
+                    Log.e("Accentor", "error getting artists", result.exception)
                     handler(Result.Error(result.exception))
                 }
             }

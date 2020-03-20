@@ -26,7 +26,7 @@ class PlayQueueAdapter(val clickHandler: (Track) -> Unit) : RecyclerView.Adapter
     var items: List<Triple<Boolean, Track, Album>> = ArrayList()
         set(value) {
             field = value
-            Log.d("PLAYQUEUE", "Queue length: ${value.size}")
+            Log.d("Accentor", "Queue length: ${value.size}")
             notifyDataSetChanged()
         }
 

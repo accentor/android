@@ -40,7 +40,7 @@ class TrackRepository(private val trackDao: TrackDao, private val authentication
                     }
                 }
                 is Result.Error -> uiThread {
-                    Log.e("TRACKS", "error getting tracks", result.exception)
+                    Log.e("Accentor", "error getting tracks", result.exception)
                     handler(Result.Error(result.exception))
                 }
             }
