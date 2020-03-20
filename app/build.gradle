@@ -73,7 +73,7 @@ dependencies {
     // Fuel
     implementation "com.github.kittinunf.fuel:fuel:2.1.0"
     implementation "com.github.kittinunf.fuel:fuel-android:2.1.0"
-    implementation "com.google.code.gson:gson:2.8.5"
+    implementation "com.google.code.gson:gson:2.8.6"
 
     // Material
     implementation 'com.google.android.material:material:1.0.0'
