@@ -332,7 +332,7 @@ class MusicService : MediaBrowserServiceCompat() {
             }
         }
 
-        @SuppressLint("WakelockTimeout")
+        @SuppressLint("WakelockTimeout", "Wakelock")
         private fun updateLocks(state: PlaybackStateCompat) {
 
             when (state.state) {

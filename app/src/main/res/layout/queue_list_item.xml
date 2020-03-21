@@ -25,7 +25,8 @@
             android:ellipsize="end"
             android:singleLine="true"
             android:textColor="@color/colorBlack"
-            android:textSize="18sp" />
+            android:textSize="18sp"
+            android:textIsSelectable="false" />
 
         <TextView
             android:id="@+id/track_artists"
@@ -34,7 +35,8 @@
             android:ellipsize="end"
             android:singleLine="true"
             android:textColor="@color/colorGrey"
-            android:textSize="14sp" />
+            android:textSize="14sp"
+            android:textIsSelectable="false" />
     </LinearLayout>
 
     <android.widget.Space
@@ -59,7 +61,8 @@
             android:ellipsize="none"
             android:singleLine="true"
             android:textColor="@color/colorGrey"
-            android:textSize="14sp" />
+            android:textSize="14sp"
+            android:textIsSelectable="false" />
     </LinearLayout>
 
 </LinearLayout>
