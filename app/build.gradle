@@ -29,6 +29,15 @@ android {
         targetCompatibility "1.8"
         sourceCompatibility "1.8"
     }
+    lintOptions {
+        quiet true
+        checkAllWarnings true
+        ignoreWarnings false
+        warningsAsErrors true
+        textReport true
+        textOutput "stdout"
+        explainIssues !project.hasProperty("isCI")
+    }
 }
 
 dependencies {
