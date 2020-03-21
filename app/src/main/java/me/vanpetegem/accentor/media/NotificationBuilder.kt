@@ -27,22 +27,22 @@ class NotificationBuilder(private val context: Context) {
 
     private val skipToPreviousAction = NotificationCompat.Action(
         R.drawable.exo_controls_previous,
-        context.getString(R.string.notification_skip_to_previous),
+        context.getString(R.string.previous),
         MediaButtonReceiver.buildMediaButtonPendingIntent(context, PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS)
     )
     private val playAction = NotificationCompat.Action(
         R.drawable.exo_controls_play,
-        context.getString(R.string.notification_play),
+        context.getString(R.string.play),
         MediaButtonReceiver.buildMediaButtonPendingIntent(context, PlaybackStateCompat.ACTION_PLAY)
     )
     private val pauseAction = NotificationCompat.Action(
         R.drawable.exo_controls_pause,
-        context.getString(R.string.notification_pause),
+        context.getString(R.string.pause),
         MediaButtonReceiver.buildMediaButtonPendingIntent(context, PlaybackStateCompat.ACTION_PAUSE)
     )
     private val skipToNextAction = NotificationCompat.Action(
         R.drawable.exo_controls_next,
-        context.getString(R.string.notification_skip_to_next),
+        context.getString(R.string.play_next),
         MediaButtonReceiver.buildMediaButtonPendingIntent(context, PlaybackStateCompat.ACTION_SKIP_TO_NEXT)
     )
     private val stopPendingIntent =
@@ -86,7 +86,7 @@ class NotificationBuilder(private val context: Context) {
             .setDeleteIntent(stopPendingIntent)
             .setLargeIcon(description.iconBitmap)
             .setOnlyAlertOnce(true)
-            .setSmallIcon(R.drawable.ic_notifcation)
+            .setSmallIcon(R.drawable.ic_notification)
             .setStyle(mediaStyle)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .build()
@@ -100,7 +100,7 @@ class NotificationBuilder(private val context: Context) {
     private fun createNowPlayingChannel() {
         val notificationChannel = NotificationChannel(
             NOW_PLAYING_CHANNEL,
-            context.getString(R.string.notification_channel),
+            context.getString(R.string.now_playing),
             NotificationManager.IMPORTANCE_LOW
         )
             .apply {
@@ -111,4 +111,3 @@ class NotificationBuilder(private val context: Context) {
         platformNotificationManager.createNotificationChannel(notificationChannel)
     }
 }
-

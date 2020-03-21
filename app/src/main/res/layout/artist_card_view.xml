@@ -16,7 +16,8 @@
             android:id="@+id/artist_card_name_view"
             style="@style/CardTitleStyle"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:textIsSelectable="false" />
 
     </LinearLayout>
 
