@@ -13,7 +13,7 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.material.navigation.NavigationView
 import com.sothree.slidinguppanel.SlidingUpPanelLayout
@@ -82,7 +82,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         navView.setNavigationItemSelectedListener(this)
         swipeRefreshLayout.setOnRefreshListener(this)
 
-        mainViewModel = ViewModelProviders.of(this).get(MainViewModel::class.java)
+        mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
         mainViewModel.loginState.observe(this, Observer {
             val loggedIn = it ?: return@Observer
             if (!loggedIn) {
@@ -155,7 +155,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
         })
 
-        mediaSessionConnection = ViewModelProviders.of(this).get(MediaSessionConnection::class.java)
+        mediaSessionConnection = ViewModelProvider(this).get(MediaSessionConnection::class.java)
         mediaSessionConnection.queuePosStr.observe(this, Observer {
             playerToolbar.subtitle = it ?: "0/0"
         })

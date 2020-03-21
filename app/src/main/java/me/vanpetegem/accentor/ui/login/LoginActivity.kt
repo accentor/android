@@ -12,7 +12,7 @@ import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import me.vanpetegem.accentor.R
 import me.vanpetegem.accentor.ui.main.MainActivity
 import org.jetbrains.anko.startActivity
@@ -32,7 +32,7 @@ class LoginActivity : AppCompatActivity() {
         val login = findViewById<Button>(R.id.login)
         val loading = findViewById<ProgressBar>(R.id.loading)
 
-        loginViewModel = ViewModelProviders.of(this).get(LoginViewModel::class.java)
+        loginViewModel = ViewModelProvider(this).get(LoginViewModel::class.java)
 
         loginViewModel.loginFormState.observe(this, Observer {
             val loginState = it ?: return@Observer

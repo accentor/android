@@ -12,7 +12,7 @@ import android.widget.TextView
 import android.widget.ViewFlipper
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -42,7 +42,7 @@ class PlayerFragment : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
-        mediaSessionConnection = ViewModelProviders.of(activity!!).get(MediaSessionConnection::class.java)
+        mediaSessionConnection = ViewModelProvider(activity!!).get(MediaSessionConnection::class.java)
 
         val playQueueView = view!!.findViewById<RecyclerView>(R.id.queue_recycler_view)
         val adapter = PlayQueueAdapter { mediaSessionConnection.skipTo(it) }
