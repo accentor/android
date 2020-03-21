@@ -71,9 +71,7 @@ class MusicService : MediaBrowserServiceCompat() {
         .build()
 
     private val exoPlayer: ExoPlayer by lazy {
-        ExoPlayerFactory.newSimpleInstance(
-            this,
-            DefaultTrackSelector(),
+        SimpleExoPlayer.Builder(this).setLoadControl(
             // TODO: This is ugly and should be done in a better way. See https://github.com/google/ExoPlayer/issues/6204
             DefaultLoadControl.Builder().setBufferDurationsMs(
                 Int.MAX_VALUE,
@@ -81,7 +79,7 @@ class MusicService : MediaBrowserServiceCompat() {
                 DefaultLoadControl.DEFAULT_BUFFER_FOR_PLAYBACK_MS,
                 DefaultLoadControl.DEFAULT_BUFFER_FOR_PLAYBACK_AFTER_REBUFFER_MS
             ).createDefaultLoadControl()
-        ).apply {
+        ).build().apply {
             setAudioAttributes(accentorAudioAttributes, true)
         }
     }
@@ -273,7 +271,7 @@ class MusicService : MediaBrowserServiceCompat() {
         val wifiManager = getSystemService(Context.WIFI_SERVICE) as WifiManager
         val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
         val wifiLock: WifiManager.WifiLock =
-            wifiManager.createWifiLock(WifiManager.WIFI_MODE_FULL, "Accentor:WifiLock")
+            wifiManager.createWifiLock(WifiManager.WIFI_MODE_FULL_HIGH_PERF, "Accentor:WifiLock")
         val wakeLock: PowerManager.WakeLock =
             powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Accentor:WakeLock")
 

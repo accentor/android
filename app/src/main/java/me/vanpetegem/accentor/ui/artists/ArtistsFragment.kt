@@ -7,7 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -29,7 +29,7 @@ class ArtistsFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProviders.of(activity!!).get(ArtistsViewModel::class.java)
+        viewModel = ViewModelProvider(activity!!).get(ArtistsViewModel::class.java)
 
         val cardView: FastScrollRecyclerView = view!!.findViewById(R.id.artist_card_recycler_view)
         val viewAdapter = ArtistCardAdapter(this)
