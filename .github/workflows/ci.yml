@@ -16,6 +16,8 @@ jobs:
     - uses: actions/setup-java@v1
       with:
         java-version: 11
+    - name: Setup Android problem matchers
+      uses: jonasb/android-problem-matchers-action@v1
     - name: Test
       run: ./gradlew test
   lint:
@@ -48,5 +50,7 @@ jobs:
     - uses: actions/setup-java@v1
       with:
         java-version: 11
+    - name: Setup Android problem matchers
+      uses: jonasb/android-problem-matchers-action@v1
     - name: Build
       run: ./gradlew assemble
