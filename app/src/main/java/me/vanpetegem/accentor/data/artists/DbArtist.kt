@@ -12,6 +12,8 @@ data class DbArtist(
     val id: Int,
     @ColumnInfo(name = "name")
     val name: String,
+    @ColumnInfo(name = "normalized_name")
+    val normalizedName: String,
     @ColumnInfo(name = "review_comment")
     val reviewComment: String?,
     @ColumnInfo(name = "created_at")

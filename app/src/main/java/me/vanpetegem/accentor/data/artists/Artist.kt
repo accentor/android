@@ -5,6 +5,7 @@ import java.time.Instant
 data class Artist(
     val id: Int,
     val name: String,
+    val normalizedName: String,
     val reviewComment: String?,
     val createdAt: Instant,
     val updatedAt: Instant,
