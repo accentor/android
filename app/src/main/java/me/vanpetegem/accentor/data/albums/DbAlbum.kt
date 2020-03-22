@@ -13,6 +13,8 @@ data class DbAlbum(
     val id: Int,
     @ColumnInfo(name = "title")
     val title: String,
+    @ColumnInfo(name = "normalized_title")
+    val normalizedTitle: String,
     @ColumnInfo(name = "release")
     val release: LocalDate,
     @ColumnInfo(name = "review_comment")
@@ -48,6 +50,8 @@ data class DbAlbumArtist(
     val artistId: Int,
     @ColumnInfo(name = "name")
     val name: String,
+    @ColumnInfo(name = "normalized_name")
+    val normalizedName: String,
     @ColumnInfo(name = "order")
     val order: Int,
     @ColumnInfo(name = "separator")

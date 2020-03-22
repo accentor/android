@@ -33,7 +33,7 @@ import me.vanpetegem.accentor.util.RoomTypeConverters
         DbTrackArtist::class,
         DbTrackGenre::class
     ],
-    version = 5
+    version = 6
 )
 abstract class AccentorDatabase : RoomDatabase() {
 
@@ -87,6 +87,32 @@ abstract class AccentorDatabase : RoomDatabase() {
                                     database.execSQL("CREATE TABLE `album_labels` (`album_id` INTEGER NOT NULL, `label_id` INTEGER NOT NULL, `catalogue_number` TEXT, PRIMARY KEY(`album_id`, `label_id`))")
                                     database.execSQL("INSERT INTO `album_labels` (`album_id`, `label_id`, `catalogue_number`) SELECT `album_id`, `label_id`, `catalogue_number` FROM `album_labels_old`")
                                     database.execSQL("DROP TABLE `album_labels_old`")
+                                    database.setTransactionSuccessful()
+                                } finally {
+                                    database.endTransaction()
+                                }
+                            }
+
+                        })
+                        .addMigrations(object: Migration(5, 6) {
+                            override fun migrate(database: SupportSQLiteDatabase) {
+                                database.beginTransaction()
+                                try {
+                                    // The UPDATE statements aren't correct;
+                                    // they don't strip diacritics. However,
+                                    // the correct data will be loaded from the
+                                    // server at some point, so it's not that
+                                    // bad.
+                                    database.execSQL("ALTER TABLE `albums` ADD COLUMN `normalized_title` TEXT NOT NULL DEFAULT ''")
+                                    database.execSQL("UPDATE `albums` SET `normalized_title` = LOWER(`title`)")
+                                    database.execSQL("ALTER TABLE `artists` ADD COLUMN `normalized_name` TEXT NOT NULL DEFAULT ''")
+                                    database.execSQL("UPDATE `artists` SET `normalized_name` = LOWER(`name`)")
+                                    database.execSQL("ALTER TABLE `tracks` ADD COLUMN `normalized_title` TEXT NOT NULL DEFAULT ''")
+                                    database.execSQL("UPDATE `tracks` SET `normalized_title` = LOWER(`title`)")
+                                    database.execSQL("ALTER TABLE `album_artists` ADD COLUMN `normalized_name` TEXT NOT NULL DEFAULT ''")
+                                    database.execSQL("UPDATE `album_artists` SET `normalized_name` = LOWER(`name`)")
+                                    database.execSQL("ALTER TABLE `track_artists` ADD COLUMN `normalized_name` TEXT NOT NULL DEFAULT ''")
+                                    database.execSQL("UPDATE `track_artists` SET `normalized_name` = LOWER(`name`)")
                                     database.setTransactionSuccessful()
                                 } finally {
                                     database.endTransaction()

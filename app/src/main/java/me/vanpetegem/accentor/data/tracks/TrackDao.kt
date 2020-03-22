@@ -19,6 +19,7 @@ abstract class TrackDao {
                     Track(
                         t.id,
                         t.title,
+                        t.normalizedTitle,
                         t.number,
                         t.albumId,
                         t.reviewComment,
@@ -46,13 +47,14 @@ abstract class TrackDao {
         return Track(
             dbTrack.id,
             dbTrack.title,
+            dbTrack.normalizedTitle,
             dbTrack.number,
             dbTrack.albumId,
             dbTrack.reviewComment,
             dbTrack.createdAt,
             dbTrack.updatedAt,
             trackGenres.map { it.genreId },
-            trackArtists.map { TrackArtist(it.artistId, it.name, it.role, it.order) },
+            trackArtists.map { TrackArtist(it.artistId, it.name, it.normalizedName, it.role, it.order) },
             dbTrack.codecId,
             dbTrack.length,
             dbTrack.bitrate,
@@ -78,6 +80,7 @@ abstract class TrackDao {
                     TrackArtist(
                         ta.artistId,
                         ta.name,
+                        ta.normalizedName,
                         ta.role,
                         ta.order
                     )
@@ -107,6 +110,7 @@ abstract class TrackDao {
                 DbTrack(
                     track.id,
                     track.title,
+                    track.normalizedTitle,
                     track.number,
                     track.albumId,
                     track.reviewComment,
@@ -119,7 +123,14 @@ abstract class TrackDao {
                 )
             )
             for (ta in track.trackArtists) {
-                insert(DbTrackArtist(track.id, ta.artistId, ta.name, ta.role, ta.order))
+                insert(DbTrackArtist(
+                    track.id,
+                    ta.artistId,
+                    ta.name,
+                    ta.normalizedName,
+                    ta.role,
+                    ta.order
+                ))
             }
             for (gId in track.genreIds) {
                 insert(DbTrackGenre(track.id, gId))

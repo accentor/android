@@ -19,6 +19,7 @@ abstract class AlbumDao {
                     Album(
                         a.id,
                         a.title,
+                        a.normalizedTitle,
                         a.release,
                         a.reviewComment,
                         a.edition,
@@ -48,6 +49,7 @@ abstract class AlbumDao {
         return Album(
             dbAlbum.id,
             dbAlbum.title,
+            dbAlbum.normalizedTitle,
             dbAlbum.release,
             dbAlbum.reviewComment,
             dbAlbum.edition,
@@ -60,7 +62,7 @@ abstract class AlbumDao {
             dbAlbum.image100,
             dbAlbum.imageType,
             albumLabels.map { AlbumLabel(it.labelId, it.catalogueNumber) },
-            albumArtists.map { AlbumArtist(it.artistId, it.name, it.order, it.separator) }
+            albumArtists.map { AlbumArtist(it.artistId, it.name, it.normalizedName, it.order, it.separator) }
         )
     }
 
@@ -89,7 +91,7 @@ abstract class AlbumDao {
             val map = SparseArray<MutableList<AlbumArtist>>()
             for (aa in it) {
                 val l = map.get(aa.albumId, ArrayList())
-                l.add(AlbumArtist(aa.artistId, aa.name, aa.order, aa.separator))
+                l.add(AlbumArtist(aa.artistId, aa.name, aa.normalizedName, aa.order, aa.separator))
                 map.put(aa.albumId, l)
             }
             return@map map
@@ -105,6 +107,7 @@ abstract class AlbumDao {
                 DbAlbum(
                     album.id,
                     album.title,
+                    album.normalizedTitle,
                     album.release,
                     album.reviewComment,
                     album.edition,
@@ -122,13 +125,13 @@ abstract class AlbumDao {
                 insert(DbAlbumLabel(album.id, al.labelId, al.catalogueNumber))
             }
             for (al: AlbumArtist in album.albumArtists) {
-                insert(DbAlbumArtist(album.id, al.artistId, al.name, al.order, al.separator))
+                insert(DbAlbumArtist(album.id, al.artistId, al.name, al.normalizedName, al.order, al.separator))
             }
         }
     }
 
 
-    @Query("SELECT * FROM albums ORDER BY title COLLATE NOCASE ASC")
+    @Query("SELECT * FROM albums ORDER BY normalized_title ASC")
     protected abstract fun getAllDbAlbums(): LiveData<List<DbAlbum>>
 
     @Query("SELECT * FROM album_artists")
