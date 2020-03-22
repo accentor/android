@@ -6,6 +6,7 @@ import java.time.LocalDate
 data class Album(
     val id: Int,
     val title: String,
+    val normalizedTitle: String,
     val release: LocalDate,
     val reviewComment: String?,
     val edition: LocalDate?,
@@ -27,6 +28,7 @@ data class Album(
 data class AlbumArtist(
     val artistId: Int,
     val name: String,
+    val normalizedName: String,
     val order: Int,
     val separator: String?
 )

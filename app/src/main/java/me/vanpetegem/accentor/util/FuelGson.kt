@@ -19,6 +19,7 @@ import java.io.Reader
 import java.time.Instant
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 inline fun <reified T : Any> Request.responseObject() =
     response(gsonDeserializer<T>())
@@ -39,21 +40,21 @@ fun gsonObject(): Gson {
     builder.setFieldNamingStrategy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
     builder.registerTypeAdapter(Permission::class.java, object : TypeAdapter<Permission>() {
         override fun write(out: JsonWriter, value: Permission) {
-            out.value(value.name.toLowerCase())
+            out.value(value.name.toLowerCase(Locale.getDefault()))
         }
 
         override fun read(`in`: JsonReader): Permission {
-            return Permission.valueOf(`in`.nextString().toUpperCase())
+            return Permission.valueOf(`in`.nextString().toUpperCase(Locale.getDefault()))
         }
     })
 
     builder.registerTypeAdapter(Role::class.java, object : TypeAdapter<Role>() {
         override fun write(out: JsonWriter, value: Role) {
-            out.value(value.name.toLowerCase())
+            out.value(value.name.toLowerCase(Locale.getDefault()))
         }
 
         override fun read(`in`: JsonReader): Role {
-            return Role.valueOf(`in`.nextString().toUpperCase())
+            return Role.valueOf(`in`.nextString().toUpperCase(Locale.getDefault()))
         }
     })
 

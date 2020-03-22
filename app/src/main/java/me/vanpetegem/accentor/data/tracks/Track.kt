@@ -5,6 +5,7 @@ import java.time.Instant
 data class Track(
     val id: Int,
     val title: String,
+    val normalizedTitle: String,
     val number: Int,
     val albumId: Int,
     val reviewComment: String?,
@@ -29,6 +30,7 @@ data class Track(
 data class TrackArtist(
     val artistId: Int,
     val name: String,
+    val normalizedName: String,
     val role: Role,
     val order: Int
 )

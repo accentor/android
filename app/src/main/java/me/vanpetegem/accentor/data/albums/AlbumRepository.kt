@@ -32,7 +32,6 @@ class AlbumRepository(private val albumDao: AlbumDao, private val authentication
                     }
                 }
                 is Result.Error -> uiThread {
-                    Log.e("Accentor", "error getting albums", result.exception)
                     handler(Result.Error(result.exception))
                 }
             }

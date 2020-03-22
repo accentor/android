@@ -9,8 +9,8 @@ android {
         applicationId "me.vanpetegem.accentor"
         minSdkVersion 26
         targetSdkVersion 29
-        versionCode 9
-        versionName "0.0.9"
+        versionCode 10
+        versionName "0.0.10"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         javaCompileOptions {
@@ -28,6 +28,16 @@ android {
     compileOptions {
         targetCompatibility "1.8"
         sourceCompatibility "1.8"
+    }
+    lintOptions {
+        quiet true
+        checkAllWarnings true
+        disable 'SyntheticAccessor'
+        ignoreWarnings false
+        warningsAsErrors true
+        textReport true
+        textOutput "stdout"
+        explainIssues !project.hasProperty("isCI")
     }
 }
 
@@ -60,10 +70,10 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0"
 
     // Glide
-    implementation("com.github.bumptech.glide:glide:4.9.0") {
+    implementation("com.github.bumptech.glide:glide:4.11.0") {
         exclude group: "com.android.support"
     }
-    kapt "com.github.bumptech.glide:compiler:4.9.0"
+    kapt "com.github.bumptech.glide:compiler:4.11.0"
 
     // ExoPlayer
     implementation "com.google.android.exoplayer:exoplayer-core:2.11.3"
@@ -82,7 +92,7 @@ dependencies {
     implementation 'com.sothree.slidinguppanel:library:3.4.0'
 
     // Fast-scrolling recyclerview
-    implementation 'com.simplecityapps:recyclerview-fastscroll:2.0.0'
+    implementation 'com.simplecityapps:recyclerview-fastscroll:2.0.1'
 
     // Tests
     testImplementation 'junit:junit:4.13'

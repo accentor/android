@@ -22,6 +22,15 @@ allprojects {
         google()
         jcenter()
     }
+    tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
+        kotlinOptions {
+            freeCompilerArgs = ["-Werror"]
+        }
+    }
+    tasks.withType(JavaCompile) {
+        options.compilerArgs << "-Xlint:deprecation" << "-Werror"
+    }
+
 }
 
 task clean(type: Delete) {

@@ -26,13 +26,15 @@
                     android:id="@+id/album_card_title_view"
                     style="@style/CardTitleStyle"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:textIsSelectable="false" />
 
                 <TextView
                     android:id="@+id/album_card_subtitle_view"
                     style="@style/CardTitleStyle.Subtitle"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:textIsSelectable="false" />
 
             </LinearLayout>
 

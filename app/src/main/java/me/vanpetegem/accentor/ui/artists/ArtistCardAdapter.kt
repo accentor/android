@@ -43,7 +43,7 @@ class ArtistCardAdapter(private val fragment: Fragment) :
         holder.artistNameView.text = items[position].name
         Glide.with(fragment)
             .load(items[position].image500)
-            .placeholder(R.drawable.ic_menu_artists)
+            .placeholder(R.drawable.ic_artist)
             .into(holder.artistImageView)
     }
 

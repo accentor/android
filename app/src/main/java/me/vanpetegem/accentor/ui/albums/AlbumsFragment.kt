@@ -8,7 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -36,8 +36,8 @@ class AlbumsFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProviders.of(activity!!).get(AlbumsViewModel::class.java)
-        mediaSessionConnection = ViewModelProviders.of(activity!!).get(MediaSessionConnection::class.java)
+        viewModel = ViewModelProvider(activity!!).get(AlbumsViewModel::class.java)
+        mediaSessionConnection = ViewModelProvider(activity!!).get(MediaSessionConnection::class.java)
 
         val cardView: FastScrollRecyclerView = view!!.findViewById(R.id.album_card_recycler_view)
         val viewAdapter = AlbumCardAdapter(this, object : AlbumActionListener {
@@ -56,7 +56,7 @@ class AlbumsFragment : Fragment() {
                         album.id,
                         ArrayList()
                     ).map { Pair(it, album) },
-                    max(0, (mediaSessionConnection.queuePosition.value ?: 0) - 1)
+                    max(0, mediaSessionConnection.queuePosition.value ?: 0)
                 )
             }
 

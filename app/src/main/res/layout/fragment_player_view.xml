@@ -30,7 +30,8 @@
                 android:layout_height="wrap_content"
                 android:textAlignment="center"
                 android:textColor="@color/colorBlack"
-                android:textSize="20sp" />
+                android:textSize="20sp"
+                android:textIsSelectable="false" />
 
             <TextView
                 android:id="@+id/track_artists_view"
@@ -38,7 +39,8 @@
                 android:layout_height="wrap_content"
                 android:textAlignment="center"
                 android:textColor="@color/colorGrey"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                android:textIsSelectable="false" />
 
             <TextView
                 android:id="@+id/album_title_view"
@@ -46,7 +48,8 @@
                 android:layout_height="wrap_content"
                 android:textAlignment="center"
                 android:textColor="@color/colorGrey"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                android:textIsSelectable="false" />
 
         </LinearLayout>
 
@@ -146,7 +149,8 @@
         <TextView
             android:id="@+id/player_current_time"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:textIsSelectable="false" />
 
         <SeekBar
             android:id="@+id/player_seek_bar"
@@ -157,7 +161,8 @@
         <TextView
             android:id="@+id/player_total_time"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:textIsSelectable="false" />
 
     </LinearLayout>
 

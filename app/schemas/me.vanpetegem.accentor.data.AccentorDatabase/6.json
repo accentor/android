@@ -1,8 +1,8 @@
 {
   "formatVersion": 1,
   "database": {
-    "version": 4,
-    "identityHash": "0d2fbeca8462fade0c06194dcab41102",
+    "version": 6,
+    "identityHash": "06e9dcc0516895493877e104a4edf8b6",
     "entities": [
       {
         "tableName": "users",
@@ -38,7 +38,7 @@
       },
       {
         "tableName": "albums",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `title` TEXT NOT NULL, `release` TEXT NOT NULL, `review_comment` TEXT, `edition` TEXT, `edition_description` TEXT, `created_at` TEXT NOT NULL, `updated_at` TEXT NOT NULL, `image` TEXT, `image_500` TEXT, `image_250` TEXT, `image_100` TEXT, `image_type` TEXT, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `title` TEXT NOT NULL, `normalized_title` TEXT NOT NULL, `release` TEXT NOT NULL, `review_comment` TEXT, `edition` TEXT, `edition_description` TEXT, `created_at` TEXT NOT NULL, `updated_at` TEXT NOT NULL, `image` TEXT, `image_500` TEXT, `image_250` TEXT, `image_100` TEXT, `image_type` TEXT, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -49,6 +49,12 @@
           {
             "fieldPath": "title",
             "columnName": "title",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "normalizedTitle",
+            "columnName": "normalized_title",
             "affinity": "TEXT",
             "notNull": true
           },
@@ -130,7 +136,7 @@
       },
       {
         "tableName": "album_artists",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`album_id` INTEGER NOT NULL, `artist_id` INTEGER NOT NULL, `name` TEXT NOT NULL, `order` INTEGER NOT NULL, `separator` TEXT, PRIMARY KEY(`album_id`, `artist_id`, `name`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`album_id` INTEGER NOT NULL, `artist_id` INTEGER NOT NULL, `name` TEXT NOT NULL, `normalized_name` TEXT NOT NULL, `order` INTEGER NOT NULL, `separator` TEXT, PRIMARY KEY(`album_id`, `artist_id`, `name`))",
         "fields": [
           {
             "fieldPath": "albumId",
@@ -147,6 +153,12 @@
           {
             "fieldPath": "name",
             "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "normalizedName",
+            "columnName": "normalized_name",
             "affinity": "TEXT",
             "notNull": true
           },
@@ -176,7 +188,7 @@
       },
       {
         "tableName": "album_labels",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`album_id` INTEGER NOT NULL, `label_id` INTEGER NOT NULL, `catalogue_number` TEXT NOT NULL, PRIMARY KEY(`album_id`, `label_id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`album_id` INTEGER NOT NULL, `label_id` INTEGER NOT NULL, `catalogue_number` TEXT, PRIMARY KEY(`album_id`, `label_id`))",
         "fields": [
           {
             "fieldPath": "albumId",
@@ -194,7 +206,7 @@
             "fieldPath": "catalogueNumber",
             "columnName": "catalogue_number",
             "affinity": "TEXT",
-            "notNull": true
+            "notNull": false
           }
         ],
         "primaryKey": {
@@ -209,7 +221,7 @@
       },
       {
         "tableName": "artists",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `name` TEXT NOT NULL, `review_comment` TEXT, `created_at` TEXT NOT NULL, `updated_at` TEXT NOT NULL, `image` TEXT, `image_500` TEXT, `image_250` TEXT, `image_100` TEXT, `image_type` TEXT, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `name` TEXT NOT NULL, `normalized_name` TEXT NOT NULL, `review_comment` TEXT, `created_at` TEXT NOT NULL, `updated_at` TEXT NOT NULL, `image` TEXT, `image_500` TEXT, `image_250` TEXT, `image_100` TEXT, `image_type` TEXT, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -220,6 +232,12 @@
           {
             "fieldPath": "name",
             "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "normalizedName",
+            "columnName": "normalized_name",
             "affinity": "TEXT",
             "notNull": true
           },
@@ -283,7 +301,7 @@
       },
       {
         "tableName": "tracks",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `title` TEXT NOT NULL, `number` INTEGER NOT NULL, `album_id` INTEGER NOT NULL, `review_comment` TEXT, `created_at` TEXT NOT NULL, `updated_at` TEXT NOT NULL, `codec_id` INTEGER, `length` INTEGER, `bitrate` INTEGER, `location_id` INTEGER, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `title` TEXT NOT NULL, `normalized_title` TEXT NOT NULL, `number` INTEGER NOT NULL, `album_id` INTEGER NOT NULL, `review_comment` TEXT, `created_at` TEXT NOT NULL, `updated_at` TEXT NOT NULL, `codec_id` INTEGER, `length` INTEGER, `bitrate` INTEGER, `location_id` INTEGER, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -294,6 +312,12 @@
           {
             "fieldPath": "title",
             "columnName": "title",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "normalizedTitle",
+            "columnName": "normalized_title",
             "affinity": "TEXT",
             "notNull": true
           },
@@ -363,7 +387,7 @@
       },
       {
         "tableName": "track_artists",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`track_id` INTEGER NOT NULL, `artist_id` INTEGER NOT NULL, `name` TEXT NOT NULL, `role` INTEGER NOT NULL, `order` INTEGER NOT NULL, PRIMARY KEY(`track_id`, `artist_id`, `name`, `role`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`track_id` INTEGER NOT NULL, `artist_id` INTEGER NOT NULL, `name` TEXT NOT NULL, `normalized_name` TEXT NOT NULL, `role` INTEGER NOT NULL, `order` INTEGER NOT NULL, PRIMARY KEY(`track_id`, `artist_id`, `name`, `role`))",
         "fields": [
           {
             "fieldPath": "trackId",
@@ -380,6 +404,12 @@
           {
             "fieldPath": "name",
             "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "normalizedName",
+            "columnName": "normalized_name",
             "affinity": "TEXT",
             "notNull": true
           },
@@ -439,7 +469,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '0d2fbeca8462fade0c06194dcab41102')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '06e9dcc0516895493877e104a4edf8b6')"
     ]
   }
 }

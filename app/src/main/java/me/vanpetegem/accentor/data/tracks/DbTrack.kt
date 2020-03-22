@@ -12,6 +12,8 @@ data class DbTrack(
     val id: Int,
     @ColumnInfo(name = "title")
     val title: String,
+    @ColumnInfo(name = "normalized_title")
+    val normalizedTitle: String,
     @ColumnInfo(name = "number")
     val number: Int,
     @ColumnInfo(name = "album_id")
@@ -40,6 +42,8 @@ data class DbTrackArtist(
     val artistId: Int,
     @ColumnInfo(name = "name")
     val name: String,
+    @ColumnInfo(name = "normalized_name")
+    val normalizedName: String,
     @ColumnInfo(name = "role")
     val role: Role,
     @ColumnInfo(name = "order")

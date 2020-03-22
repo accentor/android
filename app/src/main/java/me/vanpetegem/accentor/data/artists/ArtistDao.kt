@@ -15,6 +15,7 @@ abstract class ArtistDao {
             Artist(
                 it.id,
                 it.name,
+                it.normalizedName,
                 it.reviewComment,
                 it.createdAt,
                 it.updatedAt,
@@ -35,6 +36,7 @@ abstract class ArtistDao {
                 DbArtist(
                     artist.id,
                     artist.name,
+                    artist.normalizedName,
                     artist.reviewComment,
                     artist.createdAt,
                     artist.updatedAt,
@@ -48,7 +50,7 @@ abstract class ArtistDao {
         }
     }
 
-    @Query("SELECT * FROM artists ORDER BY name COLLATE NOCASE ASC")
+    @Query("SELECT * FROM artists ORDER BY normalized_name ASC")
     protected abstract fun getAllDbArtists(): LiveData<List<DbArtist>>
 
     @Insert

@@ -5,7 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import me.vanpetegem.accentor.R
 
 class HomeFragment : Fragment() {
@@ -21,7 +21,7 @@ class HomeFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProviders.of(activity!!).get(HomeViewModel::class.java)
+        viewModel = ViewModelProvider(activity!!).get(HomeViewModel::class.java)
     }
 
 }

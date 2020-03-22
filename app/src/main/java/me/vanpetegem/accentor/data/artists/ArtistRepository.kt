@@ -33,7 +33,6 @@ class ArtistRepository(
                     }
                 }
                 is Result.Error -> uiThread {
-                    Log.e("Accentor", "error getting artists", result.exception)
                     handler(Result.Error(result.exception))
                 }
             }

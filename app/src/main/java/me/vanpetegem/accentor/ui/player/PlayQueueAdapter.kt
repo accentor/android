@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import me.vanpetegem.accentor.BuildConfig
 import me.vanpetegem.accentor.R
 import me.vanpetegem.accentor.data.albums.Album
 import me.vanpetegem.accentor.data.tracks.Track
@@ -26,7 +27,6 @@ class PlayQueueAdapter(val clickHandler: (Track) -> Unit) : RecyclerView.Adapter
     var items: List<Triple<Boolean, Track, Album>> = ArrayList()
         set(value) {
             field = value
-            Log.d("Accentor", "Queue length: ${value.size}")
             notifyDataSetChanged()
         }
 
