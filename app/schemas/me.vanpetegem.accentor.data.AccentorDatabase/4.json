@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 4,
-    "identityHash": "7d8ba21c4c05659f7a86a6704affc4d5",
+    "identityHash": "0d2fbeca8462fade0c06194dcab41102",
     "entities": [
       {
         "tableName": "users",
@@ -176,7 +176,7 @@
       },
       {
         "tableName": "album_labels",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`album_id` INTEGER NOT NULL, `label_id` INTEGER NOT NULL, `catalogue_number` TEXT, PRIMARY KEY(`album_id`, `label_id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`album_id` INTEGER NOT NULL, `label_id` INTEGER NOT NULL, `catalogue_number` TEXT NOT NULL, PRIMARY KEY(`album_id`, `label_id`))",
         "fields": [
           {
             "fieldPath": "albumId",
@@ -194,7 +194,7 @@
             "fieldPath": "catalogueNumber",
             "columnName": "catalogue_number",
             "affinity": "TEXT",
-            "notNull": false
+            "notNull": true
           }
         ],
         "primaryKey": {
@@ -439,7 +439,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '7d8ba21c4c05659f7a86a6704affc4d5')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '0d2fbeca8462fade0c06194dcab41102')"
     ]
   }
 }
