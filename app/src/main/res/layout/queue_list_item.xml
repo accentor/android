@@ -17,8 +17,8 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:paddingHorizontal="4dp"
-        android:layout_toLeftOf="@+id/track_length_container"
-        android:layout_toRightOf="@+id/playing_indicator">
+        android:layout_toStartOf="@+id/track_length_container"
+        android:layout_toEndOf="@+id/playing_indicator">
 
         <TextView
             android:id="@+id/track_title"
@@ -46,7 +46,7 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:layout_alignParentRight="true">
+        android:layout_alignParentEnd="true">
 
         <android.widget.Space
             android:layout_width="match_parent"
