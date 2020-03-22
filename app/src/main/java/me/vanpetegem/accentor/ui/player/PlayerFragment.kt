@@ -45,7 +45,10 @@ class PlayerFragment : Fragment() {
         mediaSessionConnection = ViewModelProvider(activity!!).get(MediaSessionConnection::class.java)
 
         val playQueueView = view!!.findViewById<RecyclerView>(R.id.queue_recycler_view)
-        val adapter = PlayQueueAdapter { mediaSessionConnection.skipTo(it) }
+        val adapter = PlayQueueAdapter {
+            mediaSessionConnection.skipTo(it)
+            mediaSessionConnection.play()
+        }
         playQueueView.adapter = adapter
         playQueueView.layoutManager = LinearLayoutManager(context)
         val dragTouchHelper = ItemTouchHelper(object : ItemTouchHelper.Callback() {
