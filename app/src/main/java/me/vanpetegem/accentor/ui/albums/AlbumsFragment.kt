@@ -56,7 +56,7 @@ class AlbumsFragment : Fragment() {
                         album.id,
                         ArrayList()
                     ).map { Pair(it, album) },
-                    max(0, (mediaSessionConnection.queuePosition.value ?: 0) - 1)
+                    max(0, mediaSessionConnection.queuePosition.value ?: 0)
                 )
             }
 
