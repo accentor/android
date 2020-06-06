@@ -194,13 +194,13 @@ class MusicService : MediaBrowserServiceCompat() {
                 override fun getSupportedPrepareActions(): Long =
                     PlaybackStateCompat.ACTION_PREPARE
 
-                override fun onPrepareFromMediaId(mediaId: String, playWhenReady: Boolean, extras: Bundle) {
+                override fun onPrepareFromMediaId(mediaId: String, playWhenReady: Boolean, extras: Bundle?) {
                 }
 
-                override fun onPrepareFromUri(uri: Uri, playWhenReady: Boolean, extras: Bundle) {
+                override fun onPrepareFromUri(uri: Uri, playWhenReady: Boolean, extras: Bundle?) {
                 }
 
-                override fun onPrepareFromSearch(query: String, playWhenReady: Boolean, extras: Bundle) {
+                override fun onPrepareFromSearch(query: String, playWhenReady: Boolean, extras: Bundle?) {
                 }
 
                 override fun onPrepare(playWhenReady: Boolean) {
