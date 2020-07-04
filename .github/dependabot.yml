@@ -10,3 +10,13 @@ updates:
   open-pull-requests-limit: 10
   reviewers:
   - charvp
+- package-ecosystem: github-actions
+  directory: "/"
+  schedule:
+    interval: weekly
+    day: saturday
+    time: "11:00"
+    timezone: Europe/Brussels
+  open-pull-requests-limit: 10
+  reviewers:
+  - charvp
