@@ -76,7 +76,7 @@ dependencies {
     kapt "com.github.bumptech.glide:compiler:4.11.0"
 
     // ExoPlayer
-    implementation "com.google.android.exoplayer:exoplayer-core:2.11.6"
+    implementation "com.google.android.exoplayer:exoplayer-core:2.11.7"
     implementation "com.google.android.exoplayer:exoplayer-ui:2.11.6"
     implementation "com.google.android.exoplayer:extension-mediasession:2.11.6"
 
