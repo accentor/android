@@ -119,7 +119,7 @@ abstract class TrackDao {
     @Query("SELECT * FROM tracks WHERE id = :id")
     protected abstract fun getDbTrackById(id: Int): DbTrack?
 
-    @Query("SELECT * FROM tracks WHERE album_id = :albumId")
+    @Query("SELECT * FROM tracks WHERE album_id = :albumId ORDER BY number ASC")
     protected abstract fun getDbTracksByAlbumId(albumId: Int): List<DbTrack>
 
     @Query("SELECT * FROM tracks WHERE id = :id")
