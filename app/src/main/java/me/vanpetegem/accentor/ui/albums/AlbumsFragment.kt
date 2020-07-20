@@ -25,7 +25,6 @@ class AlbumsFragment : Fragment() {
 
     private lateinit var viewModel: AlbumsViewModel
     private lateinit var mediaSessionConnection: MediaSessionConnection
-    private var allTracksByAlbumId = SparseArray<MutableList<Track>>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -42,31 +41,18 @@ class AlbumsFragment : Fragment() {
         val cardView: FastScrollRecyclerView = view!!.findViewById(R.id.album_card_recycler_view)
         val viewAdapter = AlbumCardAdapter(this, object : AlbumActionListener {
             override fun play(album: Album) {
-                mediaSessionConnection.play(
-                    allTracksByAlbumId.get(
-                        album.id,
-                        ArrayList()
-                    ).map { Pair(it, album) }
-                )
+                mediaSessionConnection.play(album)
             }
 
             override fun playNext(album: Album) {
                 mediaSessionConnection.addTracksToQueue(
-                    allTracksByAlbumId.get(
-                        album.id,
-                        ArrayList()
-                    ).map { Pair(it, album) },
+                    album,
                     max(0, mediaSessionConnection.queuePosition.value ?: 0)
                 )
             }
 
             override fun playLast(album: Album) {
-                mediaSessionConnection.addTracksToQueue(
-                    allTracksByAlbumId.get(
-                        album.id,
-                        ArrayList()
-                    ).map { Pair(it, album) }
-                )
+                mediaSessionConnection.addTracksToQueue(album)
             }
 
         })
@@ -94,9 +80,6 @@ class AlbumsFragment : Fragment() {
         }
         viewModel.allAlbums.observe(viewLifecycleOwner, Observer {
             viewAdapter.items = it
-        })
-        viewModel.tracksByAlbumId.observe(viewLifecycleOwner, Observer {
-            allTracksByAlbumId = it
         })
         viewModel.scrollState.observe(viewLifecycleOwner, Observer {
             it?.let { cardView.layoutManager?.onRestoreInstanceState(it) }
