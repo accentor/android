@@ -20,7 +20,6 @@ class AlbumsViewModel(application: Application) : AndroidViewModel(application) 
     private val trackRepository: TrackRepository
 
     val allAlbums: LiveData<List<Album>>
-    val tracksByAlbumId: LiveData<SparseArray<MutableList<Track>>>
     private val _scrollState = MutableLiveData<Parcelable>()
     val scrollState: LiveData<Parcelable> = _scrollState
 
@@ -29,7 +28,6 @@ class AlbumsViewModel(application: Application) : AndroidViewModel(application) 
         albumRepository = AlbumRepository(database.albumDao(), authenticationRepository)
         trackRepository = TrackRepository(database.trackDao(), authenticationRepository)
         allAlbums = albumRepository.allAlbums
-        tracksByAlbumId = trackRepository.allTracksByAlbumId
     }
 
     fun saveScrollState(state: Parcelable) {

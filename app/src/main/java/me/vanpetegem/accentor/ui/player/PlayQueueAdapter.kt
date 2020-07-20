@@ -14,7 +14,7 @@ import me.vanpetegem.accentor.data.tracks.Track
 import me.vanpetegem.accentor.util.formatTrackLength
 import org.jetbrains.anko.sdk27.coroutines.onClick
 
-class PlayQueueAdapter(val clickHandler: (Track) -> Unit) : RecyclerView.Adapter<PlayQueueAdapter.ViewHolder>() {
+class PlayQueueAdapter(val clickHandler: (Track?) -> Unit) : RecyclerView.Adapter<PlayQueueAdapter.ViewHolder>() {
 
     class ViewHolder(
         val root: View,
@@ -24,7 +24,7 @@ class PlayQueueAdapter(val clickHandler: (Track) -> Unit) : RecyclerView.Adapter
         val playingIndicator: ImageView
     ) : RecyclerView.ViewHolder(root)
 
-    var items: List<Triple<Boolean, Track, Album>> = ArrayList()
+    var items: List<Triple<Boolean, Track?, Album?>> = ArrayList()
         set(value) {
             field = value
             notifyDataSetChanged()
@@ -45,10 +45,10 @@ class PlayQueueAdapter(val clickHandler: (Track) -> Unit) : RecyclerView.Adapter
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.root.onClick { clickHandler(items[position].second) }
-        holder.trackTitleView.text = items[position].second.title
-        val trackArtists = items[position].second.stringifyTrackArtists()
-        holder.trackArtistsView.text = if (trackArtists.isEmpty()) items[position].second.title else trackArtists
-        holder.trackLengthView.text = items[position].second.length.formatTrackLength()
+        holder.trackTitleView.text = items[position].second?.title ?: ""
+        val trackArtists = items[position].second?.stringifyTrackArtists() ?: ""
+        holder.trackArtistsView.text = if (trackArtists.isEmpty()) items[position].second?.title ?: "" else trackArtists
+        holder.trackLengthView.text = items[position].second?.length?.formatTrackLength() ?: "0:00"
         holder.playingIndicator.visibility = if (items[position].first) View.VISIBLE else View.GONE
     }
 

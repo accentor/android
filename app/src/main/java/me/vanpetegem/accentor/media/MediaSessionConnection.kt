@@ -29,12 +29,12 @@ import me.vanpetegem.accentor.data.tracks.Track
 import me.vanpetegem.accentor.data.tracks.TrackDao
 import me.vanpetegem.accentor.data.tracks.TrackRepository
 import me.vanpetegem.accentor.media.extensions.currentPlayBackPosition
+import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.uiThread
 
 class MediaSessionConnection(application: Application) : AndroidViewModel(application) {
 
     private val authenticationDataSource = AuthenticationDataSource(application)
-    private val trackDao: TrackDao
-    private val albumDao: AlbumDao
 
     private val mediaBrowserConnectionCallback = MediaBrowserConnectionCallback(application)
     private val mediaBrowser = MediaBrowserCompat(
@@ -48,10 +48,10 @@ class MediaSessionConnection(application: Application) : AndroidViewModel(applic
 
     private val currentTrackId = MutableLiveData<Int>().apply { postValue(null) }
     val currentTrack: LiveData<Track?> = switchMap(currentTrackId) { id ->
-        map(tracksById) { id?.let { id -> it[id] } }
+        id?.let { trackRepository.findById(id) }
     }
     val currentAlbum: LiveData<Album?> = switchMap(currentTrack) { t ->
-        map(albumsById) { t?.let { t -> it[t.albumId] } }
+        t?.let { albumRepository.findById(t.albumId) }
     }
     private val _currentPosition = MutableLiveData<Long>()
     val currentPosition: LiveData<Int> = map(_currentPosition) {
@@ -72,7 +72,7 @@ class MediaSessionConnection(application: Application) : AndroidViewModel(applic
 
     private val _queue = MutableLiveData<List<MediaSessionCompat.QueueItem>>().apply { postValue(ArrayList()) }
     private val _queueIds: LiveData<List<Int>> = map(_queue) { it.map { item -> item.description.mediaId!!.toInt() } }
-    val queue: LiveData<List<Triple<Boolean, Track, Album>>>
+    val queue: LiveData<List<Triple<Boolean, Track?, Album?>>>
 
     private val activeQueueItemId = MutableLiveData<Long>().apply {
         postValue(MediaSession.QueueItem.UNKNOWN_ID.toLong())
@@ -90,28 +90,28 @@ class MediaSessionConnection(application: Application) : AndroidViewModel(applic
         }
     }
 
-    private val albumsById: LiveData<SparseArray<Album>>
-    private val tracksById: LiveData<SparseArray<Track>>
+    private val albumRepository: AlbumRepository;
+    private val trackRepository: TrackRepository;
 
     init {
         val database = AccentorDatabase.getDatabase(application)
-        trackDao = database.trackDao()
-        albumDao = database.albumDao()
-        val albumRepository = AlbumRepository(albumDao, AuthenticationRepository(authenticationDataSource))
-        albumsById = albumRepository.allAlbumsById
-        val trackRepository = TrackRepository(trackDao, AuthenticationRepository(authenticationDataSource))
-        tracksById = trackRepository.allTracksById
-        queue = switchMap(tracksById) { tracks ->
-            switchMap(albumsById) { albums ->
-                switchMap(_queueIds) { q ->
-                    map(queuePosition) { qPos ->
+        val trackDao = database.trackDao()
+        val albumDao = database.albumDao()
+        albumRepository = AlbumRepository(albumDao, AuthenticationRepository(authenticationDataSource))
+        trackRepository = TrackRepository(trackDao, AuthenticationRepository(authenticationDataSource))
+        queue = switchMap(_queueIds) { q ->
+            switchMap(queuePosition) { qPos ->
+                switchMap(trackRepository.findByIds(q)) { tracks ->
+                    map(albumRepository.findByIds(tracks.map { it.albumId })) { albums ->
                         q.mapIndexed { pos, id ->
-                            val track = tracks[id]
-                            Triple(qPos == pos + 1, track, albums[track.albumId])
+                            val track = tracks.find { it.id == id }
+                            val album = albums.find { it.id == track?.albumId }
+                            Triple(qPos == pos + 1, track, album)
                         }
                     }
                 }
             }
+
         }
     }
 
@@ -149,9 +149,27 @@ class MediaSessionConnection(application: Application) : AndroidViewModel(applic
         play()
     }
 
-    fun clearQueue() = mediaController?.queue?.forEach { mediaController?.removeQueueItem(it.description) }
+    fun play(album: Album) {
+        stop()
+        clearQueue()
+        addTracksToQueue(album, 0) { play() }
+    }
 
-    fun addTracksToQueue(tracks: List<Pair<Track, Album>>) = addTracksToQueue(tracks, _queue.value?.size ?: 0)
+    fun addTracksToQueue(album: Album) = addTracksToQueue(album, _queue.value?.size ?: 0) {}
+
+    fun addTracksToQueue(album: Album, index: Int) = addTracksToQueue(album, index) {}
+
+    fun addTracksToQueue(album: Album, index: Int, resultHandler: () -> Unit) {
+        doAsync {
+            val tracks = trackRepository.getByAlbum(album).map { Pair(it, album) }
+            uiThread {
+                addTracksToQueue(tracks, index)
+                resultHandler()
+            }
+        }
+    }
+
+    fun clearQueue() = mediaController?.queue?.forEach { mediaController?.removeQueueItem(it.description) }
 
     fun addTracksToQueue(tracks: List<Pair<Track, Album>>, index: Int) {
         var base = index

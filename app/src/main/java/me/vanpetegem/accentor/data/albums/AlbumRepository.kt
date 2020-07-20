@@ -18,6 +18,13 @@ class AlbumRepository(private val albumDao: AlbumDao, private val authentication
         map
     }
 
+    fun findById(id: Int): LiveData<Album?> {
+        return albumDao.findById(id)
+    }
+
+    fun findByIds(ids: List<Int>): LiveData<List<Album>> {
+        return albumDao.findByIds(ids)
+    }
 
     fun refresh(handler: (Result<Unit>) -> Unit) {
         doAsync {

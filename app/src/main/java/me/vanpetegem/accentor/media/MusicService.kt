@@ -71,15 +71,7 @@ class MusicService : MediaBrowserServiceCompat() {
         .build()
 
     private val exoPlayer: ExoPlayer by lazy {
-        SimpleExoPlayer.Builder(this).setLoadControl(
-            // TODO: This is ugly and should be done in a better way. See https://github.com/google/ExoPlayer/issues/6204
-            DefaultLoadControl.Builder().setBufferDurationsMs(
-                Int.MAX_VALUE,
-                Int.MAX_VALUE,
-                DefaultLoadControl.DEFAULT_BUFFER_FOR_PLAYBACK_MS,
-                DefaultLoadControl.DEFAULT_BUFFER_FOR_PLAYBACK_AFTER_REBUFFER_MS
-            ).createDefaultLoadControl()
-        ).build().apply {
+        SimpleExoPlayer.Builder(this).build().apply {
             setAudioAttributes(accentorAudioAttributes, true)
         }
     }

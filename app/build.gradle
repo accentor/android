@@ -33,6 +33,7 @@ android {
         quiet true
         checkAllWarnings true
         disable 'SyntheticAccessor'
+        disable 'OldTargetApi'
         ignoreWarnings false
         warningsAsErrors true
         textReport true
