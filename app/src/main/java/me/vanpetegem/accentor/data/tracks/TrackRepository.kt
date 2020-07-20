@@ -7,33 +7,22 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations.map
 import me.vanpetegem.accentor.api.track.index
 import me.vanpetegem.accentor.data.authentication.AuthenticationRepository
+import me.vanpetegem.accentor.data.albums.Album
 import me.vanpetegem.accentor.util.Result
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 
 class TrackRepository(private val trackDao: TrackDao, private val authenticationRepository: AuthenticationRepository) {
-    val allTracks: LiveData<List<Track>> = trackDao.getAll()
-    val allTracksById: LiveData<SparseArray<Track>> = map(allTracks) {
-        val map = SparseArray<Track>()
-        it.forEach { t -> map.put(t.id, t) }
-        map
-    }
-    val allTracksByAlbumId: LiveData<SparseArray<MutableList<Track>>> = map(allTracks) {
-        val map = SparseArray<MutableList<Track>>()
-        it.forEach { t ->
-            val l = map.get(t.albumId, ArrayList())
-            l.add(t)
-            map.put(t.albumId, l)
-        }
-        map.also { m -> m.valueIterator().forEach { l -> l.sortBy { t -> t.number } } }
-    }
-
     fun findById(id: Int): LiveData<Track?> {
         return trackDao.findById(id)
     }
 
     fun findByIds(ids: List<Int>): LiveData<List<Track>> {
         return trackDao.findByIds(ids)
+    }
+
+    fun getByAlbum(album: Album): List<Track> {
+        return trackDao.getByAlbum(album)
     }
 
     fun refresh(handler: (Result<Unit>) -> Unit) {

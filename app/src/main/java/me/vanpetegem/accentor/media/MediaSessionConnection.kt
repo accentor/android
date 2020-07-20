@@ -29,6 +29,8 @@ import me.vanpetegem.accentor.data.tracks.Track
 import me.vanpetegem.accentor.data.tracks.TrackDao
 import me.vanpetegem.accentor.data.tracks.TrackRepository
 import me.vanpetegem.accentor.media.extensions.currentPlayBackPosition
+import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.uiThread
 
 class MediaSessionConnection(application: Application) : AndroidViewModel(application) {
 
@@ -147,9 +149,27 @@ class MediaSessionConnection(application: Application) : AndroidViewModel(applic
         play()
     }
 
-    fun clearQueue() = mediaController?.queue?.forEach { mediaController?.removeQueueItem(it.description) }
+    fun play(album: Album) {
+        stop()
+        clearQueue()
+        addTracksToQueue(album, 0) { play() }
+    }
 
-    fun addTracksToQueue(tracks: List<Pair<Track, Album>>) = addTracksToQueue(tracks, _queue.value?.size ?: 0)
+    fun addTracksToQueue(album: Album) = addTracksToQueue(album, _queue.value?.size ?: 0) {}
+
+    fun addTracksToQueue(album: Album, index: Int) = addTracksToQueue(album, index) {}
+
+    fun addTracksToQueue(album: Album, index: Int, resultHandler: () -> Unit) {
+        doAsync {
+            val tracks = trackRepository.getByAlbum(album).map { Pair(it, album) }
+            uiThread {
+                addTracksToQueue(tracks, index)
+                resultHandler()
+            }
+        }
+    }
+
+    fun clearQueue() = mediaController?.queue?.forEach { mediaController?.removeQueueItem(it.description) }
 
     fun addTracksToQueue(tracks: List<Pair<Track, Album>>, index: Int) {
         var base = index
