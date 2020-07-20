@@ -46,13 +46,15 @@ class PlayerFragment : Fragment() {
 
         val playQueueView = view!!.findViewById<RecyclerView>(R.id.queue_recycler_view)
         val adapter = PlayQueueAdapter {
-            mediaSessionConnection.skipTo(it)
-            mediaSessionConnection.play()
+            it?.let {
+                mediaSessionConnection.skipTo(it)
+                mediaSessionConnection.play()
+            }
         }
         playQueueView.adapter = adapter
         playQueueView.layoutManager = LinearLayoutManager(context)
         val dragTouchHelper = ItemTouchHelper(object : ItemTouchHelper.Callback() {
-            var item: Triple<Boolean, Track, Album>? = null
+            var item: Triple<Boolean, Track?, Album?>? = null
             var newPosition = 0
 
             override fun getMovementFlags(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int =
@@ -78,8 +80,7 @@ class PlayerFragment : Fragment() {
             }
 
             override fun clearView(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) {
-                item?.let { mediaSessionConnection.move(it.second, newPosition) }
-
+                item?.second?.let { mediaSessionConnection.move(it, newPosition) }
             }
         })
         dragTouchHelper.attachToRecyclerView(playQueueView)
@@ -90,9 +91,9 @@ class PlayerFragment : Fragment() {
             override fun onMove(_r: RecyclerView, _vh: RecyclerView.ViewHolder, _t: RecyclerView.ViewHolder): Boolean =
                 false
 
-            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) =
-                mediaSessionConnection.removeFromQueue(adapter.items[viewHolder.adapterPosition].second)
-
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                adapter.items[viewHolder.adapterPosition].second?.let { mediaSessionConnection.removeFromQueue(it) }
+            }
         })
         swipeTouchHelper.attachToRecyclerView(playQueueView)
 

@@ -28,6 +28,14 @@ class TrackRepository(private val trackDao: TrackDao, private val authentication
         map.also { m -> m.valueIterator().forEach { l -> l.sortBy { t -> t.number } } }
     }
 
+    fun findById(id: Int): LiveData<Track?> {
+        return trackDao.findById(id)
+    }
+
+    fun findByIds(ids: List<Int>): LiveData<List<Track>> {
+        return trackDao.findByIds(ids)
+    }
+
     fun refresh(handler: (Result<Unit>) -> Unit) {
         doAsync {
             when (val result =

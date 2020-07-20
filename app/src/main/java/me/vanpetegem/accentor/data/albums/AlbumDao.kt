@@ -39,6 +39,62 @@ abstract class AlbumDao {
         }
     }
 
+    open fun findByIds(ids: List<Int>): LiveData<List<Album>> = switchMap(findDbAlbumsByIds(ids)) { albums ->
+        switchMap(albumArtistsByAlbumIdWhereAlbumIds(ids)) { albumArtists ->
+            map(albumLabelsByAlbumIdWhereAlbumIds(ids)) { albumLabels ->
+                albums.map { a ->
+                    Album(
+                        a.id,
+                        a.title,
+                        a.normalizedTitle,
+                        a.release,
+                        a.reviewComment,
+                        a.edition,
+                        a.editionDescription,
+                        a.createdAt,
+                        a.updatedAt,
+                        a.image,
+                        a.image500,
+                        a.image250,
+                        a.image100,
+                        a.imageType,
+                        albumLabels.get(a.id, ArrayList()),
+                        albumArtists.get(a.id, ArrayList())
+                    )
+                }
+            }
+        }
+    }
+
+    open fun findById(id: Int): LiveData<Album?> = switchMap(findDbAlbumById(id)) { dbAlbum ->
+        switchMap(findDbAlbumArtistsById(id)) { albumArtists ->
+            map(findDbAlbumLabelsById(id)) { albumLabels ->
+                if (dbAlbum != null) {
+                    Album(
+                        dbAlbum.id,
+                        dbAlbum.title,
+                        dbAlbum.normalizedTitle,
+                        dbAlbum.release,
+                        dbAlbum.reviewComment,
+                        dbAlbum.edition,
+                        dbAlbum.editionDescription,
+                        dbAlbum.createdAt,
+                        dbAlbum.updatedAt,
+                        dbAlbum.image,
+                        dbAlbum.image500,
+                        dbAlbum.image250,
+                        dbAlbum.image100,
+                        dbAlbum.imageType,
+                        albumLabels.map { AlbumLabel(it.labelId, it.catalogueNumber) },
+                        albumArtists.map { AlbumArtist(it.artistId, it.name, it.normalizedName, it.order, it.separator) }
+                    )
+                } else {
+                    null
+                }
+            }
+        }
+    }
+
     @Transaction
     open fun getAlbumById(id: Int): Album? {
         val dbAlbum = getDbAlbumById(id)
@@ -69,11 +125,23 @@ abstract class AlbumDao {
     @Query("SELECT * FROM albums WHERE id = :id")
     protected abstract fun getDbAlbumById(id: Int): DbAlbum?
 
+    @Query("SELECT * FROM albums WHERE id = :id")
+    protected abstract fun findDbAlbumById(id: Int): LiveData<DbAlbum?>
+
+    @Query("SELECT * FROM albums WHERE id IN (:ids)")
+    protected abstract fun findDbAlbumsByIds(ids: List<Int>): LiveData<List<DbAlbum>>
+
     @Query("SELECT * FROM album_artists WHERE album_id = :id")
     protected abstract fun getDbAlbumArtistsById(id: Int): List<DbAlbumArtist>
 
+    @Query("SELECT * FROM album_artists WHERE album_id = :id")
+    protected abstract fun findDbAlbumArtistsById(id: Int): LiveData<List<DbAlbumArtist>>
+
     @Query("SELECT * FROM album_labels WHERE album_id = :id")
     protected abstract fun getDbAlbumLabelsById(id: Int): List<DbAlbumLabel>
+
+    @Query("SELECT * FROM album_labels WHERE album_id = :id")
+    protected abstract fun findDbAlbumLabelsById(id: Int): LiveData<List<DbAlbumLabel>>
 
     protected open fun albumLabelsByAlbumId(): LiveData<SparseArray<MutableList<AlbumLabel>>> =
         map(getAllAlbumLabels()) {
@@ -86,8 +154,30 @@ abstract class AlbumDao {
             return@map map
         }
 
+    protected open fun albumLabelsByAlbumIdWhereAlbumIds(ids: List<Int>): LiveData<SparseArray<MutableList<AlbumLabel>>> =
+        map(getAllAlbumLabelsWhereAlbumIds(ids)) {
+            val map = SparseArray<MutableList<AlbumLabel>>()
+            for (al in it) {
+                val l = map.get(al.albumId, ArrayList())
+                l.add(AlbumLabel(al.labelId, al.catalogueNumber))
+                map.put(al.albumId, l)
+            }
+            return@map map
+        }
+
     protected open fun albumArtistsByAlbumId(): LiveData<SparseArray<MutableList<AlbumArtist>>> =
         map(getAllAlbumArtists()) {
+            val map = SparseArray<MutableList<AlbumArtist>>()
+            for (aa in it) {
+                val l = map.get(aa.albumId, ArrayList())
+                l.add(AlbumArtist(aa.artistId, aa.name, aa.normalizedName, aa.order, aa.separator))
+                map.put(aa.albumId, l)
+            }
+            return@map map
+        }
+
+    protected open fun albumArtistsByAlbumIdWhereAlbumIds(ids: List<Int>): LiveData<SparseArray<MutableList<AlbumArtist>>> =
+        map(getAllAlbumArtistsWhereAlbumIds(ids)) {
             val map = SparseArray<MutableList<AlbumArtist>>()
             for (aa in it) {
                 val l = map.get(aa.albumId, ArrayList())
@@ -130,15 +220,20 @@ abstract class AlbumDao {
         }
     }
 
-
     @Query("SELECT * FROM albums ORDER BY normalized_title ASC")
     protected abstract fun getAllDbAlbums(): LiveData<List<DbAlbum>>
 
     @Query("SELECT * FROM album_artists")
     protected abstract fun getAllAlbumArtists(): LiveData<List<DbAlbumArtist>>
 
+    @Query("SELECT * FROM album_artists WHERE album_id IN (:ids)")
+    protected abstract fun getAllAlbumArtistsWhereAlbumIds(ids: List<Int>): LiveData<List<DbAlbumArtist>>
+
     @Query("SELECT * FROM album_labels")
     protected abstract fun getAllAlbumLabels(): LiveData<List<DbAlbumLabel>>
+
+    @Query("SELECT * FROM album_labels WHERE album_id IN (:ids)")
+    protected abstract fun getAllAlbumLabelsWhereAlbumIds(ids: List<Int>): LiveData<List<DbAlbumLabel>>
 
     @Insert
     protected abstract fun insert(album: DbAlbum)
