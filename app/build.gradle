@@ -87,7 +87,7 @@ dependencies {
     implementation "com.google.code.gson:gson:2.8.6"
 
     // Material
-    implementation 'com.google.android.material:material:1.1.0'
+    implementation 'com.google.android.material:material:1.2.0'
 
     // Sliding up panel
     implementation 'com.sothree.slidinguppanel:library:3.4.0'
