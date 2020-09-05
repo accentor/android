@@ -172,6 +172,7 @@ abstract class TrackDao {
                     ta.order
                 )
             )
+            map.put(ta.trackId, l)
         }
         return map
     }
