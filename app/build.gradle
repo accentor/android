@@ -34,6 +34,9 @@ android {
         checkAllWarnings true
         disable 'SyntheticAccessor'
         disable 'OldTargetApi'
+        disable 'UnsafeExperimentalUsageError'
+        disable 'UnsafeExperimentalUsageWarning'
+        disable 'ObsoleteLintCustomCheck'
         ignoreWarnings false
         warningsAsErrors true
         textReport true
