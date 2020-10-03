@@ -37,15 +37,9 @@
             android:name=".media.MusicService"
             android:exported="false">
             <intent-filter>
-                <action android:name="android.media.browse.MediaBrowserService" />
+                <action android:name="androidx.media2.session.MediaSessionService" />
             </intent-filter>
         </service>
-
-        <receiver android:name="androidx.media.session.MediaButtonReceiver">
-            <intent-filter>
-                <action android:name="android.intent.action.MEDIA_BUTTON" />
-            </intent-filter>
-        </receiver>
     </application>
 
 </manifest>

@@ -1,6 +1,5 @@
 package me.vanpetegem.accentor.data.artists
 
-import android.util.Log
 import android.util.SparseArray
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations.map
