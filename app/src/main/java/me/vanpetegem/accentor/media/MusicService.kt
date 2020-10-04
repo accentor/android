@@ -120,11 +120,7 @@ class MusicService : MediaBrowserServiceCompat() {
                             override fun createDataSource(): DataSource {
                                 return CacheDataSource(
                                     cache,
-                                    base.createDataSource(),
-                                    FileDataSource(),
-                                    CacheDataSink(cache, C.LENGTH_UNSET.toLong()),
-                                    (CacheDataSource.FLAG_BLOCK_ON_CACHE or CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR),
-                                    null
+                                    base.createDataSource()
                                 )
                             }
                         }, DefaultExtractorsFactory().setConstantBitrateSeekingEnabled(true))
