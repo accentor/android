@@ -2,6 +2,7 @@ package me.vanpetegem.accentor.ui.player
 
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import android.support.v4.media.session.PlaybackStateCompat
 import android.view.LayoutInflater
 import android.view.View
@@ -27,7 +28,7 @@ import me.vanpetegem.accentor.util.formatTrackLength
 
 class PlayerFragment : Fragment() {
     private lateinit var mediaSessionConnection: MediaSessionConnection
-    private val timerHandler = Handler()
+    private val timerHandler = Handler(Looper.getMainLooper())
     private val timerRunnable = object : Runnable {
         override fun run() {
             mediaSessionConnection.updateCurrentPosition()

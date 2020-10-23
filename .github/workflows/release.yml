@@ -35,10 +35,10 @@ jobs:
     - name: Build release APK
       run: |
         ./gradlew assembleRelease
-        $ANDROID_SDK_ROOT/build-tools/29.0.2/zipalign -v -p 4 app/build/outputs/apk/release/app-release-unsigned.apk app/build/outputs/apk/release/app-release-unsigned-aligned.apk
+        $ANDROID_SDK_ROOT/build-tools/30.0.2/zipalign -v -p 4 app/build/outputs/apk/release/app-release-unsigned.apk app/build/outputs/apk/release/app-release-unsigned-aligned.apk
         echo "${{ secrets.KEYSTORE_FILE }}" | base64 -d > keystore.jks
-        echo "${{ secrets.KEYSTORE_PASSWORD }}" | $ANDROID_SDK_ROOT/build-tools/29.0.2/apksigner sign --ks keystore.jks --out app-release.apk app/build/outputs/apk/release/app-release-unsigned-aligned.apk
-        $ANDROID_SDK_ROOT/build-tools/29.0.2/apksigner verify app-release.apk
+        echo "${{ secrets.KEYSTORE_PASSWORD }}" | $ANDROID_SDK_ROOT/build-tools/30.0.2/apksigner sign --ks keystore.jks --out app-release.apk app/build/outputs/apk/release/app-release-unsigned-aligned.apk
+        $ANDROID_SDK_ROOT/build-tools/30.0.2/apksigner verify app-release.apk
     - name: Upload Release Asset
       id: upload-release-asset
       uses: actions/upload-release-asset@v1
