@@ -2,21 +2,17 @@ package me.vanpetegem.accentor.ui.albums
 
 import android.content.res.Configuration
 import android.os.Bundle
-import android.util.SparseArray
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.simplecityapps.recyclerview_fastscroll.interfaces.OnFastScrollStateChangeListener
-import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
+import kotlinx.android.synthetic.main.fragment_albums.view.*
 import me.vanpetegem.accentor.R
 import me.vanpetegem.accentor.data.albums.Album
-import me.vanpetegem.accentor.data.tracks.Track
 import me.vanpetegem.accentor.media.MediaSessionConnection
 import me.vanpetegem.accentor.ui.main.MainActivity
 import kotlin.math.max
@@ -36,9 +32,9 @@ class AlbumsFragment : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         viewModel = ViewModelProvider(activity!!).get(AlbumsViewModel::class.java)
-        mediaSessionConnection = ViewModelProvider(activity!!).get(MediaSessionConnection::class.java)
+        mediaSessionConnection =
+            ViewModelProvider(activity!!).get(MediaSessionConnection::class.java)
 
-        val cardView: FastScrollRecyclerView = view!!.findViewById(R.id.album_card_recycler_view)
         val viewAdapter = AlbumCardAdapter(this, object : AlbumActionListener {
             override fun play(album: Album) {
                 mediaSessionConnection.play(album)
@@ -60,29 +56,31 @@ class AlbumsFragment : Fragment() {
             context,
             if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) 2 else 4
         )
-        (activity as MainActivity).setCanChildScrollUpCallback(SwipeRefreshLayout.OnChildScrollUpCallback { _, _ -> lm.findFirstCompletelyVisibleItemPosition() > 0 })
-        cardView.apply {
+        (activity as MainActivity).setCanChildScrollUpCallback { _, _ -> lm.findFirstCompletelyVisibleItemPosition() > 0 }
+        view?.albumCardRecyclerView?.apply {
             setHasFixedSize(true)
             layoutManager = lm
             adapter = viewAdapter
             addOnScrollListener(object : RecyclerView.OnScrollListener() {
                 override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                    cardView.layoutManager?.onSaveInstanceState()?.let { viewModel.saveScrollState(it) }
+                    view?.albumCardRecyclerView?.layoutManager?.onSaveInstanceState()
+                        ?.let { viewModel.saveScrollState(it) }
                 }
             })
             setOnFastScrollStateChangeListener(object : OnFastScrollStateChangeListener {
                 override fun onFastScrollStop() {
-                    cardView.layoutManager?.onSaveInstanceState()?.let { viewModel.saveScrollState(it) }
+                    view?.albumCardRecyclerView?.layoutManager?.onSaveInstanceState()
+                        ?.let { viewModel.saveScrollState(it) }
                 }
 
                 override fun onFastScrollStart() {}
             })
         }
-        viewModel.allAlbums.observe(viewLifecycleOwner, Observer {
+        viewModel.allAlbums.observe(viewLifecycleOwner, {
             viewAdapter.items = it
         })
-        viewModel.scrollState.observe(viewLifecycleOwner, Observer {
-            it?.let { cardView.layoutManager?.onRestoreInstanceState(it) }
+        viewModel.scrollState.observe(viewLifecycleOwner, {
+            it?.let { view?.albumCardRecyclerView?.layoutManager?.onRestoreInstanceState(it) }
         })
     }
 
