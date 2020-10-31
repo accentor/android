@@ -21,7 +21,7 @@
         android:layout_toEndOf="@+id/playing_indicator">
 
         <TextView
-            android:id="@+id/track_title"
+            android:id="@+id/trackTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:ellipsize="end"
@@ -31,7 +31,7 @@
             android:textIsSelectable="false" />
 
         <TextView
-            android:id="@+id/track_artists"
+            android:id="@+id/trackArtists"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:ellipsize="end"

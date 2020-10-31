@@ -17,7 +17,7 @@
             android:orientation="vertical">
 
             <ImageView
-                android:id="@+id/album_cover_image_view"
+                android:id="@+id/albumCoverImageView"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"

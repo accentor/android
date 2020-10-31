@@ -115,7 +115,7 @@ class PlayerFragment : Fragment() {
             }
         }
 
-        val albumCoverImageView: ImageView = view!!.findViewById(R.id.album_cover_image_view)
+        val albumCoverImageView: ImageView = view!!.findViewById(R.id.albumCoverImageView)
         val albumTitleView: TextView = view!!.findViewById(R.id.album_title_view)
         val trackTitleView: TextView = view!!.findViewById(R.id.track_title_view)
         val trackArtistsView: TextView = view!!.findViewById(R.id.track_artists_view)

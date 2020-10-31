@@ -1,13 +1,11 @@
 package me.vanpetegem.accentor.ui.player
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import me.vanpetegem.accentor.BuildConfig
 import me.vanpetegem.accentor.R
 import me.vanpetegem.accentor.data.albums.Album
 import me.vanpetegem.accentor.data.tracks.Track
@@ -35,8 +33,8 @@ class PlayQueueAdapter(val clickHandler: (Track?) -> Unit) : RecyclerView.Adapte
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val root = LayoutInflater.from(parent.context).inflate(R.layout.queue_list_item, parent, false)
 
-        val trackTitleView = root.findViewById<TextView>(R.id.track_title)
-        val trackArtistsView = root.findViewById<TextView>(R.id.track_artists)
+        val trackTitleView = root.findViewById<TextView>(R.id.trackTitle)
+        val trackArtistsView = root.findViewById<TextView>(R.id.trackArtists)
         val trackLengthView = root.findViewById<TextView>(R.id.track_length)
         val playingIndicator = root.findViewById<ImageView>(R.id.playing_indicator)
 

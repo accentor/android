@@ -7,7 +7,7 @@
     android:orientation="horizontal">
 
     <me.vanpetegem.accentor.components.SquaredImageView
-        android:id="@+id/album_cover_image_view"
+        android:id="@+id/albumCoverImageView"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:background="@color/colorWhite"
@@ -23,7 +23,7 @@
         android:paddingEnd="8dp">
 
         <TextView
-            android:id="@+id/track_title"
+            android:id="@+id/trackTitle"
             style="@style/TextAppearance.AppCompat.Widget.ActionBar.Title.Inverse"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -33,7 +33,7 @@
 
 
         <TextView
-            android:id="@+id/track_artists"
+            android:id="@+id/trackArtists"
             style="@style/TextAppearance.AppCompat.Widget.ActionBar.Subtitle.Inverse"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -50,7 +50,7 @@
 
         <me.vanpetegem.accentor.components.SquaredImageView
             android:background="@null"
-            android:id="@+id/bottom_bar_previous"
+            android:id="@+id/bottomBarPrevious"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:clickable="true"
@@ -61,7 +61,7 @@
 
         <me.vanpetegem.accentor.components.SquaredImageView
             android:background="@null"
-            android:id="@+id/bottom_bar_pause"
+            android:id="@+id/bottomBarPause"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:clickable="true"
@@ -72,7 +72,7 @@
 
         <me.vanpetegem.accentor.components.SquaredImageView
             android:background="@null"
-            android:id="@+id/bottom_bar_play"
+            android:id="@+id/bottomBarPlay"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:clickable="true"
@@ -83,7 +83,7 @@
 
         <me.vanpetegem.accentor.components.SquaredImageView
             android:background="@null"
-            android:id="@+id/bottom_bar_next"
+            android:id="@+id/bottomBarNext"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:clickable="true"
