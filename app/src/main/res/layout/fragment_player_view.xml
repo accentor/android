@@ -6,7 +6,7 @@
     android:orientation="vertical">
 
     <ViewFlipper
-        android:id="@+id/player_view_flipper"
+        android:id="@+id/playerViewFlipper"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1">
@@ -25,7 +25,7 @@
                 android:scaleType="fitStart" />
 
             <TextView
-                android:id="@+id/track_title_view"
+                android:id="@+id/trackTitleView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textAlignment="center"
@@ -34,7 +34,7 @@
                 android:textIsSelectable="false" />
 
             <TextView
-                android:id="@+id/track_artists_view"
+                android:id="@+id/trackArtistsView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textAlignment="center"
@@ -43,7 +43,7 @@
                 android:textIsSelectable="false" />
 
             <TextView
-                android:id="@+id/album_title_view"
+                android:id="@+id/albumTitleView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textAlignment="center"
@@ -54,7 +54,7 @@
         </LinearLayout>
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/queue_recycler_view"
+            android:id="@+id/queueRecyclerView"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
@@ -69,7 +69,7 @@
         android:orientation="horizontal">
 
         <me.vanpetegem.accentor.components.SquaredImageView
-            android:id="@+id/play_controls_repeat"
+            android:id="@+id/playControlsRepeat"
             android:layout_width="wrap_content"
             android:layout_height="36dp"
             android:background="@null"
@@ -83,7 +83,7 @@
             android:layout_weight="1" />
 
         <me.vanpetegem.accentor.components.SquaredImageView
-            android:id="@+id/play_controls_previous"
+            android:id="@+id/playControlsPrevious"
             android:layout_width="wrap_content"
             android:layout_height="36dp"
             android:background="@null"
@@ -93,7 +93,7 @@
             custom:direction="horizontal" />
 
         <me.vanpetegem.accentor.components.SquaredImageView
-            android:id="@+id/play_controls_pause"
+            android:id="@+id/playControlsPause"
             android:layout_width="wrap_content"
             android:layout_height="48dp"
             android:background="@null"
@@ -103,7 +103,7 @@
             custom:direction="horizontal" />
 
         <me.vanpetegem.accentor.components.SquaredImageView
-            android:id="@+id/play_controls_play"
+            android:id="@+id/playControlsPlay"
             android:layout_width="wrap_content"
             android:layout_height="48dp"
             android:background="@null"
@@ -113,7 +113,7 @@
             custom:direction="horizontal" />
 
         <me.vanpetegem.accentor.components.SquaredImageView
-            android:id="@+id/play_controls_next"
+            android:id="@+id/playControlsNext"
             android:layout_width="wrap_content"
             android:layout_height="36dp"
             android:background="@null"
@@ -128,7 +128,7 @@
             android:layout_weight="1" />
 
         <me.vanpetegem.accentor.components.SquaredImageView
-            android:id="@+id/play_controls_shuffle"
+            android:id="@+id/playControlsShuffle"
             android:layout_width="wrap_content"
             android:layout_height="36dp"
             android:background="@null"
@@ -147,19 +147,19 @@
         android:orientation="horizontal">
 
         <TextView
-            android:id="@+id/player_current_time"
+            android:id="@+id/playerCurrentTime"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:textIsSelectable="false" />
 
         <SeekBar
-            android:id="@+id/player_seek_bar"
+            android:id="@+id/playerSeekBar"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1" />
 
         <TextView
-            android:id="@+id/player_total_time"
+            android:id="@+id/playerTotalTime"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:textIsSelectable="false" />
