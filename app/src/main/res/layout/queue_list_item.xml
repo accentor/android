@@ -6,7 +6,7 @@
     android:padding="4dp">
 
     <ImageView
-        android:id="@+id/playing_indicator"
+        android:id="@+id/playingIndicator"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:contentDescription="@string/now_playing"
@@ -18,7 +18,7 @@
         android:orientation="vertical"
         android:paddingHorizontal="4dp"
         android:layout_toStartOf="@+id/track_length_container"
-        android:layout_toEndOf="@+id/playing_indicator">
+        android:layout_toEndOf="@+id/playingIndicator">
 
         <TextView
             android:id="@+id/trackTitle"
@@ -54,7 +54,7 @@
             android:layout_weight="1" />
 
         <TextView
-            android:id="@+id/track_length"
+            android:id="@+id/trackLength"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:ellipsize="none"
