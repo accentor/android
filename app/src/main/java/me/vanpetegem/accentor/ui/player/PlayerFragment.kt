@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import kotlinx.android.synthetic.main.player_views_holder.*
 import me.vanpetegem.accentor.R
 import me.vanpetegem.accentor.components.SquaredImageView
 import me.vanpetegem.accentor.data.albums.Album

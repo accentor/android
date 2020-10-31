@@ -12,7 +12,7 @@
     android:theme="@style/ThemeOverlay.AppCompat.Dark">
 
     <TextView
-        android:id="@+id/nav_header_username"
+        android:id="@+id/navUsernameText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingTop="@dimen/nav_header_vertical_spacing"
@@ -20,7 +20,7 @@
         android:textIsSelectable="false" />
 
     <TextView
-        android:id="@+id/nav_header_server_url"
+        android:id="@+id/navServerURLText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textIsSelectable="false" />

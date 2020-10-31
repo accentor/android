@@ -5,18 +5,19 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.FrameLayout
-import android.widget.TextView
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
-import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.material.navigation.NavigationView
 import com.sothree.slidinguppanel.SlidingUpPanelLayout
+import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.app_bar_main.*
+import kotlinx.android.synthetic.main.content_main.*
+import kotlinx.android.synthetic.main.nav_header_main.view.*
+import kotlinx.android.synthetic.main.player_views_holder.*
 import me.vanpetegem.accentor.R
 import me.vanpetegem.accentor.media.MediaSessionConnection
 import me.vanpetegem.accentor.ui.albums.AlbumsFragment
@@ -36,42 +37,35 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private lateinit var mainViewModel: MainViewModel
     private lateinit var mediaSessionConnection: MediaSessionConnection
-    private lateinit var swipeRefreshLayout: SwipeRefreshLayout
-    lateinit var slidingUpPanelLayout: SlidingUpPanelLayout
-    lateinit var playerToolbar: Toolbar
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_main)
 
-        val mainToolbar: Toolbar = findViewById(R.id.toolbar)
-        setSupportActionBar(mainToolbar)
+        setSupportActionBar(toolbar)
 
-        slidingUpPanelLayout = findViewById(R.id.sliding_layout)
-        val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
-        val navView: NavigationView = findViewById(R.id.nav_view)
-        swipeRefreshLayout = findViewById(R.id.swipe_refresh_layout)
         val toggle = ActionBarDrawerToggle(
-            this, drawerLayout, mainToolbar,
+            this, drawerLayout, toolbar,
             R.string.navigation_drawer_open,
             R.string.navigation_drawer_close
         )
 
-        playerToolbar = findViewById<Toolbar>(R.id.player_toolbar).apply {
+        playerToolbar.apply {
             setNavigationIcon(R.drawable.ic_menu_back)
-            setNavigationOnClickListener { slidingUpPanelLayout.panelState = SlidingUpPanelLayout.PanelState.COLLAPSED }
+            setNavigationOnClickListener {
+                slidingUpPanelLayout.panelState = SlidingUpPanelLayout.PanelState.COLLAPSED
+            }
             menuInflater.inflate(R.menu.player_toolbar_menu, menu)
             setTitle(R.string.now_playing)
             subtitle = "0/0"
         }
 
         val headerView: View = navView.getHeaderView(0)
-        val usernameText: TextView = headerView.findViewById(R.id.nav_header_username)
-        val serverURLText: TextView = headerView.findViewById(R.id.nav_header_server_url)
-        val bottomBarFragmentHolder: FrameLayout = findViewById(R.id.bottom_bar)
-        supportFragmentManager.beginTransaction().replace(R.id.bottom_bar, BottomBarFragment()).commit()
-        supportFragmentManager.beginTransaction().replace(R.id.player_view, PlayerFragment()).commit()
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.bottomBarFragmentHolder, BottomBarFragment()).commit()
+        supportFragmentManager.beginTransaction().replace(R.id.player_view, PlayerFragment())
+            .commit()
 
         toggle.setHomeAsUpIndicator(R.drawable.ic_menu_back)
         drawerLayout.addDrawerListener(toggle)
@@ -93,19 +87,19 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
         })
 
-        mainViewModel.currentUser.observe(this, Observer {
+        mainViewModel.currentUser.observe(this, {
             if (it == null) {
-                usernameText.text = ""
+                headerView.navUsernameText.text = ""
             } else {
-                usernameText.text = it.name
+                headerView.navUsernameText.text = it.name
             }
         })
 
-        mainViewModel.serverURL.observe(this, Observer {
+        mainViewModel.serverURL.observe(this, {
             if (it == null) {
-                serverURLText.text = ""
+                headerView.navServerURLText.text = ""
             } else {
-                serverURLText.text = it
+                headerView.navServerURLText.text = it
             }
         })
 
@@ -156,7 +150,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         })
 
         mediaSessionConnection = ViewModelProvider(this).get(MediaSessionConnection::class.java)
-        mediaSessionConnection.queuePosStr.observe(this, Observer {
+        mediaSessionConnection.queuePosStr.observe(this, {
             playerToolbar.subtitle = it ?: "0/0"
         })
     }
@@ -180,8 +174,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     override fun onBackPressed() {
-        val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
-        val slidingUpPanelLayout: SlidingUpPanelLayout = findViewById(R.id.sliding_layout)
         when {
             slidingUpPanelLayout.panelState == SlidingUpPanelLayout.PanelState.EXPANDED -> slidingUpPanelLayout.panelState =
                 SlidingUpPanelLayout.PanelState.COLLAPSED
@@ -215,7 +207,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         mainViewModel.navigate(item.itemId)
-        val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
         drawerLayout.closeDrawer(GravityCompat.START)
         return true
     }
