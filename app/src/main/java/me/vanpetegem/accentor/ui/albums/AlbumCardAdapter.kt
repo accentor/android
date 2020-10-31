@@ -3,7 +3,6 @@ package me.vanpetegem.accentor.ui.albums
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.PopupMenu
 import android.widget.TextView
@@ -12,6 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
+import kotlinx.android.synthetic.main.album_card_view.view.*
 import me.vanpetegem.accentor.R
 import me.vanpetegem.accentor.data.albums.Album
 import org.jetbrains.anko.sdk27.coroutines.onClick
@@ -22,7 +22,10 @@ interface AlbumActionListener {
     fun playLast(album: Album)
 }
 
-class AlbumCardAdapter(private val fragment: Fragment, private val actionListener: AlbumActionListener) :
+class AlbumCardAdapter(
+    private val fragment: Fragment,
+    private val actionListener: AlbumActionListener
+) :
     RecyclerView.Adapter<AlbumCardAdapter.ViewHolder>(), FastScrollRecyclerView.SectionedAdapter {
 
     var items: List<Album> = ArrayList()
@@ -43,14 +46,20 @@ class AlbumCardAdapter(private val fragment: Fragment, private val actionListene
         val gridView = LayoutInflater.from(parent.context)
             .inflate(R.layout.album_card_view, parent, false) as CardView
 
-        val albumTitleView: TextView = gridView.findViewById(R.id.album_card_title_view)
-        val albumSubtitleView: TextView = gridView.findViewById(R.id.album_card_subtitle_view)
-        val imageView: ImageView = gridView.findViewById(R.id.album_card_image_view)
-        val menuButton: ImageButton = gridView.findViewById(R.id.album_card_menu_button)
-        val menu = PopupMenu(fragment.context, menuButton, Gravity.END).apply { inflate(R.menu.album_card_menu) }
-        menuButton.onClick { menu.show() }
+        val menu = PopupMenu(
+            fragment.context,
+            gridView.albumCardMenuButton,
+            Gravity.END
+        ).apply { inflate(R.menu.album_card_menu) }
+        gridView.albumCardMenuButton.onClick { menu.show() }
 
-        return ViewHolder(gridView, albumTitleView, albumSubtitleView, imageView, menu)
+        return ViewHolder(
+            gridView,
+            gridView.albumCardTitleView,
+            gridView.albumCardSubtitleView,
+            gridView.albumCardImageView,
+            menu
+        )
     }
 
     override fun getItemCount(): Int = items.size

@@ -8,12 +8,12 @@
         android:orientation="vertical">
 
         <me.vanpetegem.accentor.components.SquaredImageView
-            android:id="@+id/artist_card_image_view"
+            android:id="@+id/artistCardImageView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
         <TextView
-            android:id="@+id/artist_card_name_view"
+            android:id="@+id/artistCardNameView"
             style="@style/CardTitleStyle"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
