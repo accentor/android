@@ -5,14 +5,13 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import android.view.inputmethod.EditorInfo
-import android.widget.Button
 import android.widget.EditText
-import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import kotlinx.android.synthetic.main.activity_login.*
 import me.vanpetegem.accentor.R
 import me.vanpetegem.accentor.ui.main.MainActivity
 import org.jetbrains.anko.startActivity
@@ -25,12 +24,6 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_login)
-
-        val server = findViewById<EditText>(R.id.server)
-        val username = findViewById<EditText>(R.id.username)
-        val password = findViewById<EditText>(R.id.password)
-        val login = findViewById<Button>(R.id.login)
-        val loading = findViewById<ProgressBar>(R.id.loading)
 
         loginViewModel = ViewModelProvider(this).get(LoginViewModel::class.java)
 
@@ -85,7 +78,11 @@ class LoginActivity : AppCompatActivity() {
 
             login.setOnClickListener {
                 loading.visibility = View.VISIBLE
-                loginViewModel.login(server.text.toString(), username.text.toString(), password.text.toString())
+                loginViewModel.login(
+                    server.text.toString(),
+                    username.text.toString(),
+                    password.text.toString()
+                )
             }
         }
     }
