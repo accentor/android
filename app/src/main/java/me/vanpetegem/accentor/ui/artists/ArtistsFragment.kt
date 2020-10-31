@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.simplecityapps.recyclerview_fastscroll.interfaces.OnFastScrollStateChangeListener
-import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
+import kotlinx.android.synthetic.main.fragment_artists.view.*
 import me.vanpetegem.accentor.R
 import me.vanpetegem.accentor.ui.main.MainActivity
 
@@ -31,25 +31,26 @@ class ArtistsFragment : Fragment() {
         super.onActivityCreated(savedInstanceState)
         viewModel = ViewModelProvider(activity!!).get(ArtistsViewModel::class.java)
 
-        val cardView: FastScrollRecyclerView = view!!.findViewById(R.id.artist_card_recycler_view)
         val viewAdapter = ArtistCardAdapter(this)
         val lm = GridLayoutManager(
             context,
             if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) 2 else 4
         )
         (activity as MainActivity).setCanChildScrollUpCallback(SwipeRefreshLayout.OnChildScrollUpCallback { _, _ -> lm.findFirstCompletelyVisibleItemPosition() > 0 })
-        cardView.apply {
+        view?.artistCardRecyclerView?.apply {
             setHasFixedSize(true)
             layoutManager = lm
             adapter = viewAdapter
             addOnScrollListener(object : RecyclerView.OnScrollListener() {
                 override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                    cardView.layoutManager?.onSaveInstanceState()?.let { viewModel.saveScrollState(it) }
+                    view?.artistCardRecyclerView?.layoutManager?.onSaveInstanceState()
+                        ?.let { viewModel.saveScrollState(it) }
                 }
             })
             setOnFastScrollStateChangeListener(object : OnFastScrollStateChangeListener {
                 override fun onFastScrollStop() {
-                    cardView.layoutManager?.onSaveInstanceState()?.let { viewModel.saveScrollState(it) }
+                    view?.artistCardRecyclerView?.layoutManager?.onSaveInstanceState()
+                        ?.let { viewModel.saveScrollState(it) }
                 }
 
                 override fun onFastScrollStart() {}
@@ -57,12 +58,12 @@ class ArtistsFragment : Fragment() {
         }
 
         viewModel.allArtists.observe(viewLifecycleOwner, Observer {
-            cardView.apply {
+            view?.artistCardRecyclerView?.apply {
                 viewAdapter.items = it
             }
         })
         viewModel.scrollState.observe(viewLifecycleOwner, Observer {
-            it?.let { cardView.layoutManager?.onRestoreInstanceState(it) }
+            it?.let { view?.artistCardRecyclerView?.layoutManager?.onRestoreInstanceState(it) }
         })
     }
 
