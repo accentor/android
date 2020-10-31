@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
+import kotlinx.android.synthetic.main.artist_card_view.view.*
 import me.vanpetegem.accentor.R
 import me.vanpetegem.accentor.data.artists.Artist
 
@@ -30,11 +31,7 @@ class ArtistCardAdapter(private val fragment: Fragment) :
         val gridView = LayoutInflater.from(parent.context)
             .inflate(R.layout.artist_card_view, parent, false) as CardView
 
-        val artistNameView: TextView = gridView.findViewById(R.id.artist_card_name_view)
-        val imageView: ImageView = gridView.findViewById(R.id.artist_card_image_view)
-
-
-        return ViewHolder(gridView, artistNameView, imageView)
+        return ViewHolder(gridView, gridView.artistCardNameView, gridView.artistCardImageView)
     }
 
     override fun getItemCount(): Int = items.size
