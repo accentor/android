@@ -31,7 +31,7 @@ jobs:
       with:
         java-version: 11
     - name: Setup Android SDK Tools
-      uses: android-actions/setup-android@v2.0.1
+      uses: android-actions/setup-android@v2.0.2
     - name: Build release APK
       run: |
         ./gradlew assembleRelease
