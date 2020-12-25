@@ -9,11 +9,11 @@
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = import nixpkgs { inherit system; config.android_sdk.accept_license = true; };
-        buildToolsVersion = "30.0.2";
+        buildToolsVersion = "30.0.3";
         composed = pkgs.androidenv.composeAndroidPackages {
           toolsVersion = "26.1.1";
-          platformToolsVersion = "30.0.4";
-          buildToolsVersions = [ "29.0.2" buildToolsVersion ];
+          platformToolsVersion = "30.0.5";
+          buildToolsVersions = [ buildToolsVersion ];
           platformVersions = [ "30" ];
           includeSources = true;
         };
