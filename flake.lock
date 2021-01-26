@@ -2,11 +2,11 @@
   "nodes": {
     "flake-utils": {
       "locked": {
-        "lastModified": 1605370193,
-        "narHash": "sha256-YyMTf3URDL/otKdKgtoMChu4vfVL3vCMkRqpGifhUn0=",
+        "lastModified": 1610051610,
+        "narHash": "sha256-U9rPz/usA1/Aohhk7Cmc2gBrEEKRzcW4nwPWMPwja4Y=",
         "owner": "numtide",
         "repo": "flake-utils",
-        "rev": "5021eac20303a61fafe17224c087f5519baed54d",
+        "rev": "3982c9903e93927c2164caa727cd3f6a0e6d14cc",
         "type": "github"
       },
       "original": {
@@ -18,16 +18,16 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1608930519,
-        "narHash": "sha256-ZcT+WCqDxtfgmUhvQPvlokEx+zFaq+LpVU1uEsRkrp8=",
-        "owner": "numinit",
+        "lastModified": 1611573985,
+        "narHash": "sha256-/99tW/FVulTati8qgvS5ul4/aQDCWHkEFAR7adXZ6BY=",
+        "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "b9941e48e97b7011fc2c72b00064f0b787a6049a",
+        "rev": "cc75b0e3b55646c141efa10fcf8c81f55daf8a9a",
         "type": "github"
       },
       "original": {
-        "owner": "numinit",
-        "ref": "update-androidenv",
+        "owner": "nixos",
+        "ref": "nixpkgs-unstable",
         "repo": "nixpkgs",
         "type": "github"
       }

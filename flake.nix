@@ -2,7 +2,7 @@
   description = "Accentor android app";
 
   inputs = {
-    nixpkgs.url = "github:numinit/nixpkgs/update-androidenv";
+    nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
     flake-utils.url = "github:numtide/flake-utils/master";
   };
   outputs = { self, nixpkgs, flake-utils }:
