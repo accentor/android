@@ -68,7 +68,7 @@ dependencies {
 
     // AndroidX Lifecycle
     implementation "androidx.lifecycle:lifecycle-extensions:2.2.0"
-    implementation "androidx.lifecycle:lifecycle-common-java8:2.2.0"
+    implementation "androidx.lifecycle:lifecycle-common-java8:2.3.0"
     androidTestImplementation "androidx.arch.core:core-testing:2.1.0"
 
     // ViewModel Kotlin support
