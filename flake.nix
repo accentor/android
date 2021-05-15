@@ -12,7 +12,7 @@
         buildToolsVersion = "30.0.3";
         composed = pkgs.androidenv.composeAndroidPackages {
           toolsVersion = "26.1.1";
-          platformToolsVersion = "30.0.5";
+          platformToolsVersion = "31.0.2";
           buildToolsVersions = [ buildToolsVersion ];
           platformVersions = [ "30" ];
           includeSources = true;
