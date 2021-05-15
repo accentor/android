@@ -83,5 +83,5 @@ class AlbumCardAdapter(private val fragment: Fragment, private val actionListene
         }
     }
 
-    override fun getSectionName(position: Int): String = "${items[position].title[0].toUpperCase()}"
+    override fun getSectionName(position: Int): String = "${items[position].title[0].uppercaseChar()}"
 }

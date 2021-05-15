@@ -40,21 +40,21 @@ fun gsonObject(): Gson {
     builder.setFieldNamingStrategy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
     builder.registerTypeAdapter(Permission::class.java, object : TypeAdapter<Permission>() {
         override fun write(out: JsonWriter, value: Permission) {
-            out.value(value.name.toLowerCase(Locale.getDefault()))
+            out.value(value.name.lowercase())
         }
 
         override fun read(`in`: JsonReader): Permission {
-            return Permission.valueOf(`in`.nextString().toUpperCase(Locale.getDefault()))
+            return Permission.valueOf(`in`.nextString().uppercase())
         }
     })
 
     builder.registerTypeAdapter(Role::class.java, object : TypeAdapter<Role>() {
         override fun write(out: JsonWriter, value: Role) {
-            out.value(value.name.toLowerCase(Locale.getDefault()))
+            out.value(value.name.lowercase())
         }
 
         override fun read(`in`: JsonReader): Role {
-            return Role.valueOf(`in`.nextString().toUpperCase(Locale.getDefault()))
+            return Role.valueOf(`in`.nextString().uppercase())
         }
     })
 
