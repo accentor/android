@@ -27,11 +27,11 @@ class ArtistsFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_artists, container, false)
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(activity!!).get(ArtistsViewModel::class.java)
 
-        val cardView: FastScrollRecyclerView = view!!.findViewById(R.id.artist_card_recycler_view)
+        val cardView: FastScrollRecyclerView = view.findViewById(R.id.artist_card_recycler_view)
         val viewAdapter = ArtistCardAdapter(this)
         val lm = GridLayoutManager(
             context,
