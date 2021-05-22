@@ -40,12 +40,12 @@ class PlayerFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_player_view, container, false)
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-        mediaSessionConnection = ViewModelProvider(activity!!).get(MediaSessionConnection::class.java)
+        mediaSessionConnection = ViewModelProvider(requireActivity()).get(MediaSessionConnection::class.java)
 
-        val playQueueView = view!!.findViewById<RecyclerView>(R.id.queue_recycler_view)
+        val playQueueView = view.findViewById<RecyclerView>(R.id.queue_recycler_view)
         val adapter = PlayQueueAdapter {
             it?.let {
                 mediaSessionConnection.skipTo(it)
@@ -98,7 +98,7 @@ class PlayerFragment : Fragment() {
         })
         swipeTouchHelper.attachToRecyclerView(playQueueView)
 
-        val viewFlipper: ViewFlipper = view!!.findViewById(R.id.player_view_flipper)
+        val viewFlipper: ViewFlipper = view.findViewById(R.id.player_view_flipper)
         (activity as MainActivity).playerToolbar.setOnMenuItemClickListener {
             when (it.itemId) {
                 R.id.view_flipper_toggler -> {
@@ -114,23 +114,23 @@ class PlayerFragment : Fragment() {
             }
         }
 
-        val albumCoverImageView: ImageView = view!!.findViewById(R.id.album_cover_image_view)
-        val albumTitleView: TextView = view!!.findViewById(R.id.album_title_view)
-        val trackTitleView: TextView = view!!.findViewById(R.id.track_title_view)
-        val trackArtistsView: TextView = view!!.findViewById(R.id.track_artists_view)
-        val currentTimeView: TextView = view!!.findViewById(R.id.player_current_time)
-        val seekBar: SeekBar = view!!.findViewById(R.id.player_seek_bar)
-        val fullLengthView: TextView = view!!.findViewById(R.id.player_total_time)
-        val pause = view!!.findViewById<SquaredImageView>(R.id.play_controls_pause)
+        val albumCoverImageView: ImageView = view.findViewById(R.id.album_cover_image_view)
+        val albumTitleView: TextView = view.findViewById(R.id.album_title_view)
+        val trackTitleView: TextView = view.findViewById(R.id.track_title_view)
+        val trackArtistsView: TextView = view.findViewById(R.id.track_artists_view)
+        val currentTimeView: TextView = view.findViewById(R.id.player_current_time)
+        val seekBar: SeekBar = view.findViewById(R.id.player_seek_bar)
+        val fullLengthView: TextView = view.findViewById(R.id.player_total_time)
+        val pause = view.findViewById<SquaredImageView>(R.id.play_controls_pause)
             .apply { setOnClickListener { mediaSessionConnection.pause() } }
-        val play = view!!.findViewById<SquaredImageView>(R.id.play_controls_play)
+        val play = view.findViewById<SquaredImageView>(R.id.play_controls_play)
             .apply { setOnClickListener { mediaSessionConnection.play() } }
-        view!!.findViewById<SquaredImageView>(R.id.play_controls_previous)
+        view.findViewById<SquaredImageView>(R.id.play_controls_previous)
             .apply { setOnClickListener { mediaSessionConnection.previous() } }
-        view!!.findViewById<SquaredImageView>(R.id.play_controls_next)
+        view.findViewById<SquaredImageView>(R.id.play_controls_next)
             .apply { setOnClickListener { mediaSessionConnection.next() } }
-        val repeatModeIndicator = view!!.findViewById<SquaredImageView>(R.id.play_controls_repeat)
-        val shuffleModeIndicator = view!!.findViewById<SquaredImageView>(R.id.play_controls_shuffle)
+        val repeatModeIndicator = view.findViewById<SquaredImageView>(R.id.play_controls_repeat)
+        val shuffleModeIndicator = view.findViewById<SquaredImageView>(R.id.play_controls_shuffle)
 
         seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {

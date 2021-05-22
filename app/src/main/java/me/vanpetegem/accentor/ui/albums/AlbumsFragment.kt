@@ -33,12 +33,12 @@ class AlbumsFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_albums, container, false)
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProvider(activity!!).get(AlbumsViewModel::class.java)
-        mediaSessionConnection = ViewModelProvider(activity!!).get(MediaSessionConnection::class.java)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        viewModel = ViewModelProvider(requireActivity()).get(AlbumsViewModel::class.java)
+        mediaSessionConnection = ViewModelProvider(requireActivity()).get(MediaSessionConnection::class.java)
 
-        val cardView: FastScrollRecyclerView = view!!.findViewById(R.id.album_card_recycler_view)
+        val cardView: FastScrollRecyclerView = view.findViewById(R.id.album_card_recycler_view)
         val viewAdapter = AlbumCardAdapter(this, object : AlbumActionListener {
             override fun play(album: Album) {
                 mediaSessionConnection.play(album)

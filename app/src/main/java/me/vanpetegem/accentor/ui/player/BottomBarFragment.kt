@@ -20,21 +20,21 @@ class BottomBarFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_bottom_bar, container, false)
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-        mediaSessionConnection = ViewModelProvider(activity!!).get(MediaSessionConnection::class.java)
+        mediaSessionConnection = ViewModelProvider(requireActivity()).get(MediaSessionConnection::class.java)
 
-        val imageView: SquaredImageView = view!!.findViewById(R.id.album_cover_image_view)
-        val trackTitle: TextView = view!!.findViewById(R.id.track_title)
-        val trackArtists: TextView = view!!.findViewById(R.id.track_artists)
-        val pause = view!!.findViewById<SquaredImageView>(R.id.bottom_bar_pause)
+        val imageView: SquaredImageView = view.findViewById(R.id.album_cover_image_view)
+        val trackTitle: TextView = view.findViewById(R.id.track_title)
+        val trackArtists: TextView = view.findViewById(R.id.track_artists)
+        val pause = view.findViewById<SquaredImageView>(R.id.bottom_bar_pause)
             .apply { setOnClickListener { mediaSessionConnection.pause() } }
-        val play = view!!.findViewById<SquaredImageView>(R.id.bottom_bar_play)
+        val play = view.findViewById<SquaredImageView>(R.id.bottom_bar_play)
             .apply { setOnClickListener { mediaSessionConnection.play() } }
-        view!!.findViewById<SquaredImageView>(R.id.bottom_bar_previous)
+        view.findViewById<SquaredImageView>(R.id.bottom_bar_previous)
             .apply { setOnClickListener { mediaSessionConnection.previous() } }
-        view!!.findViewById<SquaredImageView>(R.id.bottom_bar_next)
+        view.findViewById<SquaredImageView>(R.id.bottom_bar_next)
             .apply { setOnClickListener { mediaSessionConnection.next() } }
 
 
