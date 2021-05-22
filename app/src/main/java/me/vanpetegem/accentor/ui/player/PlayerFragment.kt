@@ -43,7 +43,7 @@ class PlayerFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        mediaSessionConnection = ViewModelProvider(activity!!).get(MediaSessionConnection::class.java)
+        mediaSessionConnection = ViewModelProvider(requireActivity()).get(MediaSessionConnection::class.java)
 
         val playQueueView = view.findViewById<RecyclerView>(R.id.queue_recycler_view)
         val adapter = PlayQueueAdapter {

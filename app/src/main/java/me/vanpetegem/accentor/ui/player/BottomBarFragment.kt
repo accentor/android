@@ -23,7 +23,7 @@ class BottomBarFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        mediaSessionConnection = ViewModelProvider(activity!!).get(MediaSessionConnection::class.java)
+        mediaSessionConnection = ViewModelProvider(requireActivity()).get(MediaSessionConnection::class.java)
 
         val imageView: SquaredImageView = view.findViewById(R.id.album_cover_image_view)
         val trackTitle: TextView = view.findViewById(R.id.track_title)

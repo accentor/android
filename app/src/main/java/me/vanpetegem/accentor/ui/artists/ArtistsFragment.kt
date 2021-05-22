@@ -29,7 +29,7 @@ class ArtistsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel = ViewModelProvider(activity!!).get(ArtistsViewModel::class.java)
+        viewModel = ViewModelProvider(requireActivity()).get(ArtistsViewModel::class.java)
 
         val cardView: FastScrollRecyclerView = view.findViewById(R.id.artist_card_recycler_view)
         val viewAdapter = ArtistCardAdapter(this)
