@@ -32,7 +32,7 @@ jobs:
         distribution: 'adopt'
         java-version: 11
     - name: Setup Android SDK Tools
-      uses: android-actions/setup-android@v2.0.6
+      uses: android-actions/setup-android@v2.0.7
     - name: Build release APK
       run: |
         ./gradlew assembleRelease
