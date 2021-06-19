@@ -36,8 +36,6 @@ android {
         quiet true
         checkAllWarnings true
         disable 'SyntheticAccessor'
-        disable 'OldTargetApi'
-        disable 'ObsoleteLintCustomCheck'
         ignoreWarnings false
         warningsAsErrors true
         textReport true
