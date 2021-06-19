@@ -1,10 +1,15 @@
 package me.vanpetegem.accentor.ui.main
 
 import android.app.Application
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations.map
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.Dispatchers.Main
 import me.vanpetegem.accentor.R
 import me.vanpetegem.accentor.data.AccentorDatabase
 import me.vanpetegem.accentor.data.albums.AlbumRepository
@@ -51,24 +56,40 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun refresh() {
         refreshing.value?.let { refreshing.value = it + 1 }
-        userRepository.refresh { refreshing.value?.let { refreshing.value = it - 1 } }
+        viewModelScope.launch(IO) {
+            userRepository.refresh {
+                withContext(Main) { refreshing.value?.let { refreshing.value = it - 1 } }
+            }
+        }
 
         refreshing.value?.let { refreshing.value = it + 1 }
-        albumRepository.refresh { refreshing.value?.let { refreshing.value = it - 1 } }
+        viewModelScope.launch(IO) {
+            albumRepository.refresh {
+                withContext(Main) { refreshing.value?.let { refreshing.value = it - 1 } }
+            }
+        }
 
         refreshing.value?.let { refreshing.value = it + 1 }
-        artistRepository.refresh { refreshing.value?.let { refreshing.value = it - 1 } }
+        viewModelScope.launch(IO) {
+            artistRepository.refresh {
+                withContext(Main) { refreshing.value?.let { refreshing.value = it - 1 } }
+            }
+        }
 
         refreshing.value?.let { refreshing.value = it + 1 }
-        trackRepository.refresh { refreshing.value?.let { refreshing.value = it - 1 } }
+        viewModelScope.launch(IO) {
+            trackRepository.refresh {
+                withContext(Main) { refreshing.value?.let { refreshing.value = it - 1 } }
+            }
+        }
     }
 
     fun logout() {
-        authenticationRepository.logout()
-        userRepository.clear()
-        albumRepository.clear()
-        artistRepository.clear()
-        trackRepository.clear()
+        viewModelScope.launch(IO) { userRepository.clear() }
+        viewModelScope.launch(IO) { albumRepository.clear() }
+        viewModelScope.launch(IO) { artistRepository.clear() }
+        viewModelScope.launch(IO) { trackRepository.clear() }
+        viewModelScope.launch(IO) { authenticationRepository.logout() }
     }
 
     fun navigate(item: Int) {

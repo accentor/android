@@ -4,12 +4,17 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
+import java.net.URI
+import java.net.URISyntaxException
+import kotlinx.coroutines.Dispatchers.Main
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import me.vanpetegem.accentor.R
 import me.vanpetegem.accentor.data.authentication.AuthenticationDataSource
 import me.vanpetegem.accentor.data.authentication.AuthenticationRepository
 import me.vanpetegem.accentor.util.Result
-import java.net.URI
-import java.net.URISyntaxException
 
 class LoginViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -22,11 +27,15 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
     val loginResult: LiveData<LoginResult> = _loginResult
 
     fun login(server: String, username: String, password: String) {
-        repository.login(server, username, password) { result ->
-            _loginResult.value = when (result) {
-                is Result.Success -> LoginResult()
-                is Result.Error -> {
-                    LoginResult(error = R.string.login_failed)
+        viewModelScope.launch(IO) {
+            repository.login(server, username, password) {
+                result -> withContext(Main) {
+                    _loginResult.value = when (result) {
+                        is Result.Success -> LoginResult()
+                        is Result.Error -> {
+                            LoginResult(error = R.string.login_failed)
+                        }
+                    }
                 }
             }
         }

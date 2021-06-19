@@ -25,7 +25,6 @@ import me.vanpetegem.accentor.ui.home.HomeFragment
 import me.vanpetegem.accentor.ui.login.LoginActivity
 import me.vanpetegem.accentor.ui.player.BottomBarFragment
 import me.vanpetegem.accentor.ui.player.PlayerFragment
-import org.jetbrains.anko.startActivity
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener,
     SwipeRefreshLayout.OnRefreshListener, SlidingUpPanelLayout.PanelSlideListener {
@@ -86,7 +85,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         mainViewModel.loginState.observe(this, Observer {
             val loggedIn = it ?: return@Observer
             if (!loggedIn) {
-                startActivity<LoginActivity>()
+                startActivity(Intent(this, LoginActivity::class.java))
                 finish()
             } else {
                 mainViewModel.refresh()

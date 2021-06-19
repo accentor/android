@@ -19,6 +19,8 @@ import androidx.media2.session.MediaController
 import androidx.media2.session.SessionCommand
 import androidx.media2.session.SessionCommandGroup
 import androidx.media2.session.SessionToken
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.Dispatchers.Main
 import me.vanpetegem.accentor.R
 import me.vanpetegem.accentor.data.AccentorDatabase
 import me.vanpetegem.accentor.data.albums.Album
@@ -29,9 +31,6 @@ import me.vanpetegem.accentor.data.authentication.AuthenticationRepository
 import me.vanpetegem.accentor.data.tracks.Track
 import me.vanpetegem.accentor.data.tracks.TrackDao
 import me.vanpetegem.accentor.data.tracks.TrackRepository
-import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.uiThread
-import java.util.concurrent.Executors
 
 class MediaSessionConnection(application: Application) : AndroidViewModel(application) {
 
@@ -154,64 +153,58 @@ class MediaSessionConnection(application: Application) : AndroidViewModel(applic
         }
     }
 
-    fun stop() {
+    suspend fun stop() {
         mediaController.sendCustomCommand(SessionCommand("STOP", null), null)
     }
 
-    fun play(tracks: List<Pair<Track, Album>>) {
+    suspend fun play(tracks: List<Pair<Track, Album>>) {
         stop()
         mediaController.setPlaylist(tracks.map { it.first.id.toString() }, null)
         play()
     }
 
-    fun play(album: Album) {
-        doAsync {
-            val tracks = trackRepository.getByAlbum(album).map { Pair(it, album) }
-            uiThread { play(tracks) }
-        }
+    suspend fun play(album: Album) {
+        val tracks = trackRepository.getByAlbum(album).map { Pair(it, album) }
+        withContext(Main) { play(tracks) }
     }
 
-    fun addTracksToQueue(album: Album) = addTracksToQueue(album, _queue.value?.size ?: 0) {}
+    suspend fun addTracksToQueue(album: Album) = addTracksToQueue(album, _queue.value?.size ?: 0) {}
 
-    fun addTracksToQueue(album: Album, index: Int) = addTracksToQueue(album, index) {}
+    suspend fun addTracksToQueue(album: Album, index: Int) = addTracksToQueue(album, index) {}
 
-    fun addTracksToQueue(album: Album, index: Int, resultHandler: () -> Unit) {
-        doAsync {
-            val tracks = trackRepository.getByAlbum(album).map { Pair(it, album) }
-            uiThread {
-                addTracksToQueue(tracks, index)
-                resultHandler()
-            }
-        }
+    suspend fun addTracksToQueue(album: Album, index: Int, resultHandler: () -> Unit) {
+        val tracks = trackRepository.getByAlbum(album).map { Pair(it, album) }
+        addTracksToQueue(tracks, index)
+        resultHandler()
     }
 
-    fun clearQueue() {
+    suspend fun clearQueue() {
         stop()
         val size = _queue.value?.let { it -> it.size } ?: 0
         for (i in size downTo 0)
             removeFromQueue(i)
     }
 
-    fun addTracksToQueue(tracks: List<Pair<Track, Album>>, index: Int) {
+    suspend fun addTracksToQueue(tracks: List<Pair<Track, Album>>, index: Int) {
         var base = index
         tracks.forEach {
             mediaController.addPlaylistItem(base++, it.first.id.toString())
         }
     }
 
-    fun previous() = mediaController.skipToPreviousPlaylistItem()
+    suspend fun previous() = mediaController.skipToPreviousPlaylistItem()
 
-    fun pause() = mediaController.pause()
+    suspend fun pause() = mediaController.pause()
 
-    fun play() = mediaController.play()
+    suspend fun play() = mediaController.play()
 
-    fun next() = mediaController.skipToNextPlaylistItem()
+    suspend fun next() = mediaController.skipToNextPlaylistItem()
 
-    fun seekTo(time: Int) = mediaController.seekTo(time.toLong() * 1000)
+    suspend fun seekTo(time: Int) = mediaController.seekTo(time.toLong() * 1000)
 
-    fun setRepeatMode(repeatMode: Int) = mediaController.setRepeatMode(repeatMode)
+    suspend fun setRepeatMode(repeatMode: Int) = mediaController.setRepeatMode(repeatMode)
 
-    fun setShuffleMode(shuffleMode: Int) = mediaController.setShuffleMode(shuffleMode)
+    suspend fun setShuffleMode(shuffleMode: Int) = mediaController.setShuffleMode(shuffleMode)
 
     fun updateCurrentPosition() {
         if (mediaController.currentPosition == SessionPlayer.UNKNOWN_TIME)
@@ -220,11 +213,11 @@ class MediaSessionConnection(application: Application) : AndroidViewModel(applic
             _currentPosition.postValue(mediaController.currentPosition)
     }
 
-    fun skipTo(position: Int) = mediaController.skipToPlaylistItem(position)
+    suspend fun skipTo(position: Int) = mediaController.skipToPlaylistItem(position)
 
-    fun move(oldPosition: Int, newPosition: Int) =
+    suspend fun move(oldPosition: Int, newPosition: Int) =
         mediaController.movePlaylistItem(oldPosition, newPosition)
 
-    fun removeFromQueue(position: Int) = mediaController.removePlaylistItem(position)
+    suspend fun removeFromQueue(position: Int) = mediaController.removePlaylistItem(position)
 
 }

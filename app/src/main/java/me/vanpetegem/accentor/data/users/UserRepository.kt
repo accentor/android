@@ -7,8 +7,6 @@ import androidx.lifecycle.Transformations.switchMap
 import me.vanpetegem.accentor.api.user.index
 import me.vanpetegem.accentor.data.authentication.AuthenticationRepository
 import me.vanpetegem.accentor.util.Result
-import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.uiThread
 
 class UserRepository(private val userDao: UserDao, private val authenticationRepository: AuthenticationRepository) {
     val allUsers: LiveData<List<User>> = userDao.getAll()
@@ -23,25 +21,17 @@ class UserRepository(private val userDao: UserDao, private val authenticationRep
         map(allUsersById) { it[authData.userId] }
     }
 
-    fun refresh(handler: (Result<Unit>) -> Unit) {
-        doAsync {
-            when (val result =
-                index(authenticationRepository.server.value!!, authenticationRepository.authData.value!!)) {
-                is Result.Success -> {
-                    userDao.replaceAll(result.data)
-
-                    uiThread {
-                        handler(Result.Success(Unit))
-                    }
-                }
-                is Result.Error -> uiThread { handler(Result.Error(result.exception)) }
+    suspend fun refresh(handler: suspend (Result<Unit>) -> Unit) {
+        when (val result = index(authenticationRepository.server.value!!, authenticationRepository.authData.value!!)) {
+            is Result.Success -> {
+                userDao.replaceAll(result.data)
+                handler(Result.Success(Unit))
             }
+            is Result.Error -> handler(Result.Error(result.exception))
         }
     }
 
-    fun clear() {
-        doAsync {
-            userDao.deleteAll()
-        }
+    suspend fun clear() {
+        userDao.deleteAll()
     }
 }

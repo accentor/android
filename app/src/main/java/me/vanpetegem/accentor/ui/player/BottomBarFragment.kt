@@ -8,7 +8,11 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.launch
 import me.vanpetegem.accentor.R
 import me.vanpetegem.accentor.components.SquaredImageView
 import me.vanpetegem.accentor.media.MediaSessionConnection
@@ -28,14 +32,18 @@ class BottomBarFragment : Fragment() {
         val imageView: SquaredImageView = view.findViewById(R.id.album_cover_image_view)
         val trackTitle: TextView = view.findViewById(R.id.track_title)
         val trackArtists: TextView = view.findViewById(R.id.track_artists)
-        val pause = view.findViewById<SquaredImageView>(R.id.bottom_bar_pause)
-            .apply { setOnClickListener { mediaSessionConnection.pause() } }
-        val play = view.findViewById<SquaredImageView>(R.id.bottom_bar_play)
-            .apply { setOnClickListener { mediaSessionConnection.play() } }
-        view.findViewById<SquaredImageView>(R.id.bottom_bar_previous)
-            .apply { setOnClickListener { mediaSessionConnection.previous() } }
-        view.findViewById<SquaredImageView>(R.id.bottom_bar_next)
-            .apply { setOnClickListener { mediaSessionConnection.next() } }
+        val pause = view.findViewById<SquaredImageView>(R.id.bottom_bar_pause).apply {
+            setOnClickListener { doDelayed { mediaSessionConnection.pause() } }
+        }
+        val play = view.findViewById<SquaredImageView>(R.id.bottom_bar_play).apply {
+            setOnClickListener { doDelayed { mediaSessionConnection.play() } }
+        }
+        view.findViewById<SquaredImageView>(R.id.bottom_bar_previous).apply {
+            setOnClickListener { doDelayed { mediaSessionConnection.previous() } }
+        }
+        view.findViewById<SquaredImageView>(R.id.bottom_bar_next).apply {
+            setOnClickListener { doDelayed { mediaSessionConnection.next() } }
+        }
 
 
         mediaSessionConnection.currentAlbum.observe(viewLifecycleOwner, Observer {
@@ -61,4 +69,6 @@ class BottomBarFragment : Fragment() {
             }
         })
     }
+
+    private fun doDelayed(block: suspend CoroutineScope.() -> Unit) = viewLifecycleOwner.lifecycleScope.launch(IO, block = block)
 }

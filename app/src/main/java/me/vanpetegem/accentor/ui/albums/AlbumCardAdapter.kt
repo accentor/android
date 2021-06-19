@@ -3,6 +3,7 @@ package me.vanpetegem.accentor.ui.albums
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.view.View
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.PopupMenu
@@ -14,7 +15,6 @@ import com.bumptech.glide.Glide
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
 import me.vanpetegem.accentor.R
 import me.vanpetegem.accentor.data.albums.Album
-import org.jetbrains.anko.sdk27.coroutines.onClick
 
 interface AlbumActionListener {
     fun play(album: Album)
@@ -48,7 +48,7 @@ class AlbumCardAdapter(private val fragment: Fragment, private val actionListene
         val imageView: ImageView = gridView.findViewById(R.id.album_card_image_view)
         val menuButton: ImageButton = gridView.findViewById(R.id.album_card_menu_button)
         val menu = PopupMenu(fragment.context, menuButton, Gravity.END).apply { inflate(R.menu.album_card_menu) }
-        menuButton.onClick { menu.show() }
+        menuButton.setOnClickListener { menu.show() }
 
         return ViewHolder(gridView, albumTitleView, albumSubtitleView, imageView, menu)
     }

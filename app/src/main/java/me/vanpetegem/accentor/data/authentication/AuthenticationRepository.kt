@@ -2,11 +2,11 @@ package me.vanpetegem.accentor.data.authentication
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.Dispatchers.Main
 import me.vanpetegem.accentor.api.auth.create
 import me.vanpetegem.accentor.api.auth.destroy
 import me.vanpetegem.accentor.util.Result
-import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.uiThread
 
 class AuthenticationRepository(
     private val prefsSource: AuthenticationDataSource
@@ -19,35 +19,29 @@ class AuthenticationRepository(
         it != null
     }
 
-    fun logout() {
-        doAsync {
-            // Ignore bad data/errors for logout: if an error happens, it isn't that bad
-            if (server.value != null && authData.value != null) {
-                destroy(server.value!!, authData.value!!, authData.value!!.id)
-            }
-            uiThread {
-                prefsSource.setAuthData(null)
-                prefsSource.setServer(null)
-            }
+    suspend fun logout() {
+        // Ignore bad data/errors for logout: if an error happens, it isn't that bad
+        if (server.value != null && authData.value != null) {
+            destroy(server.value!!, authData.value!!, authData.value!!.id)
+        }
+        withContext(Main) {
+            prefsSource.setAuthData(null)
+            prefsSource.setServer(null)
         }
     }
 
-    fun login(server: String, username: String, password: String, handler: (Result<Unit>) -> Unit) {
-        doAsync {
-            val result = create(server, username, password)
+    suspend fun login(server: String, username: String, password: String, handler: suspend (Result<Unit>) -> Unit) {
+        val result = create(server, username, password)
 
-            uiThread {
-                handler(
-                    when (result) {
-                        is Result.Success -> {
-                            setLoggedInUser(result.data, server)
-                            Result.Success(Unit)
-                        }
-                        is Result.Error -> Result.Error(result.exception)
-                    }
-                )
+        handler(
+            when (result) {
+                is Result.Success -> {
+                    setLoggedInUser(result.data, server)
+                    Result.Success(Unit)
+                }
+                is Result.Error -> Result.Error(result.exception)
             }
-        }
+        )
     }
 
     private fun setLoggedInUser(authenticationData: AuthenticationData, server: String) {

@@ -42,6 +42,11 @@ import com.google.android.exoplayer2.upstream.cache.CacheDataSink
 import com.google.android.exoplayer2.upstream.cache.CacheDataSource
 import com.google.android.exoplayer2.upstream.cache.LeastRecentlyUsedCacheEvictor
 import com.google.android.exoplayer2.upstream.cache.SimpleCache
+import java.io.File
+import java.util.concurrent.Executors
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.Dispatchers.IO
 import me.vanpetegem.accentor.R
 import me.vanpetegem.accentor.data.AccentorDatabase
 import me.vanpetegem.accentor.data.albums.AlbumRepository
@@ -51,12 +56,10 @@ import me.vanpetegem.accentor.data.authentication.AuthenticationRepository
 import me.vanpetegem.accentor.data.tracks.TrackRepository
 import me.vanpetegem.accentor.data.tracks.Track
 import me.vanpetegem.accentor.userAgent
-import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.uiThread
-import java.io.File
-import java.util.concurrent.Executors
 
 class MusicService : MediaSessionService() {
+    private val mainScope = MainScope()
+
     private lateinit var authenticationDataSource: AuthenticationDataSource
 
     private lateinit var notificationManager: NotificationManagerCompat
@@ -124,7 +127,7 @@ class MusicService : MediaSessionService() {
                 builder.putBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART, bitmap)
                 builder.putBitmap(MediaMetadata.METADATA_KEY_ART, bitmap)
             } catch (e: Exception) {
-                doAsync {
+                mainScope.launch(IO) {
                     Glide.with(this@MusicService).load(album.image500).preload()
                 }
             }

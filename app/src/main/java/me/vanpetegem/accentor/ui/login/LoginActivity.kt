@@ -1,5 +1,6 @@
 package me.vanpetegem.accentor.ui.login
 
+import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -15,7 +16,6 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import me.vanpetegem.accentor.R
 import me.vanpetegem.accentor.ui.main.MainActivity
-import org.jetbrains.anko.startActivity
 
 class LoginActivity : AppCompatActivity() {
 
@@ -53,7 +53,7 @@ class LoginActivity : AppCompatActivity() {
             if (loginResult.error != null) {
                 showLoginFailed(loginResult.error)
             } else {
-                startActivity<MainActivity>()
+                startActivity(Intent(this, MainActivity::class.java))
                 finish()
             }
         })
