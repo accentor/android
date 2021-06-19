@@ -72,7 +72,7 @@ class NotificationBuilder(private val context: Context) {
         val mediaStyle = MediaStyle()
             .setCancelButtonIntent(stopPendingIntent)
             .setMediaSession(session.getSessionCompatToken())
-            .setShowActionsInCompactView(1)
+            .setShowActionsInCompactView(0, 1, 2)
 
         val openIntent = Intent(context, MainActivity::class.java).apply {
             putExtra(MainActivity.INTENT_EXTRA_OPEN_PLAYER, true)
