@@ -75,22 +75,24 @@ class MusicService : MediaSessionService() {
 
     private val exoPlayer: ExoPlayer by lazy {
         SimpleExoPlayer.Builder(this).apply {
-            setMediaSourceFactory(ProgressiveMediaSource.Factory(object : DataSource.Factory {
-                val base = DefaultDataSourceFactory(this@MusicService.application, DefaultHttpDataSource.Factory().setUserAgent(userAgent))
-                val cache = SimpleCache(
-                    File(this@MusicService.application.cacheDir, "audio"),
-                    LeastRecentlyUsedCacheEvictor(10 * 1024L * 1024L * 1024L),
-                    ExoDatabaseProvider(this@MusicService.application)
-                )
+            setMediaSourceFactory(
+                ProgressiveMediaSource.Factory(
+                    object : DataSource.Factory {
+                        val base = DefaultDataSourceFactory(this@MusicService.application, DefaultHttpDataSource.Factory().setUserAgent(userAgent))
+                        val cache = SimpleCache(
+                            File(this@MusicService.application.cacheDir, "audio"),
+                            LeastRecentlyUsedCacheEvictor(10 * 1024L * 1024L * 1024L),
+                            ExoDatabaseProvider(this@MusicService.application)
+                        )
 
-                override fun createDataSource(): DataSource {
-                    return CacheDataSource(
-                        cache,
-                        base.createDataSource(),
-                        (CacheDataSource.FLAG_BLOCK_ON_CACHE or CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR)
-                    )
-                }
-            }, DefaultExtractorsFactory().setConstantBitrateSeekingEnabled(true)))
+                        override fun createDataSource(): DataSource {
+                            return CacheDataSource(
+                                cache,
+                                base.createDataSource(),
+                                (CacheDataSource.FLAG_BLOCK_ON_CACHE or CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR)
+                            )
+                        }
+                    }, DefaultExtractorsFactory().setConstantBitrateSeekingEnabled(true)))
             setHandleAudioBecomingNoisy(true)
         }.build().apply {
             setAudioAttributes(accentorAudioAttributes, true)
@@ -99,9 +101,9 @@ class MusicService : MediaSessionService() {
 
     private fun convertTrack(track: Track, album: Album): MediaItem {
         val mediaUri = "${authenticationDataSource.getServer()}/api/tracks/${track.id}/audio" +
-                    "?secret=${authenticationDataSource.getSecret()}" +
-                    "&device_id=${authenticationDataSource.getDeviceId()}" +
-                    "&codec_conversion_id=4"
+            "?secret=${authenticationDataSource.getSecret()}" +
+            "&device_id=${authenticationDataSource.getDeviceId()}" +
+            "&codec_conversion_id=4"
 
         val builder = MediaMetadata.Builder()
         builder.putString(MediaMetadata.METADATA_KEY_TITLE, track.title)
@@ -109,8 +111,8 @@ class MusicService : MediaSessionService() {
         builder.putString(MediaMetadata.METADATA_KEY_ARTIST, track.stringifyTrackArtists())
         builder.putString(MediaMetadata.METADATA_KEY_DATE, album.release.toString())
         builder.putString(MediaMetadata.METADATA_KEY_ALBUM_ARTIST, album.stringifyAlbumArtists().let {
-                   if (it.isEmpty()) application.getString(R.string.various_artists) else it
-               })
+                              if (it.isEmpty()) application.getString(R.string.various_artists) else it
+        })
         builder.putString(MediaMetadata.METADATA_KEY_ART_URI, album.image500)
         builder.putString(MediaMetadata.METADATA_KEY_ALBUM_ART_URI, album.image500)
         builder.putString(MediaMetadata.METADATA_KEY_MEDIA_URI, mediaUri)
@@ -131,7 +133,6 @@ class MusicService : MediaSessionService() {
         return MediaItem.Builder().setMetadata(builder.build()).build()
     }
 
-
     override fun onCreate() {
         super.onCreate()
 
@@ -142,15 +143,15 @@ class MusicService : MediaSessionService() {
 
 
         sessionPlayerConnector = SessionPlayerConnector(exoPlayer)
-        sessionCallback = SessionCallbackBuilder(baseContext, sessionPlayerConnector)
-            .setMediaItemProvider(object : SessionCallbackBuilder.MediaItemProvider {
+        sessionCallback = SessionCallbackBuilder(baseContext, sessionPlayerConnector).setMediaItemProvider(
+            object : SessionCallbackBuilder.MediaItemProvider {
                 override fun onCreateMediaItem(session: MediaSession, info: MediaSession.ControllerInfo, mediaId: String): MediaItem? {
                     val track = trackDao.getTrackById(mediaId.toInt())
                     val album = track?.let { albumDao.getAlbumById(it.albumId) }
                     return track?.let { t -> album?.let { a -> convertTrack(t, a) } }
                 }
-            })
-            .setCustomCommandProvider(object : SessionCallbackBuilder.CustomCommandProvider {
+        }).setCustomCommandProvider(
+            object : SessionCallbackBuilder.CustomCommandProvider {
                 override fun onCustomCommand(session: MediaSession, info: MediaSession.ControllerInfo, command: SessionCommand, args: Bundle?): SessionResult {
                     when (command.customAction) {
                         "STOP" -> {
@@ -166,11 +167,10 @@ class MusicService : MediaSessionService() {
                         .addCommand(SessionCommand("STOP", null))
                         .build()
                 }
-            })
-            .build()
+        }).build()
         mediaSession = MediaSession.Builder(baseContext, sessionPlayerConnector)
-                .setSessionCallback(Executors.newSingleThreadExecutor(), sessionCallback)
-                .build()
+            .setSessionCallback(Executors.newSingleThreadExecutor(), sessionCallback)
+            .build()
 
         notificationManager = NotificationManagerCompat.from(this)
         notificationBuilder = NotificationBuilder(this)

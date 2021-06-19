@@ -9,10 +9,9 @@ buildscript {
         lifecycle_version = '2.3.1'
         room_version = '2.3.0'
     }
-
     repositories {
         google()
-        jcenter()
+        mavenCentral()
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:4.2.1'
@@ -26,6 +25,7 @@ allprojects {
     repositories {
         google()
         jcenter()
+        mavenCentral()
     }
     tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
         kotlinOptions {
