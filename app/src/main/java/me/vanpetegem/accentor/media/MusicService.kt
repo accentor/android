@@ -50,7 +50,6 @@ import me.vanpetegem.accentor.data.authentication.AuthenticationDataSource
 import me.vanpetegem.accentor.data.authentication.AuthenticationRepository
 import me.vanpetegem.accentor.data.tracks.TrackRepository
 import me.vanpetegem.accentor.data.tracks.Track
-import me.vanpetegem.accentor.ui.main.MainActivity
 import me.vanpetegem.accentor.userAgent
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
