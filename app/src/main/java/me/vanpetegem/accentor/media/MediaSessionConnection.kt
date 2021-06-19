@@ -3,21 +3,22 @@ package me.vanpetegem.accentor.media
 import android.app.Application
 import android.content.ComponentName
 import android.content.Context
-import android.media.session.MediaSession
 import android.net.Uri
 import android.os.Bundle
-import android.support.v4.media.MediaBrowserCompat
-import android.support.v4.media.MediaDescriptionCompat
-import android.support.v4.media.MediaMetadataCompat
-import android.support.v4.media.session.MediaControllerCompat
-import android.support.v4.media.session.MediaSessionCompat
-import android.support.v4.media.session.PlaybackStateCompat
 import android.util.SparseArray
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations.map
 import androidx.lifecycle.Transformations.switchMap
+import androidx.media2.common.MediaItem
+import androidx.media2.common.MediaMetadata
+import androidx.media2.common.SessionPlayer
+import androidx.media2.session.MediaController
+import androidx.media2.session.SessionCommand
+import androidx.media2.session.SessionCommandGroup
+import androidx.media2.session.SessionToken
 import me.vanpetegem.accentor.R
 import me.vanpetegem.accentor.data.AccentorDatabase
 import me.vanpetegem.accentor.data.albums.Album
@@ -28,23 +29,66 @@ import me.vanpetegem.accentor.data.authentication.AuthenticationRepository
 import me.vanpetegem.accentor.data.tracks.Track
 import me.vanpetegem.accentor.data.tracks.TrackDao
 import me.vanpetegem.accentor.data.tracks.TrackRepository
-import me.vanpetegem.accentor.media.extensions.currentPlayBackPosition
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
+import java.util.concurrent.Executors
 
 class MediaSessionConnection(application: Application) : AndroidViewModel(application) {
 
     private val authenticationDataSource = AuthenticationDataSource(application)
 
-    private val mediaBrowserConnectionCallback = MediaBrowserConnectionCallback(application)
-    private val mediaBrowser = MediaBrowserCompat(
-        application,
-        ComponentName(application, MusicService::class.java),
-        mediaBrowserConnectionCallback,
-        null
-    ).apply { connect() }
-    private val mediaDescBuilder = MediaDescriptionCompat.Builder()
-    private var mediaController: MediaControllerCompat? = null
+    private val mediaController: MediaController = MediaController.Builder(application)
+        .setSessionToken(SessionToken(application, ComponentName(application, MusicService::class.java)))
+        .setControllerCallback(ContextCompat.getMainExecutor(application), object : MediaController.ControllerCallback() {
+            override fun onConnected(controller: MediaController, _allowedCommands: SessionCommandGroup) {
+                onCurrentMediaItemChanged(controller, controller.currentMediaItem)
+                _buffering.postValue(controller.bufferingState == SessionPlayer.BUFFERING_STATE_BUFFERING_AND_STARVED)
+                onPlayerStateChanged(controller, controller.playerState)
+                onPlaylistChanged(controller, controller.playlist, controller.playlistMetadata)
+                onRepeatModeChanged(controller, controller.repeatMode)
+                onShuffleModeChanged(controller, controller.shuffleMode)
+            }
+
+            override fun onCurrentMediaItemChanged(controller: MediaController, item: MediaItem?) {
+                currentTrackId.postValue(item?.metadata?.getString(MediaMetadata.METADATA_KEY_MEDIA_ID)?.toInt())
+                _queuePosition.postValue(controller.currentMediaItemIndex + 1)
+            }
+
+            override fun onBufferingStateChanged(controller: MediaController, item: MediaItem, state: Int) {
+                when(state) {
+                    SessionPlayer.BUFFERING_STATE_BUFFERING_AND_STARVED -> {
+                        _buffering.postValue(true)
+                    }
+                    else -> {
+                        _buffering.postValue(false)
+                    }
+                }
+            }
+
+            override fun onPlayerStateChanged(controller: MediaController, state: Int) {
+                when (state) {
+                    SessionPlayer.PLAYER_STATE_PLAYING -> {
+                        _playing.postValue(true)
+                    }
+                    else -> {
+                        _playing.postValue(false)
+                    }
+                }
+                updateCurrentPosition()
+            }
+
+            override fun onPlaylistChanged(controller: MediaController, items: MutableList<MediaItem>?, metadata: MediaMetadata?) {
+                _queue.postValue(items ?: ArrayList())
+                onCurrentMediaItemChanged(controller, controller.currentMediaItem)
+            }
+
+            override fun onRepeatModeChanged(controller: MediaController, repeatMode: Int) =
+                _repeatMode.postValue(repeatMode)
+
+            override fun onShuffleModeChanged(controller: MediaController, shuffleMode: Int) =
+                _shuffleMode.postValue(shuffleMode)
+
+        }).build()
 
     private val currentTrackId = MutableLiveData<Int>().apply { postValue(null) }
     val currentTrack: LiveData<Track?> = switchMap(currentTrackId) { id ->
@@ -70,19 +114,14 @@ class MediaSessionConnection(application: Application) : AndroidViewModel(applic
     private val _shuffleMode = MutableLiveData<Int>()
     val shuffleMode: LiveData<Int> = _shuffleMode
 
-    private val _queue = MutableLiveData<List<MediaSessionCompat.QueueItem>>().apply { postValue(ArrayList()) }
-    private val _queueIds: LiveData<List<Int>> = map(_queue) { it.map { item -> item.description.mediaId!!.toInt() } }
+    private val _queue = MutableLiveData<List<MediaItem>>().apply { postValue(ArrayList()) }
+    private val _queueIds: LiveData<List<Int>> = map(_queue) { it.map { item -> item.metadata?.mediaId!!.toInt() } }
     val queue: LiveData<List<Triple<Boolean, Track?, Album?>>>
 
-    private val activeQueueItemId = MutableLiveData<Long>().apply {
-        postValue(MediaSession.QueueItem.UNKNOWN_ID.toLong())
+    val _queuePosition: MutableLiveData<Int> = MutableLiveData<Int>().apply {
+        postValue(0)
     }
-
-    val queuePosition: LiveData<Int> = switchMap(_queue) { q ->
-        map(activeQueueItemId) {
-            q.indexOfFirst { item -> item.queueId == it } + 1
-        }
-    }
+    val queuePosition: LiveData<Int> = _queuePosition
 
     val queuePosStr: LiveData<String> = switchMap(_queue) { q ->
         map(queuePosition) {
@@ -115,44 +154,21 @@ class MediaSessionConnection(application: Application) : AndroidViewModel(applic
         }
     }
 
-    private fun convertTrack(track: Track, album: Album): MediaDescriptionCompat {
-        val mediaUri =
-            ("${authenticationDataSource.getServer()}/api/tracks/${track.id}/audio" +
-                    "?secret=${authenticationDataSource.getSecret()}" +
-                    "&device_id=${authenticationDataSource.getDeviceId()}" +
-                    "&codec_conversion_id=4").toUri()
-
-        val extras = Bundle()
-        extras.putString(Track.ALBUMARTIST, album.stringifyAlbumArtists().let {
-            if (it.isEmpty())
-                this.getApplication<Application>().getString(R.string.various_artists)
-            else
-                it
-        })
-        extras.putString(Track.ARTIST, track.stringifyTrackArtists())
-        extras.putString(Track.YEAR, album.release.toString())
-
-        return mediaDescBuilder
-            .setTitle(track.title)
-            .setSubtitle(album.title)
-            .setIconUri(album.image500?.toUri())
-            .setMediaUri(mediaUri)
-            .setMediaId(track.id.toString())
-            .setExtras(extras)
-            .build()
+    fun stop() {
+        mediaController.sendCustomCommand(SessionCommand("STOP", null), null)
     }
 
     fun play(tracks: List<Pair<Track, Album>>) {
         stop()
-        clearQueue()
-        addTracksToQueue(tracks, 0)
+        mediaController.setPlaylist(tracks.map { it.first.id.toString() }, null)
         play()
     }
 
     fun play(album: Album) {
-        stop()
-        clearQueue()
-        addTracksToQueue(album, 0) { play() }
+        doAsync {
+            val tracks = trackRepository.getByAlbum(album).map { Pair(it, album) }
+            uiThread { play(tracks) }
+        }
     }
 
     fun addTracksToQueue(album: Album) = addTracksToQueue(album, _queue.value?.size ?: 0) {}
@@ -169,115 +185,46 @@ class MediaSessionConnection(application: Application) : AndroidViewModel(applic
         }
     }
 
-    fun clearQueue() = mediaController?.queue?.forEach { mediaController?.removeQueueItem(it.description) }
+    fun clearQueue() {
+        stop()
+        val size = _queue.value?.let { it -> it.size } ?: 0
+        for (i in size downTo 0)
+            removeFromQueue(i)
+    }
 
     fun addTracksToQueue(tracks: List<Pair<Track, Album>>, index: Int) {
         var base = index
         tracks.forEach {
-            mediaController?.addQueueItem(convertTrack(it.first, it.second), base++)
+            mediaController.addPlaylistItem(base++, it.first.id.toString())
         }
     }
 
-    fun previous() = mediaController?.transportControls?.skipToPrevious()
+    fun previous() = mediaController.skipToPreviousPlaylistItem()
 
+    fun pause() = mediaController.pause()
 
-    fun pause() = mediaController?.transportControls?.pause()
+    fun play() = mediaController.play()
 
+    fun next() = mediaController.skipToNextPlaylistItem()
 
-    fun play() = mediaController?.transportControls?.play()
+    fun seekTo(time: Int) = mediaController.seekTo(time.toLong() * 1000)
 
+    fun setRepeatMode(repeatMode: Int) = mediaController.setRepeatMode(repeatMode)
 
-    fun stop() = mediaController?.transportControls?.stop()
-
-
-    fun next() = mediaController?.transportControls?.skipToNext()
-
-
-    fun seekTo(time: Int) = mediaController?.transportControls?.seekTo(time.toLong() * 1000)
-
-
-    fun setRepeatMode(repeatMode: Int) = mediaController?.transportControls?.setRepeatMode(repeatMode)
-
-
-    fun setShuffleMode(shuffleMode: Int) = mediaController?.transportControls?.setShuffleMode(shuffleMode)
+    fun setShuffleMode(shuffleMode: Int) = mediaController.setShuffleMode(shuffleMode)
 
     fun updateCurrentPosition() {
-        mediaController?.playbackState?.currentPlayBackPosition?.let { _currentPosition.postValue(it) }
+        if (mediaController.currentPosition == SessionPlayer.UNKNOWN_TIME)
+            _currentPosition.postValue(0)
+        else
+            _currentPosition.postValue(mediaController.currentPosition)
     }
 
-    fun skipTo(track: Track) {
-        _queue.value?.find { it.description.mediaId == track.id.toString() }?.queueId?.let {
-            mediaController?.transportControls?.skipToQueueItem(it)
-        }
-    }
+    fun skipTo(position: Int) = mediaController.skipToPlaylistItem(position)
 
-    fun move(track: Track, newPosition: Int) {
-        val oldPosition = _queue.value?.indexOfFirst { it.description.mediaId == track.id.toString() } ?: return
+    fun move(oldPosition: Int, newPosition: Int) =
+        mediaController.movePlaylistItem(oldPosition, newPosition)
 
-        val argsBundle = Bundle()
-        argsBundle.putInt(MusicService.MOVE_COMMAND_FROM, oldPosition)
-        argsBundle.putInt(MusicService.MOVE_COMMAND_TO, newPosition)
-        mediaController?.sendCommand(MusicService.MOVE_COMMAND, argsBundle, null)
-    }
+    fun removeFromQueue(position: Int) = mediaController.removePlaylistItem(position)
 
-    fun removeFromQueue(track: Track) {
-        _queue.value?.find { it.description.mediaId == track.id.toString() }?.description?.let {
-            mediaController?.removeQueueItem(it)
-        }
-    }
-
-    private inner class MediaBrowserConnectionCallback(private val context: Context) :
-        MediaBrowserCompat.ConnectionCallback() {
-        override fun onConnected() {
-            mediaController = MediaControllerCompat(context, mediaBrowser.sessionToken).apply {
-                val callback = MediaControllerCallback()
-                registerCallback(callback)
-                callback.onMetadataChanged(metadata)
-                callback.onPlaybackStateChanged(playbackState)
-                callback.onQueueChanged(queue)
-                callback.onRepeatModeChanged(repeatMode)
-                callback.onShuffleModeChanged(shuffleMode)
-            }
-        }
-    }
-
-    private inner class MediaControllerCallback : MediaControllerCompat.Callback() {
-        override fun onMetadataChanged(metadata: MediaMetadataCompat?) {
-            currentTrackId.postValue(metadata?.getString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID)?.toInt())
-        }
-
-        override fun onPlaybackStateChanged(state: PlaybackStateCompat?) {
-            when (state?.state) {
-                PlaybackStateCompat.STATE_PLAYING -> {
-                    _playing.postValue(true)
-                    _buffering.postValue(false)
-                }
-                PlaybackStateCompat.STATE_BUFFERING -> {
-                    _playing.postValue(true)
-                    _buffering.postValue(true)
-                }
-                else -> {
-                    _playing.postValue(false)
-                    _buffering.postValue(false)
-                }
-            }
-
-            state?.activeQueueItemId?.let { activeQueueItemId.postValue(it) }
-            state?.currentPlayBackPosition?.let { _currentPosition.postValue(it) }
-        }
-
-        override fun onQueueChanged(queue: MutableList<MediaSessionCompat.QueueItem>?) {
-            _queue.postValue(queue ?: ArrayList())
-        }
-
-        override fun onRepeatModeChanged(repeatMode: Int) {
-            _repeatMode.postValue(repeatMode)
-        }
-
-        override fun onShuffleModeChanged(shuffleMode: Int) {
-            _shuffleMode.postValue(shuffleMode)
-        }
-    }
 }
-
-fun String?.toUri(): Uri = this?.let { Uri.parse(it) } ?: Uri.EMPTY

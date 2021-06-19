@@ -1,6 +1,5 @@
 package me.vanpetegem.accentor.data.tracks
 
-import android.util.Log
 import android.util.SparseArray
 import androidx.core.util.valueIterator
 import androidx.lifecycle.LiveData

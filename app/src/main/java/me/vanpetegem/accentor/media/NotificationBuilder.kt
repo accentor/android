@@ -1,19 +1,21 @@
 package me.vanpetegem.accentor.media
 
+import android.app.PendingIntent
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.content.Intent
+import android.content.ComponentName
 import android.content.Context
-import android.support.v4.media.session.MediaControllerCompat
-import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
+import android.view.KeyEvent
 import androidx.core.app.NotificationCompat
-import androidx.media.session.MediaButtonReceiver
+import androidx.media.app.NotificationCompat.MediaStyle
+import androidx.media2.common.SessionPlayer
+import androidx.media2.common.MediaMetadata
+import androidx.media2.session.MediaSession
+import me.vanpetegem.accentor.ui.main.MainActivity
 import me.vanpetegem.accentor.R
-import me.vanpetegem.accentor.media.extensions.isPlayEnabled
-import me.vanpetegem.accentor.media.extensions.isPlaying
-import me.vanpetegem.accentor.media.extensions.isSkipToNextEnabled
-import me.vanpetegem.accentor.media.extensions.isSkipToPreviousEnabled
 
 const val NOW_PLAYING_CHANNEL: String = "me.vanpetegem.accentor.media.NOW_PLAYING_CHANNEL"
 const val NOW_PLAYING_NOTIFICATION: Int = 0xb339
@@ -28,68 +30,78 @@ class NotificationBuilder(private val context: Context) {
     private val skipToPreviousAction = NotificationCompat.Action(
         R.drawable.exo_controls_previous,
         context.getString(R.string.previous),
-        MediaButtonReceiver.buildMediaButtonPendingIntent(context, PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS)
+        createPendingIntent(PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS)
     )
     private val playAction = NotificationCompat.Action(
         R.drawable.exo_controls_play,
         context.getString(R.string.play),
-        MediaButtonReceiver.buildMediaButtonPendingIntent(context, PlaybackStateCompat.ACTION_PLAY)
+        createPendingIntent(PlaybackStateCompat.ACTION_PLAY)
     )
     private val pauseAction = NotificationCompat.Action(
         R.drawable.exo_controls_pause,
         context.getString(R.string.pause),
-        MediaButtonReceiver.buildMediaButtonPendingIntent(context, PlaybackStateCompat.ACTION_PAUSE)
+        createPendingIntent(PlaybackStateCompat.ACTION_PAUSE)
     )
     private val skipToNextAction = NotificationCompat.Action(
         R.drawable.exo_controls_next,
         context.getString(R.string.play_next),
-        MediaButtonReceiver.buildMediaButtonPendingIntent(context, PlaybackStateCompat.ACTION_SKIP_TO_NEXT)
+        createPendingIntent(PlaybackStateCompat.ACTION_SKIP_TO_NEXT)
     )
     private val stopPendingIntent =
-        MediaButtonReceiver.buildMediaButtonPendingIntent(context, PlaybackStateCompat.ACTION_STOP)
+        createPendingIntent(PlaybackStateCompat.ACTION_STOP)
 
-    fun buildNotification(sessionToken: MediaSessionCompat.Token): Notification {
+    fun buildNotification(session: MediaSession): Notification {
         if (shouldCreateNowPlayingChannel()) {
             createNowPlayingChannel()
         }
 
-        val controller = MediaControllerCompat(context, sessionToken)
-        val description = controller.metadata.description
-        val playbackState = controller.playbackState
+        val player = session.player
+        val metadata = player.currentMediaItem?.metadata
+        val state = player.playerState
 
         val builder = NotificationCompat.Builder(context, NOW_PLAYING_CHANNEL)
 
-        // Only add actions for skip back, play/pause, skip forward, based on what's enabled.
-        var playPauseIndex = 0
-        if (playbackState.isSkipToPreviousEnabled) {
-            builder.addAction(skipToPreviousAction)
-            ++playPauseIndex
-        }
-        if (playbackState.isPlaying) {
+        builder.addAction(skipToPreviousAction)
+        if (state == SessionPlayer.PLAYER_STATE_PLAYING) {
             builder.addAction(pauseAction)
-        } else if (playbackState.isPlayEnabled) {
+        } else {
             builder.addAction(playAction)
         }
-        if (playbackState.isSkipToNextEnabled) {
-            builder.addAction(skipToNextAction)
-        }
+        builder.addAction(skipToNextAction)
 
-        val mediaStyle = androidx.media.app.NotificationCompat.MediaStyle()
+        val mediaStyle = MediaStyle()
             .setCancelButtonIntent(stopPendingIntent)
-            .setMediaSession(sessionToken)
-            .setShowActionsInCompactView(playPauseIndex)
-            .setShowCancelButton(true)
+            .setMediaSession(session.getSessionCompatToken())
+            .setShowActionsInCompactView(1)
 
-        return builder.setContentIntent(controller.sessionActivity)
-            .setContentTitle(description.title)
-            .setContentText(description.subtitle)
+        val openIntent = Intent(context, MainActivity::class.java).apply {
+            putExtra(MainActivity.INTENT_EXTRA_OPEN_PLAYER, true)
+        }
+        val pendingIntent = PendingIntent.getActivity(context, 0, openIntent, 0)
+
+        return builder.setContentIntent(pendingIntent)
+            .setContentTitle(metadata?.getString(MediaMetadata.METADATA_KEY_TITLE))
+            .setContentText(metadata?.getString(MediaMetadata.METADATA_KEY_ARTIST))
             .setDeleteIntent(stopPendingIntent)
-            .setLargeIcon(description.iconBitmap)
+            .setLargeIcon(metadata?.getBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART))
             .setOnlyAlertOnce(true)
             .setSmallIcon(R.drawable.ic_notification)
             .setStyle(mediaStyle)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .build()
+    }
+
+    private fun createPendingIntent(action: Long): PendingIntent {
+        val keyCode = PlaybackStateCompat.toKeyCode(action)
+        val intent = Intent(Intent.ACTION_MEDIA_BUTTON).apply {
+            setComponent(ComponentName(context, context.javaClass))
+            putExtra(Intent.EXTRA_KEY_EVENT, KeyEvent(KeyEvent.ACTION_DOWN, keyCode))
+        }
+        if (action != PlaybackStateCompat.ACTION_PAUSE) {
+            return PendingIntent.getForegroundService(context, keyCode, intent, 0)
+        } else {
+            return PendingIntent.getService(context, keyCode, intent, 0)
+        }
     }
 
     private fun shouldCreateNowPlayingChannel() = !nowPlayingChannelExists()

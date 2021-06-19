@@ -1,6 +1,5 @@
 package me.vanpetegem.accentor.data.albums
 
-import android.util.Log
 import android.util.SparseArray
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations.map

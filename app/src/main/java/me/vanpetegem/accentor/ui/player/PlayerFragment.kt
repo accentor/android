@@ -3,7 +3,6 @@ package me.vanpetegem.accentor.ui.player
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.support.v4.media.session.PlaybackStateCompat
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,6 +13,7 @@ import android.widget.ViewFlipper
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.media2.common.SessionPlayer
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -47,15 +47,13 @@ class PlayerFragment : Fragment() {
 
         val playQueueView = view.findViewById<RecyclerView>(R.id.queue_recycler_view)
         val adapter = PlayQueueAdapter {
-            it?.let {
-                mediaSessionConnection.skipTo(it)
-                mediaSessionConnection.play()
-            }
+            mediaSessionConnection.skipTo(it)
+            mediaSessionConnection.play()
         }
         playQueueView.adapter = adapter
         playQueueView.layoutManager = LinearLayoutManager(context)
         val dragTouchHelper = ItemTouchHelper(object : ItemTouchHelper.Callback() {
-            var item: Triple<Boolean, Track?, Album?>? = null
+            var oldPosition = 0
             var newPosition = 0
 
             override fun getMovementFlags(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int =
@@ -65,7 +63,7 @@ class PlayerFragment : Fragment() {
                 )
 
             override fun onMove(_r: RecyclerView, vh: RecyclerView.ViewHolder, t: RecyclerView.ViewHolder): Boolean {
-                item = adapter.items[vh.adapterPosition]
+                oldPosition = vh.adapterPosition
                 newPosition = t.adapterPosition
                 return true
             }
@@ -81,7 +79,7 @@ class PlayerFragment : Fragment() {
             }
 
             override fun clearView(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) {
-                item?.second?.let { mediaSessionConnection.move(it, newPosition) }
+                mediaSessionConnection.move(oldPosition, newPosition)
             }
         })
         dragTouchHelper.attachToRecyclerView(playQueueView)
@@ -93,7 +91,7 @@ class PlayerFragment : Fragment() {
                 false
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                adapter.items[viewHolder.adapterPosition].second?.let { mediaSessionConnection.removeFromQueue(it) }
+                mediaSessionConnection.removeFromQueue(viewHolder.adapterPosition)
             }
         })
         swipeTouchHelper.attachToRecyclerView(playQueueView)
@@ -106,7 +104,6 @@ class PlayerFragment : Fragment() {
                     true
                 }
                 R.id.clear_queue -> {
-                    mediaSessionConnection.stop()
                     mediaSessionConnection.clearQueue()
                     true
                 }
@@ -185,30 +182,30 @@ class PlayerFragment : Fragment() {
 
         mediaSessionConnection.repeatMode.observe(viewLifecycleOwner, Observer {
             when (it) {
-                PlaybackStateCompat.REPEAT_MODE_ALL -> {
+                SessionPlayer.REPEAT_MODE_ALL -> {
                     repeatModeIndicator.setImageResource(R.drawable.ic_repeat_all)
-                    repeatModeIndicator.setOnClickListener { mediaSessionConnection.setRepeatMode(PlaybackStateCompat.REPEAT_MODE_ONE) }
+                    repeatModeIndicator.setOnClickListener { mediaSessionConnection.setRepeatMode(SessionPlayer.REPEAT_MODE_ONE) }
                 }
-                PlaybackStateCompat.REPEAT_MODE_ONE -> {
+                SessionPlayer.REPEAT_MODE_ONE -> {
                     repeatModeIndicator.setImageResource(R.drawable.ic_repeat_one)
-                    repeatModeIndicator.setOnClickListener { mediaSessionConnection.setRepeatMode(PlaybackStateCompat.REPEAT_MODE_NONE) }
+                    repeatModeIndicator.setOnClickListener { mediaSessionConnection.setRepeatMode(SessionPlayer.REPEAT_MODE_NONE) }
                 }
                 else -> {
                     repeatModeIndicator.setImageResource(R.drawable.ic_repeat_off)
-                    repeatModeIndicator.setOnClickListener { mediaSessionConnection.setRepeatMode(PlaybackStateCompat.REPEAT_MODE_ALL) }
+                    repeatModeIndicator.setOnClickListener { mediaSessionConnection.setRepeatMode(SessionPlayer.REPEAT_MODE_ALL) }
                 }
             }
         })
 
         mediaSessionConnection.shuffleMode.observe(viewLifecycleOwner, Observer {
             when (it) {
-                PlaybackStateCompat.SHUFFLE_MODE_ALL -> {
+                SessionPlayer.SHUFFLE_MODE_ALL -> {
                     shuffleModeIndicator.setImageResource(R.drawable.ic_shuffle_all)
-                    shuffleModeIndicator.setOnClickListener { mediaSessionConnection.setShuffleMode(PlaybackStateCompat.SHUFFLE_MODE_NONE) }
+                    shuffleModeIndicator.setOnClickListener { mediaSessionConnection.setShuffleMode(SessionPlayer.SHUFFLE_MODE_NONE) }
                 }
                 else -> {
                     shuffleModeIndicator.setImageResource(R.drawable.ic_shuffle_none)
-                    shuffleModeIndicator.setOnClickListener { mediaSessionConnection.setShuffleMode(PlaybackStateCompat.SHUFFLE_MODE_ALL) }
+                    shuffleModeIndicator.setOnClickListener { mediaSessionConnection.setShuffleMode(SessionPlayer.SHUFFLE_MODE_ALL) }
                 }
             }
         })
