@@ -15,7 +15,6 @@ import androidx.media2.session.MediaController
 import androidx.media2.session.SessionCommand
 import androidx.media2.session.SessionCommandGroup
 import androidx.media2.session.SessionToken
-import kotlinx.coroutines.guava.asDeferred
 import kotlinx.coroutines.guava.await
 import me.vanpetegem.accentor.data.AccentorDatabase
 import me.vanpetegem.accentor.data.albums.Album
@@ -191,9 +190,7 @@ class MediaSessionConnection(application: Application) : AndroidViewModel(applic
 
     suspend fun addTracksToQueue(tracks: List<Pair<Track, Album>>, index: Int) {
         var base = index
-        tracks.map {
-            mediaController.addPlaylistItem(base++, it.first.id.toString()).asDeferred()
-        }.forEach { it.join() }
+        tracks.forEach { mediaController.addPlaylistItem(base++, it.first.id.toString()).await() }
     }
 
     suspend fun previous() = mediaController.skipToPreviousPlaylistItem().await()

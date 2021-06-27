@@ -28,8 +28,7 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
 
     fun login(server: String, username: String, password: String) {
         viewModelScope.launch(IO) {
-            repository.login(server, username, password) {
-                result ->
+            repository.login(server, username, password) { result ->
                 withContext(Main) {
                     _loginResult.value = when (result) {
                         is Result.Success -> LoginResult()
