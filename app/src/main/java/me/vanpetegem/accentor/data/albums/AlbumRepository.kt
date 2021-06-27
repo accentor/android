@@ -7,7 +7,10 @@ import me.vanpetegem.accentor.api.album.index
 import me.vanpetegem.accentor.data.authentication.AuthenticationRepository
 import me.vanpetegem.accentor.util.Result
 
-class AlbumRepository(private val albumDao: AlbumDao, private val authenticationRepository: AuthenticationRepository) {
+class AlbumRepository(
+    private val albumDao: AlbumDao,
+    private val authenticationRepository: AuthenticationRepository
+) {
     val allAlbums: LiveData<List<Album>> = albumDao.getAll()
     val allAlbumsById: LiveData<SparseArray<Album>> = map(allAlbums) {
         val map = SparseArray<Album>()

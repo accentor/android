@@ -7,8 +7,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import java.net.URI
 import java.net.URISyntaxException
-import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.vanpetegem.accentor.R
@@ -29,7 +29,8 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
     fun login(server: String, username: String, password: String) {
         viewModelScope.launch(IO) {
             repository.login(server, username, password) {
-                result -> withContext(Main) {
+                result ->
+                withContext(Main) {
                     _loginResult.value = when (result) {
                         is Result.Success -> LoginResult()
                         is Result.Error -> {

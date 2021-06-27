@@ -79,7 +79,7 @@ abstract class AccentorDatabase : RoomDatabase() {
                                 }
                             }
                         })
-                        .addMigrations(object: Migration(4, 5) {
+                        .addMigrations(object : Migration(4, 5) {
                             override fun migrate(database: SupportSQLiteDatabase) {
                                 database.beginTransaction()
                                 try {
@@ -92,9 +92,8 @@ abstract class AccentorDatabase : RoomDatabase() {
                                     database.endTransaction()
                                 }
                             }
-
                         })
-                        .addMigrations(object: Migration(5, 6) {
+                        .addMigrations(object : Migration(5, 6) {
                             override fun migrate(database: SupportSQLiteDatabase) {
                                 database.beginTransaction()
                                 try {
@@ -118,7 +117,6 @@ abstract class AccentorDatabase : RoomDatabase() {
                                     database.endTransaction()
                                 }
                             }
-
                         })
                         .build()
                 INSTANCE = instance

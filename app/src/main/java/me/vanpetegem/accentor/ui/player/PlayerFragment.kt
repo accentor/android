@@ -24,8 +24,6 @@ import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
 import me.vanpetegem.accentor.R
 import me.vanpetegem.accentor.components.SquaredImageView
-import me.vanpetegem.accentor.data.albums.Album
-import me.vanpetegem.accentor.data.tracks.Track
 import me.vanpetegem.accentor.media.MediaSessionConnection
 import me.vanpetegem.accentor.ui.main.MainActivity
 import me.vanpetegem.accentor.util.formatTrackLength
@@ -40,7 +38,11 @@ class PlayerFragment : Fragment() {
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         return inflater.inflate(R.layout.fragment_player_view, container, false)
     }
 
@@ -62,13 +64,20 @@ class PlayerFragment : Fragment() {
             var oldPosition = 0
             var newPosition = 0
 
-            override fun getMovementFlags(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int =
+            override fun getMovementFlags(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder
+            ): Int =
                 makeFlag(
                     ItemTouchHelper.ACTION_STATE_DRAG,
                     ItemTouchHelper.DOWN or ItemTouchHelper.UP
                 )
 
-            override fun onMove(_r: RecyclerView, vh: RecyclerView.ViewHolder, t: RecyclerView.ViewHolder): Boolean {
+            override fun onMove(
+                _r: RecyclerView,
+                vh: RecyclerView.ViewHolder,
+                t: RecyclerView.ViewHolder
+            ): Boolean {
                 oldPosition = vh.adapterPosition
                 newPosition = t.adapterPosition
                 return true
@@ -90,10 +99,17 @@ class PlayerFragment : Fragment() {
         })
         dragTouchHelper.attachToRecyclerView(playQueueView)
         val swipeTouchHelper = ItemTouchHelper(object : ItemTouchHelper.Callback() {
-            override fun getMovementFlags(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int =
+            override fun getMovementFlags(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder
+            ): Int =
                 makeFlag(ItemTouchHelper.ACTION_STATE_SWIPE, ItemTouchHelper.RIGHT or ItemTouchHelper.LEFT)
 
-            override fun onMove(_r: RecyclerView, _vh: RecyclerView.ViewHolder, _t: RecyclerView.ViewHolder): Boolean =
+            override fun onMove(
+                _r: RecyclerView,
+                _vh: RecyclerView.ViewHolder,
+                _t: RecyclerView.ViewHolder
+            ): Boolean =
                 false
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
@@ -146,84 +162,108 @@ class PlayerFragment : Fragment() {
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
         })
 
-        mediaSessionConnection.queue.observe(viewLifecycleOwner, Observer {
-            adapter.items = it ?: ArrayList()
-        })
-
-        mediaSessionConnection.playing.observe(viewLifecycleOwner, Observer {
-            if (it != null && it) {
-                play.visibility = View.GONE
-                pause.visibility = View.VISIBLE
-            } else {
-                play.visibility = View.VISIBLE
-                pause.visibility = View.GONE
+        mediaSessionConnection.queue.observe(
+            viewLifecycleOwner,
+            Observer {
+                adapter.items = it ?: ArrayList()
             }
-        })
+        )
 
-        mediaSessionConnection.buffering.observe(viewLifecycleOwner, Observer {
-            seekBar.isEnabled = !(it ?: true)
-        })
-
-        mediaSessionConnection.currentAlbum.observe(viewLifecycleOwner, Observer {
-            Glide.with(this@PlayerFragment)
-                .load(it?.image500)
-                .placeholder(R.drawable.ic_menu_albums)
-                .into(albumCoverImageView)
-
-            albumTitleView.text = it?.title ?: ""
-        })
-
-        mediaSessionConnection.currentTrack.observe(viewLifecycleOwner, Observer {
-            trackArtistsView.text = it?.stringifyTrackArtists() ?: ""
-            trackTitleView.text = it?.title ?: ""
-            fullLengthView.text = it?.length.formatTrackLength()
-            seekBar.max = it?.length ?: 0
-        })
-
-        mediaSessionConnection.currentPosition.observe(viewLifecycleOwner, Observer {
-            currentTimeView.text = it.formatTrackLength()
-            seekBar.setProgress(it ?: 0, false)
-        })
-
-        mediaSessionConnection.repeatMode.observe(viewLifecycleOwner, Observer {
-            when (it) {
-                SessionPlayer.REPEAT_MODE_ALL -> {
-                    repeatModeIndicator.setImageResource(R.drawable.ic_repeat_all)
-                    repeatModeIndicator.setOnClickListener {
-                        doDelayed { mediaSessionConnection.setRepeatMode(SessionPlayer.REPEAT_MODE_ONE) }
-                    }
-                }
-                SessionPlayer.REPEAT_MODE_ONE -> {
-                    repeatModeIndicator.setImageResource(R.drawable.ic_repeat_one)
-                    repeatModeIndicator.setOnClickListener {
-                        doDelayed { mediaSessionConnection.setRepeatMode(SessionPlayer.REPEAT_MODE_NONE) }
-                    }
-                }
-                else -> {
-                    repeatModeIndicator.setImageResource(R.drawable.ic_repeat_off)
-                    repeatModeIndicator.setOnClickListener {
-                        doDelayed { mediaSessionConnection.setRepeatMode(SessionPlayer.REPEAT_MODE_ALL) }
-                    }
+        mediaSessionConnection.playing.observe(
+            viewLifecycleOwner,
+            Observer {
+                if (it != null && it) {
+                    play.visibility = View.GONE
+                    pause.visibility = View.VISIBLE
+                } else {
+                    play.visibility = View.VISIBLE
+                    pause.visibility = View.GONE
                 }
             }
-        })
+        )
 
-        mediaSessionConnection.shuffleMode.observe(viewLifecycleOwner, Observer {
-            when (it) {
-                SessionPlayer.SHUFFLE_MODE_ALL -> {
-                    shuffleModeIndicator.setImageResource(R.drawable.ic_shuffle_all)
-                    shuffleModeIndicator.setOnClickListener {
-                        doDelayed { mediaSessionConnection.setShuffleMode(SessionPlayer.SHUFFLE_MODE_NONE) }
+        mediaSessionConnection.buffering.observe(
+            viewLifecycleOwner,
+            Observer {
+                seekBar.isEnabled = !(it ?: true)
+            }
+        )
+
+        mediaSessionConnection.currentAlbum.observe(
+            viewLifecycleOwner,
+            Observer {
+                Glide.with(this@PlayerFragment)
+                    .load(it?.image500)
+                    .placeholder(R.drawable.ic_menu_albums)
+                    .into(albumCoverImageView)
+
+                albumTitleView.text = it?.title ?: ""
+            }
+        )
+
+        mediaSessionConnection.currentTrack.observe(
+            viewLifecycleOwner,
+            Observer {
+                trackArtistsView.text = it?.stringifyTrackArtists() ?: ""
+                trackTitleView.text = it?.title ?: ""
+                fullLengthView.text = it?.length.formatTrackLength()
+                seekBar.max = it?.length ?: 0
+            }
+        )
+
+        mediaSessionConnection.currentPosition.observe(
+            viewLifecycleOwner,
+            Observer {
+                currentTimeView.text = it.formatTrackLength()
+                seekBar.setProgress(it ?: 0, false)
+            }
+        )
+
+        mediaSessionConnection.repeatMode.observe(
+            viewLifecycleOwner,
+            Observer {
+                when (it) {
+                    SessionPlayer.REPEAT_MODE_ALL -> {
+                        repeatModeIndicator.setImageResource(R.drawable.ic_repeat_all)
+                        repeatModeIndicator.setOnClickListener {
+                            doDelayed { mediaSessionConnection.setRepeatMode(SessionPlayer.REPEAT_MODE_ONE) }
+                        }
                     }
-                }
-                else -> {
-                    shuffleModeIndicator.setImageResource(R.drawable.ic_shuffle_none)
-                    shuffleModeIndicator.setOnClickListener {
-                        doDelayed { mediaSessionConnection.setShuffleMode(SessionPlayer.SHUFFLE_MODE_ALL) }
+                    SessionPlayer.REPEAT_MODE_ONE -> {
+                        repeatModeIndicator.setImageResource(R.drawable.ic_repeat_one)
+                        repeatModeIndicator.setOnClickListener {
+                            doDelayed { mediaSessionConnection.setRepeatMode(SessionPlayer.REPEAT_MODE_NONE) }
+                        }
+                    }
+                    else -> {
+                        repeatModeIndicator.setImageResource(R.drawable.ic_repeat_off)
+                        repeatModeIndicator.setOnClickListener {
+                            doDelayed { mediaSessionConnection.setRepeatMode(SessionPlayer.REPEAT_MODE_ALL) }
+                        }
                     }
                 }
             }
-        })
+        )
+
+        mediaSessionConnection.shuffleMode.observe(
+            viewLifecycleOwner,
+            Observer {
+                when (it) {
+                    SessionPlayer.SHUFFLE_MODE_ALL -> {
+                        shuffleModeIndicator.setImageResource(R.drawable.ic_shuffle_all)
+                        shuffleModeIndicator.setOnClickListener {
+                            doDelayed { mediaSessionConnection.setShuffleMode(SessionPlayer.SHUFFLE_MODE_NONE) }
+                        }
+                    }
+                    else -> {
+                        shuffleModeIndicator.setImageResource(R.drawable.ic_shuffle_none)
+                        shuffleModeIndicator.setOnClickListener {
+                            doDelayed { mediaSessionConnection.setShuffleMode(SessionPlayer.SHUFFLE_MODE_ALL) }
+                        }
+                    }
+                }
+            }
+        )
     }
 
     override fun onResume() {

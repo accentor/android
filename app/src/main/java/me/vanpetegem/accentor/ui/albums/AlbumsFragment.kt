@@ -2,7 +2,6 @@ package me.vanpetegem.accentor.ui.albums
 
 import android.content.res.Configuration
 import android.os.Bundle
-import android.util.SparseArray
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,7 +19,6 @@ import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
 import me.vanpetegem.accentor.R
 import me.vanpetegem.accentor.data.albums.Album
-import me.vanpetegem.accentor.data.tracks.Track
 import me.vanpetegem.accentor.media.MediaSessionConnection
 import me.vanpetegem.accentor.ui.main.MainActivity
 
@@ -30,7 +28,8 @@ class AlbumsFragment : Fragment() {
     private lateinit var mediaSessionConnection: MediaSessionConnection
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         return inflater.inflate(R.layout.fragment_albums, container, false)
@@ -63,7 +62,6 @@ class AlbumsFragment : Fragment() {
                         mediaSessionConnection.addTracksToQueue(album)
                     }
                 }
-
             }
         )
         val lm = GridLayoutManager(

@@ -15,7 +15,7 @@ abstract class TrackDao {
 
     @Transaction
     open fun getByAlbum(album: Album): List<Track> {
-        val tracks = getDbTracksByAlbumId(album.id);
+        val tracks = getDbTracksByAlbumId(album.id)
         val ids = tracks.map { it.id }
         val trackGenres = getTrackGenresByTrackIdWhereTrackIds(ids)
         val trackArtists = getTrackArtistsByTrackIdWhereTrackIds(ids)
@@ -220,14 +220,16 @@ abstract class TrackDao {
                 )
             )
             for (ta in track.trackArtists) {
-                insert(DbTrackArtist(
-                    track.id,
-                    ta.artistId,
-                    ta.name,
-                    ta.normalizedName,
-                    ta.role,
-                    ta.order
-                ))
+                insert(
+                    DbTrackArtist(
+                        track.id,
+                        ta.artistId,
+                        ta.name,
+                        ta.normalizedName,
+                        ta.role,
+                        ta.order
+                    )
+                )
             }
             for (gId in track.genreIds) {
                 insert(DbTrackGenre(track.id, gId))

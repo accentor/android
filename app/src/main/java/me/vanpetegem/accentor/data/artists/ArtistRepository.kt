@@ -31,5 +31,4 @@ class ArtistRepository(
     suspend fun clear() {
         artistDao.deleteAll()
     }
-
 }

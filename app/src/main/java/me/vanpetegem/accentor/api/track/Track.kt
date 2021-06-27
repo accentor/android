@@ -6,7 +6,6 @@ import me.vanpetegem.accentor.data.tracks.Track
 import me.vanpetegem.accentor.util.Result
 import me.vanpetegem.accentor.util.responseObject
 
-
 fun index(server: String, authenticationData: AuthenticationData): Result<List<Track>> {
 
     var page = 1

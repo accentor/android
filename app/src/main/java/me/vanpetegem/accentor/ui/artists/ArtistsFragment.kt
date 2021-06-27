@@ -21,7 +21,8 @@ class ArtistsFragment : Fragment() {
     private lateinit var viewModel: ArtistsViewModel
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         return inflater.inflate(R.layout.fragment_artists, container, false)
@@ -56,14 +57,20 @@ class ArtistsFragment : Fragment() {
             })
         }
 
-        viewModel.allArtists.observe(viewLifecycleOwner, Observer {
-            cardView.apply {
-                viewAdapter.items = it
+        viewModel.allArtists.observe(
+            viewLifecycleOwner,
+            Observer {
+                cardView.apply {
+                    viewAdapter.items = it
+                }
             }
-        })
-        viewModel.scrollState.observe(viewLifecycleOwner, Observer {
-            it?.let { cardView.layoutManager?.onRestoreInstanceState(it) }
-        })
+        )
+        viewModel.scrollState.observe(
+            viewLifecycleOwner,
+            Observer {
+                it?.let { cardView.layoutManager?.onRestoreInstanceState(it) }
+            }
+        )
     }
 
     override fun onDestroyView() {
