@@ -1,21 +1,21 @@
 package me.vanpetegem.accentor.media
 
-import android.app.PendingIntent
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.content.Intent
+import android.app.PendingIntent
 import android.content.ComponentName
 import android.content.Context
+import android.content.Intent
 import android.support.v4.media.session.PlaybackStateCompat
 import android.view.KeyEvent
 import androidx.core.app.NotificationCompat
 import androidx.media.app.NotificationCompat.MediaStyle
-import androidx.media2.common.SessionPlayer
 import androidx.media2.common.MediaMetadata
+import androidx.media2.common.SessionPlayer
 import androidx.media2.session.MediaSession
-import me.vanpetegem.accentor.ui.main.MainActivity
 import me.vanpetegem.accentor.R
+import me.vanpetegem.accentor.ui.main.MainActivity
 
 const val NOW_PLAYING_CHANNEL: String = "me.vanpetegem.accentor.media.NOW_PLAYING_CHANNEL"
 const val NOW_PLAYING_NOTIFICATION: Int = 0xb339

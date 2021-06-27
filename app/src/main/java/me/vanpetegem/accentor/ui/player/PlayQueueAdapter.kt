@@ -6,7 +6,6 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import me.vanpetegem.accentor.BuildConfig
 import me.vanpetegem.accentor.R
 import me.vanpetegem.accentor.data.albums.Album
 import me.vanpetegem.accentor.data.tracks.Track
@@ -49,5 +48,4 @@ class PlayQueueAdapter(val clickHandler: (Int) -> Unit) : RecyclerView.Adapter<P
         holder.trackLengthView.text = items[position].second?.length?.formatTrackLength() ?: "0:00"
         holder.playingIndicator.visibility = if (items[position].first) View.VISIBLE else View.GONE
     }
-
 }

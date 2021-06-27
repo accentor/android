@@ -54,8 +54,23 @@ abstract class AccentorDatabase : RoomDatabase() {
                                 database.beginTransaction()
                                 try {
                                     database.execSQL("ALTER TABLE `album_artists` RENAME TO `album_artists_old`")
-                                    database.execSQL("CREATE TABLE `album_artists` (`album_id` INTEGER NOT NULL, `artist_id` INTEGER NOT NULL, `name` TEXT NOT NULL, `order` INTEGER NOT NULL, `separator` TEXT, PRIMARY KEY(`album_id`, `artist_id`, `name`))")
-                                    database.execSQL("INSERT INTO `album_artists` (`album_id`, `artist_id`, `name`, `order`, `separator`) SELECT `album_id`, `artist_id`, `name`, `order`, `join` AS `separator` FROM `album_artists_old`")
+                                    database.execSQL(
+                                        """
+                                        CREATE TABLE `album_artists` (
+                                            `album_id` INTEGER NOT NULL,
+                                            `artist_id` INTEGER NOT NULL,
+                                            `name` TEXT NOT NULL,
+                                            `order` INTEGER NOT NULL, `
+                                            separator` TEXT,
+                                            PRIMARY KEY(`album_id`, `artist_id`, `name`))
+                                        """
+                                    )
+                                    database.execSQL(
+                                        """
+                                        INSERT INTO `album_artists` (`album_id`, `artist_id`, `name`, `order`, `separator`)
+                                            SELECT `album_id`, `artist_id`, `name`, `order`, `join` AS `separator` FROM `album_artists_old`
+                                        """
+                                    )
                                     database.execSQL("DROP TABLE `album_artists_old`")
                                     database.setTransactionSuccessful()
                                 } finally {
@@ -79,22 +94,35 @@ abstract class AccentorDatabase : RoomDatabase() {
                                 }
                             }
                         })
-                        .addMigrations(object: Migration(4, 5) {
+                        .addMigrations(object : Migration(4, 5) {
                             override fun migrate(database: SupportSQLiteDatabase) {
                                 database.beginTransaction()
                                 try {
                                     database.execSQL("ALTER TABLE `album_labels` RENAME TO `album_labels_old`")
-                                    database.execSQL("CREATE TABLE `album_labels` (`album_id` INTEGER NOT NULL, `label_id` INTEGER NOT NULL, `catalogue_number` TEXT, PRIMARY KEY(`album_id`, `label_id`))")
-                                    database.execSQL("INSERT INTO `album_labels` (`album_id`, `label_id`, `catalogue_number`) SELECT `album_id`, `label_id`, `catalogue_number` FROM `album_labels_old`")
+                                    database.execSQL(
+                                        """
+                                        CREATE TABLE `album_labels` (
+                                            `album_id` INTEGER NOT NULL,
+                                            `label_id` INTEGER NOT NULL,
+                                            `catalogue_number` TEXT,
+                                            PRIMARY KEY(`album_id`, `label_id`)
+                                        )
+                                        """
+                                    )
+                                    database.execSQL(
+                                        """
+                                        INSERT INTO `album_labels` (`album_id`, `label_id`, `catalogue_number`)
+                                            SELECT `album_id`, `label_id`, `catalogue_number` FROM `album_labels_old`
+                                        """
+                                    )
                                     database.execSQL("DROP TABLE `album_labels_old`")
                                     database.setTransactionSuccessful()
                                 } finally {
                                     database.endTransaction()
                                 }
                             }
-
                         })
-                        .addMigrations(object: Migration(5, 6) {
+                        .addMigrations(object : Migration(5, 6) {
                             override fun migrate(database: SupportSQLiteDatabase) {
                                 database.beginTransaction()
                                 try {
@@ -118,7 +146,6 @@ abstract class AccentorDatabase : RoomDatabase() {
                                     database.endTransaction()
                                 }
                             }
-
                         })
                         .build()
                 INSTANCE = instance

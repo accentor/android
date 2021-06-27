@@ -15,7 +15,7 @@ abstract class TrackDao {
 
     @Transaction
     open fun getByAlbum(album: Album): List<Track> {
-        val tracks = getDbTracksByAlbumId(album.id);
+        val tracks = getDbTracksByAlbumId(album.id)
         val ids = tracks.map { it.id }
         val trackGenres = getTrackGenresByTrackIdWhereTrackIds(ids)
         val trackArtists = getTrackArtistsByTrackIdWhereTrackIds(ids)
@@ -177,15 +177,16 @@ abstract class TrackDao {
         return map
     }
 
-    protected open fun findTrackGenresByTrackIdWhereTrackIds(ids: List<Int>): LiveData<SparseArray<MutableList<Int>>> = map(findAllTrackGenresWhereTrackIds(ids)) {
-        val map = SparseArray<MutableList<Int>>()
-        for (tg in it) {
-            val l = map.get(tg.trackId, ArrayList())
-            l.add(tg.genreId)
-            map.put(tg.trackId, l)
+    protected open fun findTrackGenresByTrackIdWhereTrackIds(ids: List<Int>): LiveData<SparseArray<MutableList<Int>>> =
+        map(findAllTrackGenresWhereTrackIds(ids)) {
+            val map = SparseArray<MutableList<Int>>()
+            for (tg in it) {
+                val l = map.get(tg.trackId, ArrayList())
+                l.add(tg.genreId)
+                map.put(tg.trackId, l)
+            }
+            return@map map
         }
-        return@map map
-    }
 
     protected open fun getTrackGenresByTrackIdWhereTrackIds(ids: List<Int>): SparseArray<MutableList<Int>> {
         val map = SparseArray<MutableList<Int>>()
@@ -220,14 +221,16 @@ abstract class TrackDao {
                 )
             )
             for (ta in track.trackArtists) {
-                insert(DbTrackArtist(
-                    track.id,
-                    ta.artistId,
-                    ta.name,
-                    ta.normalizedName,
-                    ta.role,
-                    ta.order
-                ))
+                insert(
+                    DbTrackArtist(
+                        track.id,
+                        ta.artistId,
+                        ta.name,
+                        ta.normalizedName,
+                        ta.role,
+                        ta.order
+                    )
+                )
             }
             for (gId in track.genreIds) {
                 insert(DbTrackGenre(track.id, gId))

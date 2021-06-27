@@ -20,7 +20,11 @@ import me.vanpetegem.accentor.media.MediaSessionConnection
 class BottomBarFragment : Fragment() {
     private lateinit var mediaSessionConnection: MediaSessionConnection
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         return inflater.inflate(R.layout.fragment_bottom_bar, container, false)
     }
 
@@ -45,29 +49,37 @@ class BottomBarFragment : Fragment() {
             setOnClickListener { doDelayed { mediaSessionConnection.next() } }
         }
 
-
-        mediaSessionConnection.currentAlbum.observe(viewLifecycleOwner, Observer {
-            Glide.with(this)
-                .load(it?.image500)
-                .placeholder(R.drawable.ic_menu_albums)
-                .into(imageView)
-        })
-
-        mediaSessionConnection.currentTrack.observe(viewLifecycleOwner, Observer {
-            trackTitle.text = it?.title ?: ""
-            trackArtists.text =
-                it?.trackArtists?.sortedBy { ta -> ta.order }?.joinToString(" / ") { ta -> ta.name } ?: ""
-        })
-
-        mediaSessionConnection.playing.observe(viewLifecycleOwner, Observer {
-            if (it != null && it) {
-                play.visibility = View.GONE
-                pause.visibility = View.VISIBLE
-            } else {
-                play.visibility = View.VISIBLE
-                pause.visibility = View.GONE
+        mediaSessionConnection.currentAlbum.observe(
+            viewLifecycleOwner,
+            Observer {
+                Glide.with(this)
+                    .load(it?.image500)
+                    .placeholder(R.drawable.ic_menu_albums)
+                    .into(imageView)
             }
-        })
+        )
+
+        mediaSessionConnection.currentTrack.observe(
+            viewLifecycleOwner,
+            Observer {
+                trackTitle.text = it?.title ?: ""
+                trackArtists.text =
+                    it?.trackArtists?.sortedBy { ta -> ta.order }?.joinToString(" / ") { ta -> ta.name } ?: ""
+            }
+        )
+
+        mediaSessionConnection.playing.observe(
+            viewLifecycleOwner,
+            Observer {
+                if (it != null && it) {
+                    play.visibility = View.GONE
+                    pause.visibility = View.VISIBLE
+                } else {
+                    play.visibility = View.VISIBLE
+                    pause.visibility = View.GONE
+                }
+            }
+        )
     }
 
     private fun doDelayed(block: suspend CoroutineScope.() -> Unit) = viewLifecycleOwner.lifecycleScope.launch(IO, block = block)

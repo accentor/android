@@ -3,7 +3,6 @@ package me.vanpetegem.accentor.ui.albums
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.view.View
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.PopupMenu
@@ -22,7 +21,10 @@ interface AlbumActionListener {
     fun playLast(album: Album)
 }
 
-class AlbumCardAdapter(private val fragment: Fragment, private val actionListener: AlbumActionListener) :
+class AlbumCardAdapter(
+    private val fragment: Fragment,
+    private val actionListener: AlbumActionListener
+) :
     RecyclerView.Adapter<AlbumCardAdapter.ViewHolder>(), FastScrollRecyclerView.SectionedAdapter {
 
     var items: List<Album> = ArrayList()

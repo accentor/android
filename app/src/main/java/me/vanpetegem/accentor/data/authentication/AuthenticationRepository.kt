@@ -2,8 +2,8 @@ package me.vanpetegem.accentor.data.authentication
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
-import kotlinx.coroutines.withContext
 import kotlinx.coroutines.Dispatchers.Main
+import kotlinx.coroutines.withContext
 import me.vanpetegem.accentor.api.auth.create
 import me.vanpetegem.accentor.api.auth.destroy
 import me.vanpetegem.accentor.util.Result
@@ -30,7 +30,12 @@ class AuthenticationRepository(
         }
     }
 
-    suspend fun login(server: String, username: String, password: String, handler: suspend (Result<Unit>) -> Unit) {
+    suspend fun login(
+        server: String,
+        username: String,
+        password: String,
+        handler: suspend (Result<Unit>) -> Unit
+    ) {
         val result = create(server, username, password)
 
         handler(

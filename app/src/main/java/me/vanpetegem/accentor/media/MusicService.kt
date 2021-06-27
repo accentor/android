@@ -1,60 +1,44 @@
 package me.vanpetegem.accentor.media
 
-import android.app.PendingIntent
-import android.content.BroadcastReceiver
-import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
-import android.media.AudioManager
-import android.net.Uri
-import android.net.wifi.WifiManager
 import android.os.Bundle
-import android.os.PowerManager
-import android.os.ResultReceiver
+import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.toBitmap
 import androidx.media2.common.MediaItem
 import androidx.media2.common.MediaMetadata
 import androidx.media2.common.SessionPlayer
-import androidx.media2.session.MediaController
 import androidx.media2.session.MediaSession
 import androidx.media2.session.MediaSessionService
 import androidx.media2.session.SessionCommand
 import androidx.media2.session.SessionCommandGroup
 import androidx.media2.session.SessionResult
-import androidx.core.app.NotificationManagerCompat
-import androidx.core.content.ContextCompat
-import androidx.core.graphics.drawable.toBitmap
-import androidx.media.MediaBrowserServiceCompat
 import com.bumptech.glide.Glide
-import com.google.android.exoplayer2.*
+import com.google.android.exoplayer2.C
+import com.google.android.exoplayer2.ExoPlayer
+import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.audio.AudioAttributes
 import com.google.android.exoplayer2.database.ExoDatabaseProvider
-import com.google.android.exoplayer2.ext.media2.SessionPlayerConnector
 import com.google.android.exoplayer2.ext.media2.SessionCallbackBuilder
+import com.google.android.exoplayer2.ext.media2.SessionPlayerConnector
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory
-import com.google.android.exoplayer2.source.MediaSourceFactory
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
-import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.upstream.DataSource
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSource
-import com.google.android.exoplayer2.upstream.FileDataSource
-import com.google.android.exoplayer2.upstream.cache.CacheDataSink
 import com.google.android.exoplayer2.upstream.cache.CacheDataSource
 import com.google.android.exoplayer2.upstream.cache.LeastRecentlyUsedCacheEvictor
 import com.google.android.exoplayer2.upstream.cache.SimpleCache
 import java.io.File
 import java.util.concurrent.Executors
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
 import me.vanpetegem.accentor.R
 import me.vanpetegem.accentor.data.AccentorDatabase
-import me.vanpetegem.accentor.data.albums.AlbumRepository
 import me.vanpetegem.accentor.data.albums.Album
 import me.vanpetegem.accentor.data.authentication.AuthenticationDataSource
-import me.vanpetegem.accentor.data.authentication.AuthenticationRepository
-import me.vanpetegem.accentor.data.tracks.TrackRepository
 import me.vanpetegem.accentor.data.tracks.Track
 import me.vanpetegem.accentor.userAgent
 
@@ -96,7 +80,10 @@ class MusicService : MediaSessionService() {
                                 (CacheDataSource.FLAG_BLOCK_ON_CACHE or CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR)
                             )
                         }
-                    }, DefaultExtractorsFactory().setConstantBitrateSeekingEnabled(true)))
+                    },
+                    DefaultExtractorsFactory().setConstantBitrateSeekingEnabled(true)
+                )
+            )
             setHandleAudioBecomingNoisy(true)
         }.build().apply {
             setAudioAttributes(accentorAudioAttributes, true)
@@ -114,9 +101,12 @@ class MusicService : MediaSessionService() {
         builder.putString(MediaMetadata.METADATA_KEY_ALBUM, album.title)
         builder.putString(MediaMetadata.METADATA_KEY_ARTIST, track.stringifyTrackArtists())
         builder.putString(MediaMetadata.METADATA_KEY_DATE, album.release.toString())
-        builder.putString(MediaMetadata.METADATA_KEY_ALBUM_ARTIST, album.stringifyAlbumArtists().let {
-                              if (it.isEmpty()) application.getString(R.string.various_artists) else it
-        })
+        builder.putString(
+            MediaMetadata.METADATA_KEY_ALBUM_ARTIST,
+            album.stringifyAlbumArtists().let {
+                if (it.isEmpty()) application.getString(R.string.various_artists) else it
+            }
+        )
         builder.putString(MediaMetadata.METADATA_KEY_ART_URI, album.image500)
         builder.putString(MediaMetadata.METADATA_KEY_ALBUM_ART_URI, album.image500)
         builder.putString(MediaMetadata.METADATA_KEY_MEDIA_URI, mediaUri)
@@ -145,33 +135,54 @@ class MusicService : MediaSessionService() {
         val trackDao = database.trackDao()
         val albumDao = database.albumDao()
 
-
         sessionPlayerConnector = SessionPlayerConnector(exoPlayer)
         sessionCallback = SessionCallbackBuilder(baseContext, sessionPlayerConnector).setMediaItemProvider(
             object : SessionCallbackBuilder.MediaItemProvider {
-                override fun onCreateMediaItem(session: MediaSession, info: MediaSession.ControllerInfo, mediaId: String): MediaItem? {
+                override fun onCreateMediaItem(
+                    session: MediaSession,
+                    info: MediaSession.ControllerInfo,
+                    mediaId: String
+                ): MediaItem? {
                     val track = trackDao.getTrackById(mediaId.toInt())
                     val album = track?.let { albumDao.getAlbumById(it.albumId) }
                     return track?.let { t -> album?.let { a -> convertTrack(t, a) } }
                 }
-        }).setCustomCommandProvider(
+            }
+        ).setCustomCommandProvider(
             object : SessionCallbackBuilder.CustomCommandProvider {
-                override fun onCustomCommand(session: MediaSession, info: MediaSession.ControllerInfo, command: SessionCommand, args: Bundle?): SessionResult {
+                override fun onCustomCommand(
+                    session: MediaSession,
+                    info: MediaSession.ControllerInfo,
+                    command: SessionCommand,
+                    args: Bundle?
+                ): SessionResult {
                     when (command.customAction) {
                         "STOP" -> {
                             mainScope.launch(Main) { exoPlayer.stop() }
+                            return SessionResult(SessionResult.RESULT_SUCCESS, null)
+                        }
+                        "CLEAR" -> {
+                            mainScope.launch(Main) {
+                                exoPlayer.stop()
+                                exoPlayer.clearMediaItems()
+                            }
                             return SessionResult(SessionResult.RESULT_SUCCESS, null)
                         }
                         else -> { return SessionResult(SessionResult.RESULT_ERROR_UNKNOWN, null) }
                     }
                 }
 
-                override fun getCustomCommands(session: MediaSession, info: MediaSession.ControllerInfo): SessionCommandGroup? {
+                override fun getCustomCommands(
+                    session: MediaSession,
+                    info: MediaSession.ControllerInfo
+                ): SessionCommandGroup? {
                     return SessionCommandGroup.Builder()
                         .addCommand(SessionCommand("STOP", null))
+                        .addCommand(SessionCommand("CLEAR", null))
                         .build()
                 }
-        }).build()
+            }
+        ).build()
         mediaSession = MediaSession.Builder(baseContext, sessionPlayerConnector)
             .setSessionCallback(Executors.newSingleThreadExecutor(), sessionCallback)
             .build()
@@ -217,6 +228,6 @@ class MusicService : MediaSessionService() {
         }
 
         // Don't use automatic foregrounding/notification showing/etc...
-        return null;
+        return null
     }
 }

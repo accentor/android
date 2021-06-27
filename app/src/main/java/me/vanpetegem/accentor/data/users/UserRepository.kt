@@ -8,7 +8,10 @@ import me.vanpetegem.accentor.api.user.index
 import me.vanpetegem.accentor.data.authentication.AuthenticationRepository
 import me.vanpetegem.accentor.util.Result
 
-class UserRepository(private val userDao: UserDao, private val authenticationRepository: AuthenticationRepository) {
+class UserRepository(
+    private val userDao: UserDao,
+    private val authenticationRepository: AuthenticationRepository
+) {
     val allUsers: LiveData<List<User>> = userDao.getAll()
     val allUsersById: LiveData<SparseArray<User>> = map(allUsers) {
         val map = SparseArray<User>()

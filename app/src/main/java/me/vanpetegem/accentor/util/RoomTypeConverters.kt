@@ -1,11 +1,11 @@
 package me.vanpetegem.accentor.util
 
 import androidx.room.TypeConverter
-import me.vanpetegem.accentor.data.tracks.Role
-import me.vanpetegem.accentor.data.users.Permission
 import java.time.Instant
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import me.vanpetegem.accentor.data.tracks.Role
+import me.vanpetegem.accentor.data.users.Permission
 
 class RoomTypeConverters {
     @TypeConverter

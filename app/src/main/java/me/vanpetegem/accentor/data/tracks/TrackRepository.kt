@@ -1,15 +1,15 @@
 package me.vanpetegem.accentor.data.tracks
 
-import android.util.SparseArray
-import androidx.core.util.valueIterator
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.Transformations.map
 import me.vanpetegem.accentor.api.track.index
-import me.vanpetegem.accentor.data.authentication.AuthenticationRepository
 import me.vanpetegem.accentor.data.albums.Album
+import me.vanpetegem.accentor.data.authentication.AuthenticationRepository
 import me.vanpetegem.accentor.util.Result
 
-class TrackRepository(private val trackDao: TrackDao, private val authenticationRepository: AuthenticationRepository) {
+class TrackRepository(
+    private val trackDao: TrackDao,
+    private val authenticationRepository: AuthenticationRepository
+) {
     fun findById(id: Int): LiveData<Track?> {
         return trackDao.findById(id)
     }
