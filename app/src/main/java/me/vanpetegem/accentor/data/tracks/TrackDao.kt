@@ -177,15 +177,16 @@ abstract class TrackDao {
         return map
     }
 
-    protected open fun findTrackGenresByTrackIdWhereTrackIds(ids: List<Int>): LiveData<SparseArray<MutableList<Int>>> = map(findAllTrackGenresWhereTrackIds(ids)) {
-        val map = SparseArray<MutableList<Int>>()
-        for (tg in it) {
-            val l = map.get(tg.trackId, ArrayList())
-            l.add(tg.genreId)
-            map.put(tg.trackId, l)
+    protected open fun findTrackGenresByTrackIdWhereTrackIds(ids: List<Int>): LiveData<SparseArray<MutableList<Int>>> =
+        map(findAllTrackGenresWhereTrackIds(ids)) {
+            val map = SparseArray<MutableList<Int>>()
+            for (tg in it) {
+                val l = map.get(tg.trackId, ArrayList())
+                l.add(tg.genreId)
+                map.put(tg.trackId, l)
+            }
+            return@map map
         }
-        return@map map
-    }
 
     protected open fun getTrackGenresByTrackIdWhereTrackIds(ids: List<Int>): SparseArray<MutableList<Int>> {
         val map = SparseArray<MutableList<Int>>()

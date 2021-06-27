@@ -211,10 +211,11 @@ class MediaSessionConnection(application: Application) : AndroidViewModel(applic
     suspend fun setShuffleMode(shuffleMode: Int) = mediaController.setShuffleMode(shuffleMode).await()
 
     fun updateCurrentPosition() {
-        if (mediaController.currentPosition == SessionPlayer.UNKNOWN_TIME)
+        if (mediaController.currentPosition == SessionPlayer.UNKNOWN_TIME) {
             _currentPosition.postValue(0)
-        else
+        } else {
             _currentPosition.postValue(mediaController.currentPosition)
+        }
     }
 
     suspend fun skipTo(position: Int) = mediaController.skipToPlaylistItem(position).await()

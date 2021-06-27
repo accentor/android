@@ -68,7 +68,11 @@ class AlbumsFragment : Fragment() {
             context,
             if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) 2 else 4
         )
-        (activity as MainActivity).setCanChildScrollUpCallback(SwipeRefreshLayout.OnChildScrollUpCallback { _, _ -> lm.findFirstCompletelyVisibleItemPosition() > 0 })
+        (activity as MainActivity).setCanChildScrollUpCallback(
+            SwipeRefreshLayout.OnChildScrollUpCallback { _, _ ->
+                lm.findFirstCompletelyVisibleItemPosition() > 0
+            }
+        )
         cardView.apply {
             setHasFixedSize(true)
             layoutManager = lm

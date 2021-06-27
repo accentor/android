@@ -7,7 +7,6 @@ import me.vanpetegem.accentor.util.Result
 import me.vanpetegem.accentor.util.responseObject
 
 fun index(server: String, authenticationData: AuthenticationData): Result<List<User>> {
-
     var page = 1
     val results = ArrayList<User>()
 

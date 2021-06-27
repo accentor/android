@@ -55,7 +55,9 @@ class MainActivity :
         val navView: NavigationView = findViewById(R.id.nav_view)
         swipeRefreshLayout = findViewById(R.id.swipe_refresh_layout)
         val toggle = ActionBarDrawerToggle(
-            this, drawerLayout, mainToolbar,
+            this,
+            drawerLayout,
+            mainToolbar,
             R.string.navigation_drawer_open,
             R.string.navigation_drawer_close
         )

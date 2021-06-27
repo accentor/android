@@ -14,7 +14,9 @@ import androidx.media2.session.SessionCommand
 import androidx.media2.session.SessionCommandGroup
 import androidx.media2.session.SessionResult
 import com.bumptech.glide.Glide
-import com.google.android.exoplayer2.*
+import com.google.android.exoplayer2.C
+import com.google.android.exoplayer2.ExoPlayer
+import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.audio.AudioAttributes
 import com.google.android.exoplayer2.database.ExoDatabaseProvider
 import com.google.android.exoplayer2.ext.media2.SessionCallbackBuilder
@@ -145,7 +147,8 @@ class MusicService : MediaSessionService() {
                     val album = track?.let { albumDao.getAlbumById(it.albumId) }
                     return track?.let { t -> album?.let { a -> convertTrack(t, a) } }
                 }
-            }).setCustomCommandProvider(
+            }
+        ).setCustomCommandProvider(
             object : SessionCallbackBuilder.CustomCommandProvider {
                 override fun onCustomCommand(
                     session: MediaSession,
@@ -178,7 +181,8 @@ class MusicService : MediaSessionService() {
                         .addCommand(SessionCommand("CLEAR", null))
                         .build()
                 }
-            }).build()
+            }
+        ).build()
         mediaSession = MediaSession.Builder(baseContext, sessionPlayerConnector)
             .setSessionCallback(Executors.newSingleThreadExecutor(), sessionCallback)
             .build()
