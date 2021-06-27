@@ -1,7 +1,8 @@
 package me.vanpetegem.accentor.util
 
 fun Int?.formatTrackLength(): String? =
-    if (this == null)
+    if (this == null) {
         "-:--"
-    else
+    } else {
         "${this / 60}:${(this % 60).toString().padStart(2, '0')}"
+    }

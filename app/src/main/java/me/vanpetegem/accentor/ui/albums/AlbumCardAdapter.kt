@@ -14,7 +14,6 @@ import com.bumptech.glide.Glide
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
 import me.vanpetegem.accentor.R
 import me.vanpetegem.accentor.data.albums.Album
-import org.jetbrains.anko.sdk27.coroutines.onClick
 
 interface AlbumActionListener {
     fun play(album: Album)
@@ -22,7 +21,10 @@ interface AlbumActionListener {
     fun playLast(album: Album)
 }
 
-class AlbumCardAdapter(private val fragment: Fragment, private val actionListener: AlbumActionListener) :
+class AlbumCardAdapter(
+    private val fragment: Fragment,
+    private val actionListener: AlbumActionListener
+) :
     RecyclerView.Adapter<AlbumCardAdapter.ViewHolder>(), FastScrollRecyclerView.SectionedAdapter {
 
     var items: List<Album> = ArrayList()
@@ -48,7 +50,7 @@ class AlbumCardAdapter(private val fragment: Fragment, private val actionListene
         val imageView: ImageView = gridView.findViewById(R.id.album_card_image_view)
         val menuButton: ImageButton = gridView.findViewById(R.id.album_card_menu_button)
         val menu = PopupMenu(fragment.context, menuButton, Gravity.END).apply { inflate(R.menu.album_card_menu) }
-        menuButton.onClick { menu.show() }
+        menuButton.setOnClickListener { menu.show() }
 
         return ViewHolder(gridView, albumTitleView, albumSubtitleView, imageView, menu)
     }
@@ -83,5 +85,5 @@ class AlbumCardAdapter(private val fragment: Fragment, private val actionListene
         }
     }
 
-    override fun getSectionName(position: Int): String = "${items[position].title[0].toUpperCase()}"
+    override fun getSectionName(position: Int): String = "${items[position].title[0].uppercaseChar()}"
 }

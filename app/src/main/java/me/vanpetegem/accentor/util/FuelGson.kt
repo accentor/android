@@ -13,17 +13,15 @@ import com.google.gson.reflect.TypeToken
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonToken
 import com.google.gson.stream.JsonWriter
-import me.vanpetegem.accentor.data.tracks.Role
-import me.vanpetegem.accentor.data.users.Permission
 import java.io.Reader
 import java.time.Instant
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import java.util.Locale
+import me.vanpetegem.accentor.data.tracks.Role
+import me.vanpetegem.accentor.data.users.Permission
 
 inline fun <reified T : Any> Request.responseObject() =
     response(gsonDeserializer<T>())
-
 
 inline fun <reified T : Any> gsonDeserializer() = object : ResponseDeserializable<T> {
     override fun deserialize(reader: Reader): T? = gsonObject().fromJson<T>(reader, object : TypeToken<T>() {}.type)
@@ -38,61 +36,73 @@ inline fun <reified T : Any> Request.jsonBody(src: T) =
 fun gsonObject(): Gson {
     val builder = GsonBuilder()
     builder.setFieldNamingStrategy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
-    builder.registerTypeAdapter(Permission::class.java, object : TypeAdapter<Permission>() {
-        override fun write(out: JsonWriter, value: Permission) {
-            out.value(value.name.toLowerCase(Locale.getDefault()))
-        }
+    builder.registerTypeAdapter(
+        Permission::class.java,
+        object : TypeAdapter<Permission>() {
+            override fun write(out: JsonWriter, value: Permission) {
+                out.value(value.name.lowercase())
+            }
 
-        override fun read(`in`: JsonReader): Permission {
-            return Permission.valueOf(`in`.nextString().toUpperCase(Locale.getDefault()))
-        }
-    })
-
-    builder.registerTypeAdapter(Role::class.java, object : TypeAdapter<Role>() {
-        override fun write(out: JsonWriter, value: Role) {
-            out.value(value.name.toLowerCase(Locale.getDefault()))
-        }
-
-        override fun read(`in`: JsonReader): Role {
-            return Role.valueOf(`in`.nextString().toUpperCase(Locale.getDefault()))
-        }
-    })
-
-    builder.registerTypeAdapter(LocalDate::class.java, object : TypeAdapter<LocalDate>() {
-        override fun write(out: JsonWriter, value: LocalDate?) {
-            if (value == null) {
-                out.nullValue()
-            } else {
-                out.value(value.format(DateTimeFormatter.ISO_LOCAL_DATE))
+            override fun read(`in`: JsonReader): Permission {
+                return Permission.valueOf(`in`.nextString().uppercase())
             }
         }
+    )
 
-        override fun read(`in`: JsonReader): LocalDate? {
-            if (`in`.peek() == JsonToken.NULL) {
-                `in`.nextNull()
-                return null
+    builder.registerTypeAdapter(
+        Role::class.java,
+        object : TypeAdapter<Role>() {
+            override fun write(out: JsonWriter, value: Role) {
+                out.value(value.name.lowercase())
             }
-            return LocalDate.parse(`in`.nextString(), DateTimeFormatter.ISO_LOCAL_DATE)
-        }
-    })
 
-    builder.registerTypeAdapter(Instant::class.java, object : TypeAdapter<Instant>() {
-        override fun write(out: JsonWriter, value: Instant?) {
-            if (value == null) {
-                out.nullValue()
-            } else {
-                out.value(value.toString())
+            override fun read(`in`: JsonReader): Role {
+                return Role.valueOf(`in`.nextString().uppercase())
             }
         }
+    )
 
-        override fun read(`in`: JsonReader): Instant? {
-            if (`in`.peek() == JsonToken.NULL) {
-                `in`.nextNull()
-                return null
+    builder.registerTypeAdapter(
+        LocalDate::class.java,
+        object : TypeAdapter<LocalDate>() {
+            override fun write(out: JsonWriter, value: LocalDate?) {
+                if (value == null) {
+                    out.nullValue()
+                } else {
+                    out.value(value.format(DateTimeFormatter.ISO_LOCAL_DATE))
+                }
             }
-            return Instant.parse(`in`.nextString())
+
+            override fun read(`in`: JsonReader): LocalDate? {
+                if (`in`.peek() == JsonToken.NULL) {
+                    `in`.nextNull()
+                    return null
+                }
+                return LocalDate.parse(`in`.nextString(), DateTimeFormatter.ISO_LOCAL_DATE)
+            }
         }
-    })
+    )
+
+    builder.registerTypeAdapter(
+        Instant::class.java,
+        object : TypeAdapter<Instant>() {
+            override fun write(out: JsonWriter, value: Instant?) {
+                if (value == null) {
+                    out.nullValue()
+                } else {
+                    out.value(value.toString())
+                }
+            }
+
+            override fun read(`in`: JsonReader): Instant? {
+                if (`in`.peek() == JsonToken.NULL) {
+                    `in`.nextNull()
+                    return null
+                }
+                return Instant.parse(`in`.nextString())
+            }
+        }
+    )
 
     return builder.create()
 }

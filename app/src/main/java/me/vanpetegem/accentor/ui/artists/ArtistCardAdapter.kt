@@ -33,7 +33,6 @@ class ArtistCardAdapter(private val fragment: Fragment) :
         val artistNameView: TextView = gridView.findViewById(R.id.artist_card_name_view)
         val imageView: ImageView = gridView.findViewById(R.id.artist_card_image_view)
 
-
         return ViewHolder(gridView, artistNameView, imageView)
     }
 
@@ -47,5 +46,5 @@ class ArtistCardAdapter(private val fragment: Fragment) :
             .into(holder.artistImageView)
     }
 
-    override fun getSectionName(position: Int): String = "${items[position].name[0].toUpperCase()}"
+    override fun getSectionName(position: Int): String = "${items[position].name[0].uppercaseChar()}"
 }

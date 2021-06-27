@@ -1,5 +1,6 @@
 package me.vanpetegem.accentor.ui.login
 
+import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -15,7 +16,6 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import me.vanpetegem.accentor.R
 import me.vanpetegem.accentor.ui.main.MainActivity
-import org.jetbrains.anko.startActivity
 
 class LoginActivity : AppCompatActivity() {
 
@@ -34,29 +34,34 @@ class LoginActivity : AppCompatActivity() {
 
         loginViewModel = ViewModelProvider(this).get(LoginViewModel::class.java)
 
-        loginViewModel.loginFormState.observe(this, Observer {
-            val loginState = it ?: return@Observer
+        loginViewModel.loginFormState.observe(
+            this,
+            Observer {
+                val loginState = it ?: return@Observer
 
-            // disable login button unless both username / password is valid
-            login.isEnabled = loginState.isDataValid
+                // disable login button unless both username / password is valid
+                login.isEnabled = loginState.isDataValid
 
-            if (loginState.serverError != null) {
-                server.error = getString(loginState.serverError)
+                if (loginState.serverError != null) {
+                    server.error = getString(loginState.serverError)
+                }
             }
+        )
 
-        })
+        loginViewModel.loginResult.observe(
+            this,
+            Observer {
+                val loginResult = it ?: return@Observer
 
-        loginViewModel.loginResult.observe(this, Observer {
-            val loginResult = it ?: return@Observer
-
-            loading.visibility = View.GONE
-            if (loginResult.error != null) {
-                showLoginFailed(loginResult.error)
-            } else {
-                startActivity<MainActivity>()
-                finish()
+                loading.visibility = View.GONE
+                if (loginResult.error != null) {
+                    showLoginFailed(loginResult.error)
+                } else {
+                    startActivity(Intent(this, MainActivity::class.java))
+                    finish()
+                }
             }
-        })
+        )
 
         server.afterTextChanged {
             loginViewModel.loginDataChanged(server.text.toString())

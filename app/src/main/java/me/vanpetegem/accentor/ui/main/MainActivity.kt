@@ -25,10 +25,12 @@ import me.vanpetegem.accentor.ui.home.HomeFragment
 import me.vanpetegem.accentor.ui.login.LoginActivity
 import me.vanpetegem.accentor.ui.player.BottomBarFragment
 import me.vanpetegem.accentor.ui.player.PlayerFragment
-import org.jetbrains.anko.startActivity
 
-class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener,
-    SwipeRefreshLayout.OnRefreshListener, SlidingUpPanelLayout.PanelSlideListener {
+class MainActivity :
+    AppCompatActivity(),
+    NavigationView.OnNavigationItemSelectedListener,
+    SwipeRefreshLayout.OnRefreshListener,
+    SlidingUpPanelLayout.PanelSlideListener {
 
     companion object {
         const val INTENT_EXTRA_OPEN_PLAYER = "INTENT_EXTRA_OPEN_PLAYER"
@@ -53,7 +55,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val navView: NavigationView = findViewById(R.id.nav_view)
         swipeRefreshLayout = findViewById(R.id.swipe_refresh_layout)
         val toggle = ActionBarDrawerToggle(
-            this, drawerLayout, mainToolbar,
+            this,
+            drawerLayout,
+            mainToolbar,
             R.string.navigation_drawer_open,
             R.string.navigation_drawer_close
         )
@@ -83,84 +87,104 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         swipeRefreshLayout.setOnRefreshListener(this)
 
         mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
-        mainViewModel.loginState.observe(this, Observer {
-            val loggedIn = it ?: return@Observer
-            if (!loggedIn) {
-                startActivity<LoginActivity>()
-                finish()
-            } else {
-                mainViewModel.refresh()
+        mainViewModel.loginState.observe(
+            this,
+            Observer {
+                val loggedIn = it ?: return@Observer
+                if (!loggedIn) {
+                    startActivity(Intent(this, LoginActivity::class.java))
+                    finish()
+                } else {
+                    mainViewModel.refresh()
+                }
             }
-        })
+        )
 
-        mainViewModel.currentUser.observe(this, Observer {
-            if (it == null) {
-                usernameText.text = ""
-            } else {
-                usernameText.text = it.name
+        mainViewModel.currentUser.observe(
+            this,
+            Observer {
+                if (it == null) {
+                    usernameText.text = ""
+                } else {
+                    usernameText.text = it.name
+                }
             }
-        })
+        )
 
-        mainViewModel.serverURL.observe(this, Observer {
-            if (it == null) {
-                serverURLText.text = ""
-            } else {
-                serverURLText.text = it
+        mainViewModel.serverURL.observe(
+            this,
+            Observer {
+                if (it == null) {
+                    serverURLText.text = ""
+                } else {
+                    serverURLText.text = it
+                }
             }
-        })
+        )
 
-        mainViewModel.navState.observe(this, Observer {
-            val navState = it ?: return@Observer
+        mainViewModel.navState.observe(
+            this,
+            Observer {
+                val navState = it ?: return@Observer
 
-            val transaction = supportFragmentManager.beginTransaction()
-            val fragment = when (navState.fragmentId) {
-                R.id.nav_home -> HomeFragment()
-                R.id.nav_albums -> AlbumsFragment()
-                R.id.nav_artists -> ArtistsFragment()
-                else -> HomeFragment()
-            }
+                val transaction = supportFragmentManager.beginTransaction()
+                val fragment = when (navState.fragmentId) {
+                    R.id.nav_home -> HomeFragment()
+                    R.id.nav_albums -> AlbumsFragment()
+                    R.id.nav_artists -> ArtistsFragment()
+                    else -> HomeFragment()
+                }
 
-            transaction.replace(R.id.main_fragment_container, fragment)
-            if (navState.showBack) {
-                transaction.addToBackStack(null)
-            }
-            transaction.commit()
+                transaction.replace(R.id.main_fragment_container, fragment)
+                if (navState.showBack) {
+                    transaction.addToBackStack(null)
+                }
+                transaction.commit()
 
-            toggle.isDrawerIndicatorEnabled = !navState.showBack
-            toggle.syncState()
-        })
-
-        mainViewModel.isRefreshing.observe(this, Observer {
-            val refreshState = it ?: return@Observer
-
-            swipeRefreshLayout.isRefreshing = refreshState
-        })
-
-        mainViewModel.isPlayerOpen.observe(this, Observer {
-            val open = it ?: return@Observer
-            if (open) {
-                slidingUpPanelLayout.setDragView(playerToolbar)
-                slidingUpPanelLayout.panelState = SlidingUpPanelLayout.PanelState.EXPANDED
-                bottomBarFragmentHolder.visibility = View.GONE
-                playerToolbar.visibility = View.VISIBLE
-
-                toggle.syncState()
-            } else {
-                slidingUpPanelLayout.setDragView(bottomBarFragmentHolder)
-                slidingUpPanelLayout.panelState = SlidingUpPanelLayout.PanelState.COLLAPSED
-                bottomBarFragmentHolder.visibility = View.VISIBLE
-                playerToolbar.visibility = View.GONE
-                supportActionBar?.apply { setDisplayShowTitleEnabled(true) }
+                toggle.isDrawerIndicatorEnabled = !navState.showBack
                 toggle.syncState()
             }
-        })
+        )
+
+        mainViewModel.isRefreshing.observe(
+            this,
+            Observer {
+                val refreshState = it ?: return@Observer
+
+                swipeRefreshLayout.isRefreshing = refreshState
+            }
+        )
+
+        mainViewModel.isPlayerOpen.observe(
+            this,
+            Observer {
+                val open = it ?: return@Observer
+                if (open) {
+                    slidingUpPanelLayout.setDragView(playerToolbar)
+                    slidingUpPanelLayout.panelState = SlidingUpPanelLayout.PanelState.EXPANDED
+                    bottomBarFragmentHolder.visibility = View.GONE
+                    playerToolbar.visibility = View.VISIBLE
+
+                    toggle.syncState()
+                } else {
+                    slidingUpPanelLayout.setDragView(bottomBarFragmentHolder)
+                    slidingUpPanelLayout.panelState = SlidingUpPanelLayout.PanelState.COLLAPSED
+                    bottomBarFragmentHolder.visibility = View.VISIBLE
+                    playerToolbar.visibility = View.GONE
+                    supportActionBar?.apply { setDisplayShowTitleEnabled(true) }
+                    toggle.syncState()
+                }
+            }
+        )
 
         mediaSessionConnection = ViewModelProvider(this).get(MediaSessionConnection::class.java)
-        mediaSessionConnection.queuePosStr.observe(this, Observer {
-            playerToolbar.subtitle = it ?: "0/0"
-        })
+        mediaSessionConnection.queuePosStr.observe(
+            this,
+            Observer {
+                playerToolbar.subtitle = it ?: "0/0"
+            }
+        )
     }
-
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
@@ -183,8 +207,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
         val slidingUpPanelLayout: SlidingUpPanelLayout = findViewById(R.id.sliding_layout)
         when {
-            slidingUpPanelLayout.panelState == SlidingUpPanelLayout.PanelState.EXPANDED -> slidingUpPanelLayout.panelState =
-                SlidingUpPanelLayout.PanelState.COLLAPSED
+            slidingUpPanelLayout.panelState == SlidingUpPanelLayout.PanelState.EXPANDED ->
+                slidingUpPanelLayout.panelState =
+                    SlidingUpPanelLayout.PanelState.COLLAPSED
             drawerLayout.isDrawerOpen(GravityCompat.START) -> drawerLayout.closeDrawer(GravityCompat.START)
             else -> super.onBackPressed()
         }

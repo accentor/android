@@ -58,5 +58,4 @@ abstract class ArtistDao {
 
     @Query("DELETE FROM artists")
     abstract fun deleteAll()
-
 }
