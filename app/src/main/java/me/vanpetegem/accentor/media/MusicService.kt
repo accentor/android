@@ -47,6 +47,7 @@ import java.util.concurrent.Executors
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.Dispatchers.Main
 import me.vanpetegem.accentor.R
 import me.vanpetegem.accentor.data.AccentorDatabase
 import me.vanpetegem.accentor.data.albums.AlbumRepository
@@ -158,7 +159,7 @@ class MusicService : MediaSessionService() {
                 override fun onCustomCommand(session: MediaSession, info: MediaSession.ControllerInfo, command: SessionCommand, args: Bundle?): SessionResult {
                     when (command.customAction) {
                         "STOP" -> {
-                            ContextCompat.getMainExecutor(this@MusicService).execute { exoPlayer.stop() }
+                            mainScope.launch(Main) { exoPlayer.stop() }
                             return SessionResult(SessionResult.RESULT_SUCCESS, null)
                         }
                         else -> { return SessionResult(SessionResult.RESULT_ERROR_UNKNOWN, null) }
