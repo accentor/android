@@ -1,10 +1,8 @@
 package me.vanpetegem.accentor.components
 
 import android.content.Context
-import android.content.res.TypedArray
 import android.util.AttributeSet
 import androidx.appcompat.widget.AppCompatImageView
-import me.vanpetegem.accentor.R
 
 class SquaredImageView : AppCompatImageView {
     val direction: String
@@ -16,12 +14,7 @@ class SquaredImageView : AppCompatImageView {
 
     constructor(context: Context, attrs: AttributeSet) : super(context, attrs) {
         scaleType = ScaleType.CENTER_CROP
-
-        val a: TypedArray = context.obtainStyledAttributes(attrs, R.styleable.SquaredImageView)
-
-        direction = a.getString(R.styleable.SquaredImageView_direction) ?: "2"
-
-        a.recycle()
+        direction = "2"
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
