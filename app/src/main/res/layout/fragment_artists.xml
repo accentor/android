@@ -5,8 +5,5 @@
     android:id="@+id/artist_card_recycler_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    app:fastScrollPopupBgColor="@color/colorAccent500"
     app:fastScrollPopupTextColor="@android:color/primary_text_dark"
-    app:fastScrollThumbColor="@color/colorAccent500"
     tools:context=".ui.artists.ArtistsFragment" />
-

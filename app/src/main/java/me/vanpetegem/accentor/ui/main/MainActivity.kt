@@ -80,7 +80,6 @@ class MainActivity :
         toggle.setHomeAsUpIndicator(R.drawable.ic_menu_back)
         drawerLayout.addDrawerListener(toggle)
         toggle.syncState()
-        swipeRefreshLayout.setColorSchemeResources(R.color.colorAccent500)
 
         slidingUpPanelLayout.addPanelSlideListener(this)
         navView.setNavigationItemSelectedListener(this)
