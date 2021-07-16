@@ -46,5 +46,5 @@ class ArtistCardAdapter(private val fragment: Fragment) :
             .into(holder.artistImageView)
     }
 
-    override fun getSectionName(position: Int): String = "${items[position].name[0].uppercaseChar()}"
+    override fun getSectionName(position: Int): String = "${String(intArrayOf(items[position].name.codePointAt(0)), 0, 1).uppercase()}"
 }
