@@ -7,6 +7,7 @@ import me.vanpetegem.accentor.data.authentication.AuthenticationData
 import me.vanpetegem.accentor.util.Result
 import me.vanpetegem.accentor.util.jsonBody
 import me.vanpetegem.accentor.util.responseObject
+import me.vanpetegem.accentor.version
 
 class AuthToken(val user_agent: String)
 class Credentials(val name: String, val password: String, val auth_token: AuthToken)
@@ -18,7 +19,7 @@ fun create(server: String, username: String, password: String): Result<Authentic
             Credentials(
                 username,
                 password,
-                AuthToken("Accentor on Android ${Build.VERSION.SDK_INT} (${Build.DEVICE})")
+                AuthToken("Accentor $version on Android ${Build.VERSION.RELEASE} (${Build.DEVICE})")
             )
         )
         .responseObject<AuthenticationData>().third
