@@ -31,7 +31,11 @@
                 android:textAlignment="center"
                 android:textColor="@color/colorBlack"
                 android:textSize="20sp"
-                android:textIsSelectable="false" />
+                android:textIsSelectable="false"
+                android:ellipsize="marquee"
+                android:marqueeRepeatLimit="marquee_forever"
+                android:singleLine="true"
+                />
 
             <TextView
                 android:id="@+id/track_artists_view"
@@ -40,7 +44,11 @@
                 android:textAlignment="center"
                 android:textColor="@color/colorGrey"
                 android:textSize="16sp"
-                android:textIsSelectable="false" />
+                android:textIsSelectable="false"
+                android:ellipsize="marquee"
+                android:marqueeRepeatLimit="marquee_forever"
+                android:singleLine="true"
+                />
 
             <TextView
                 android:id="@+id/album_title_view"
@@ -49,7 +57,11 @@
                 android:textAlignment="center"
                 android:textColor="@color/colorGrey"
                 android:textSize="16sp"
-                android:textIsSelectable="false" />
+                android:textIsSelectable="false"
+                android:ellipsize="marquee"
+                android:marqueeRepeatLimit="marquee_forever"
+                android:singleLine="true"
+                />
 
         </LinearLayout>
 
