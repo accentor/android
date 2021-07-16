@@ -21,6 +21,7 @@
         android:usesCleartextTraffic="true">
         <activity
             android:name=".ui.login.LoginActivity"
+            android:windowSoftInputMode="adjustResize"
             android:label="@string/sign_in" />
         <activity
             android:name=".ui.main.MainActivity"
