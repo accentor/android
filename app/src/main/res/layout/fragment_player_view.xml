@@ -29,7 +29,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textAlignment="center"
-                android:textColor="@color/colorBlack"
                 android:textSize="20sp"
                 android:textIsSelectable="false"
                 android:ellipsize="marquee"
@@ -42,7 +41,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textAlignment="center"
-                android:textColor="@color/colorGrey"
                 android:textSize="16sp"
                 android:textIsSelectable="false"
                 android:ellipsize="marquee"
@@ -55,7 +53,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textAlignment="center"
-                android:textColor="@color/colorGrey"
                 android:textSize="16sp"
                 android:textIsSelectable="false"
                 android:ellipsize="marquee"
@@ -86,8 +83,7 @@
             android:layout_height="36dp"
             android:background="@null"
             android:contentDescription="@string/repeat_off"
-            android:src="@drawable/ic_repeat_off"
-            custom:direction="horizontal" />
+            android:src="@drawable/ic_repeat_off" />
 
         <Space
             android:layout_width="0dp"
@@ -101,8 +97,7 @@
             android:background="@null"
             android:clickable="true"
             android:contentDescription="@string/previous"
-            android:src="@drawable/ic_previous"
-            custom:direction="horizontal" />
+            android:src="@drawable/ic_previous" />
 
         <me.vanpetegem.accentor.components.SquaredImageView
             android:id="@+id/play_controls_pause"
@@ -111,8 +106,7 @@
             android:background="@null"
             android:clickable="true"
             android:contentDescription="@string/pause"
-            android:src="@drawable/ic_pause"
-            custom:direction="horizontal" />
+            android:src="@drawable/ic_pause" />
 
         <me.vanpetegem.accentor.components.SquaredImageView
             android:id="@+id/play_controls_play"
@@ -121,8 +115,7 @@
             android:background="@null"
             android:clickable="true"
             android:contentDescription="@string/play"
-            android:src="@drawable/ic_play"
-            custom:direction="horizontal" />
+            android:src="@drawable/ic_play" />
 
         <me.vanpetegem.accentor.components.SquaredImageView
             android:id="@+id/play_controls_next"
@@ -131,8 +124,7 @@
             android:background="@null"
             android:clickable="true"
             android:contentDescription="@string/next"
-            android:src="@drawable/ic_next"
-            custom:direction="horizontal" />
+            android:src="@drawable/ic_next" />
 
         <Space
             android:layout_width="0dp"
@@ -146,8 +138,7 @@
             android:background="@null"
             android:clickable="true"
             android:contentDescription="@string/shuffle"
-            android:src="@drawable/ic_shuffle_none"
-            custom:direction="horizontal" />
+            android:src="@drawable/ic_shuffle_none" />
 
     </LinearLayout>
 

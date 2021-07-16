@@ -26,7 +26,6 @@
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:singleLine="true"
-            android:textColor="@color/colorBlack"
             android:textSize="18sp"
             android:textIsSelectable="false" />
 
@@ -36,7 +35,6 @@
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:singleLine="true"
-            android:textColor="@color/colorGrey"
             android:textSize="14sp"
             android:textIsSelectable="false" />
     </LinearLayout>
@@ -59,7 +57,6 @@
             android:layout_height="wrap_content"
             android:ellipsize="none"
             android:singleLine="true"
-            android:textColor="@color/colorGrey"
             android:textSize="14sp"
             android:textIsSelectable="false" />
     </LinearLayout>
