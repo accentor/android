@@ -34,19 +34,16 @@ class AuthenticationRepository(
         server: String,
         username: String,
         password: String,
-        handler: suspend (Result<Unit>) -> Unit
-    ) {
+    ): Result<Unit> {
         val result = create(server, username, password)
 
-        handler(
-            when (result) {
-                is Result.Success -> {
-                    setLoggedInUser(result.data, server)
-                    Result.Success(Unit)
-                }
-                is Result.Error -> Result.Error(result.exception)
+        return when (result) {
+            is Result.Success -> {
+                setLoggedInUser(result.data, server)
+                Result.Success(Unit)
             }
-        )
+            is Result.Error -> Result.Error(result.exception)
+        }
     }
 
     private fun setLoggedInUser(authenticationData: AuthenticationData, server: String) {

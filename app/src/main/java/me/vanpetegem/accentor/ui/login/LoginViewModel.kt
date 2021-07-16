@@ -4,13 +4,8 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
 import java.net.URI
 import java.net.URISyntaxException
-import kotlinx.coroutines.Dispatchers.IO
-import kotlinx.coroutines.Dispatchers.Main
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import me.vanpetegem.accentor.R
 import me.vanpetegem.accentor.data.authentication.AuthenticationDataSource
 import me.vanpetegem.accentor.data.authentication.AuthenticationRepository
@@ -23,27 +18,26 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
     private val _loginForm = MutableLiveData<LoginFormState>()
     val loginFormState: LiveData<LoginFormState> = _loginForm
 
-    private val _loginResult = MutableLiveData<LoginResult>()
-    val loginResult: LiveData<LoginResult> = _loginResult
+    private val _loading = MutableLiveData<Boolean>()
+    val loading: LiveData<Boolean> = _loading
 
-    fun login(server: String, username: String, password: String) {
-        viewModelScope.launch(IO) {
-            repository.login(server, username, password) { result ->
-                withContext(Main) {
-                    _loginResult.value = when (result) {
-                        is Result.Success -> LoginResult()
-                        is Result.Error -> {
-                            LoginResult(error = R.string.login_failed)
-                        }
-                    }
-                }
+    suspend fun login(server: String, username: String, password: String): LoginResult {
+        _loading.postValue(true)
+        val result = repository.login(server, username, password)
+        _loading.postValue(false)
+        return when (result) {
+            is Result.Success -> LoginResult()
+            is Result.Error -> {
+                LoginResult(error = R.string.login_failed)
             }
         }
     }
 
-    fun loginDataChanged(server: String) {
+    fun loginDataChanged(server: String, username: String, password: String) {
         if (!isServerValid(server)) {
             _loginForm.value = LoginFormState(serverError = R.string.invalid_server)
+        } else if (server.equals("") || username.equals("") || password.equals("")) {
+            _loginForm.value = LoginFormState()
         } else {
             _loginForm.value = LoginFormState(isDataValid = true)
         }
