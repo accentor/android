@@ -134,9 +134,15 @@ class PlayerFragment : Fragment() {
         }
 
         val albumCoverImageView: ImageView = view.findViewById(R.id.album_cover_image_view)
-        val albumTitleView: TextView = view.findViewById(R.id.album_title_view)
-        val trackTitleView: TextView = view.findViewById(R.id.track_title_view)
-        val trackArtistsView: TextView = view.findViewById(R.id.track_artists_view)
+        val albumTitleView: TextView = view.findViewById<TextView>(R.id.album_title_view).apply {
+            setSelected(true)
+        }
+        val trackTitleView: TextView = view.findViewById<TextView>(R.id.track_title_view).apply {
+            setSelected(true)
+        }
+        val trackArtistsView: TextView = view.findViewById<TextView>(R.id.track_artists_view).apply {
+            setSelected(true)
+        }
         val currentTimeView: TextView = view.findViewById(R.id.player_current_time)
         val seekBar: SeekBar = view.findViewById(R.id.player_seek_bar)
         val fullLengthView: TextView = view.findViewById(R.id.player_total_time)
