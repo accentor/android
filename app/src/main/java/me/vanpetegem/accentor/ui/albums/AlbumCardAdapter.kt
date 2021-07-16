@@ -85,5 +85,5 @@ class AlbumCardAdapter(
         }
     }
 
-    override fun getSectionName(position: Int): String = "${items[position].title[0].uppercaseChar()}"
+    override fun getSectionName(position: Int): String = "${String(intArrayOf(items[position].title.codePointAt(0)), 0, 1).uppercase()}"
 }
