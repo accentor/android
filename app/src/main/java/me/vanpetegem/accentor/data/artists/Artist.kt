@@ -14,4 +14,6 @@ data class Artist(
     val image250: String?,
     val image100: String?,
     val imageType: String?
-)
+) {
+    fun firstCharacter() = String(intArrayOf(name.codePointAt(0)), 0, 1)
+}
