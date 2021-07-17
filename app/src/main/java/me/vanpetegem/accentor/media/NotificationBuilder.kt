@@ -74,9 +74,7 @@ class NotificationBuilder(private val context: Context) {
             .setMediaSession(session.getSessionCompatToken())
             .setShowActionsInCompactView(0, 1, 2)
 
-        val openIntent = Intent(context, MainActivity::class.java).apply {
-            putExtra(MainActivity.INTENT_EXTRA_OPEN_PLAYER, true)
-        }
+        val openIntent = Intent(context, MainActivity::class.java)
         val pendingIntent = PendingIntent.getActivity(context, 0, openIntent, 0)
 
         return builder.setContentIntent(pendingIntent)

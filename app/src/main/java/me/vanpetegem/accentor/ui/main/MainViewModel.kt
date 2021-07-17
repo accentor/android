@@ -29,9 +29,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val refreshing = MutableLiveData<Int>()
     val isRefreshing: LiveData<Boolean> = map(refreshing) { if (it != null) it > 0 else false }
 
-    private val playerOpen = MutableLiveData<Boolean>().apply { value = false }
-    val isPlayerOpen: LiveData<Boolean> = playerOpen
-
     val currentUser: LiveData<User?>
     val loginState: LiveData<Boolean> = authenticationRepository.isLoggedIn
 
@@ -81,9 +78,5 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch(IO) { artistRepository.clear() }
         viewModelScope.launch(IO) { trackRepository.clear() }
         viewModelScope.launch(IO) { authenticationRepository.logout() }
-    }
-
-    fun setPlayerOpen(value: Boolean) {
-        playerOpen.value = value
     }
 }

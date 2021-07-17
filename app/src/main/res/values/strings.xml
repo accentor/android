@@ -16,7 +16,7 @@
 
     <string name="home">Home</string>
     <string name="various_artists">Various Artists</string>
-    <string name="now_playing">Now Playing</string>
+    <string name="now_playing">Now playing</string>
     <string name="play_next">Play next</string>
     <string name="play_last">Play last</string>
     <string name="play_now">Play now</string>
@@ -24,9 +24,12 @@
     <string name="toggle_queue">Toggle queue</string>
     <string name="clear_queue">Clear queue</string>
     <string name="repeat_off">Repeat off</string>
+    <string name="repeat_all">Repeat all</string>
+    <string name="repeat_one">Repeat one</string>
     <string name="previous">Previous</string>
     <string name="pause">Pause</string>
     <string name="play">Play</string>
     <string name="next">Next</string>
-    <string name="shuffle">Shuffle</string>
+    <string name="shuffle_all">Shuffle on</string>
+    <string name="shuffle_none">Shuffle off</string>
 </resources>

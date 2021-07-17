@@ -1,6 +1,6 @@
 package me.vanpetegem.accentor.util
 
-fun Int?.formatTrackLength(): String? =
+fun Int?.formatTrackLength(): String =
     if (this == null) {
         "-:--"
     } else {

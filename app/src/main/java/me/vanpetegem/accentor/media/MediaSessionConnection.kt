@@ -132,6 +132,7 @@ class MediaSessionConnection(application: Application) : AndroidViewModel(applic
     val _queuePosition: MutableLiveData<Int> = MutableLiveData<Int>().apply {
         postValue(0)
     }
+    val queueLength: LiveData<Int> = map(_queue) { it.size }
     val queuePosition: LiveData<Int> = _queuePosition
 
     val queuePosStr: LiveData<String> = switchMap(_queue) { q ->
