@@ -46,10 +46,10 @@ public fun AlbumCard(album: Album, mediaSessionConnection: MediaSessionConnectio
             Image(
                 painter = if (album.image500 != null) {
                     rememberImagePainter(album.image500) {
-                        placeholder(R.drawable.ic_menu_albums)
+                        placeholder(R.drawable.ic_album)
                     }
                 } else {
-                    painterResource(R.drawable.ic_menu_albums)
+                    painterResource(R.drawable.ic_album)
                 },
                 contentDescription = null,
                 modifier = Modifier.fillMaxWidth().aspectRatio(1f),

@@ -1,7 +1,5 @@
 <resources>
     <string name="app_name">Accentor</string>
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="action_refresh">Refresh</string>
     <string name="action_sign_out">Sign out</string>
 

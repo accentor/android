@@ -3,34 +3,66 @@ package me.vanpetegem.accentor.ui.main
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
-import android.view.MenuItem
 import android.view.View
 import android.widget.FrameLayout
-import android.widget.TextView
-import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.annotation.DrawableRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
-import androidx.core.view.GravityCompat
-import androidx.drawerlayout.widget.DrawerLayout
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.DropdownMenuItem
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.ListItem
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
+import androidx.compose.material.TopAppBar
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.rememberScaffoldState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import com.google.android.material.navigation.NavigationView
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.sothree.slidinguppanel.SlidingUpPanelLayout
+import kotlinx.coroutines.launch
 import me.vanpetegem.accentor.R
 import me.vanpetegem.accentor.media.MediaSessionConnection
-import me.vanpetegem.accentor.ui.albums.AlbumsFragment
-import me.vanpetegem.accentor.ui.artists.ArtistsFragment
-import me.vanpetegem.accentor.ui.home.HomeFragment
+import me.vanpetegem.accentor.ui.AccentorTheme
+import me.vanpetegem.accentor.ui.albums.AlbumGrid
+import me.vanpetegem.accentor.ui.artists.ArtistGrid
+import me.vanpetegem.accentor.ui.home.Home
 import me.vanpetegem.accentor.ui.login.LoginActivity
 import me.vanpetegem.accentor.ui.player.BottomBarFragment
 import me.vanpetegem.accentor.ui.player.PlayerFragment
 
-class MainActivity :
-    AppCompatActivity(),
-    NavigationView.OnNavigationItemSelectedListener,
-    SwipeRefreshLayout.OnRefreshListener,
-    SlidingUpPanelLayout.PanelSlideListener {
+class MainActivity : AppCompatActivity(), SlidingUpPanelLayout.PanelSlideListener {
 
     companion object {
         const val INTENT_EXTRA_OPEN_PLAYER = "INTENT_EXTRA_OPEN_PLAYER"
@@ -38,7 +70,6 @@ class MainActivity :
 
     private lateinit var mainViewModel: MainViewModel
     private lateinit var mediaSessionConnection: MediaSessionConnection
-    private lateinit var swipeRefreshLayout: SwipeRefreshLayout
     lateinit var slidingUpPanelLayout: SlidingUpPanelLayout
     lateinit var playerToolbar: Toolbar
 
@@ -47,21 +78,7 @@ class MainActivity :
 
         setContentView(R.layout.activity_main)
 
-        val mainToolbar: Toolbar = findViewById(R.id.toolbar)
-        setSupportActionBar(mainToolbar)
-
         slidingUpPanelLayout = findViewById(R.id.sliding_layout)
-        val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
-        val navView: NavigationView = findViewById(R.id.nav_view)
-        swipeRefreshLayout = findViewById(R.id.swipe_refresh_layout)
-        val toggle = ActionBarDrawerToggle(
-            this,
-            drawerLayout,
-            mainToolbar,
-            R.string.navigation_drawer_open,
-            R.string.navigation_drawer_close
-        )
-
         playerToolbar = findViewById<Toolbar>(R.id.player_toolbar).apply {
             setNavigationIcon(R.drawable.ic_menu_back)
             setNavigationOnClickListener { slidingUpPanelLayout.panelState = SlidingUpPanelLayout.PanelState.COLLAPSED }
@@ -70,20 +87,11 @@ class MainActivity :
             subtitle = "0/0"
         }
 
-        val headerView: View = navView.getHeaderView(0)
-        val usernameText: TextView = headerView.findViewById(R.id.nav_header_username)
-        val serverURLText: TextView = headerView.findViewById(R.id.nav_header_server_url)
         val bottomBarFragmentHolder: FrameLayout = findViewById(R.id.bottom_bar)
         supportFragmentManager.beginTransaction().replace(R.id.bottom_bar, BottomBarFragment()).commit()
         supportFragmentManager.beginTransaction().replace(R.id.player_view, PlayerFragment()).commit()
 
-        toggle.setHomeAsUpIndicator(R.drawable.ic_menu_back)
-        drawerLayout.addDrawerListener(toggle)
-        toggle.syncState()
-
         slidingUpPanelLayout.addPanelSlideListener(this)
-        navView.setNavigationItemSelectedListener(this)
-        swipeRefreshLayout.setOnRefreshListener(this)
 
         mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
         mainViewModel.loginState.observe(
@@ -93,64 +101,7 @@ class MainActivity :
                 if (!loggedIn) {
                     startActivity(Intent(this, LoginActivity::class.java))
                     finish()
-                } else {
-                    mainViewModel.refresh()
                 }
-            }
-        )
-
-        mainViewModel.currentUser.observe(
-            this,
-            Observer {
-                if (it == null) {
-                    usernameText.text = ""
-                } else {
-                    usernameText.text = it.name
-                }
-            }
-        )
-
-        mainViewModel.serverURL.observe(
-            this,
-            Observer {
-                if (it == null) {
-                    serverURLText.text = ""
-                } else {
-                    serverURLText.text = it
-                }
-            }
-        )
-
-        mainViewModel.navState.observe(
-            this,
-            Observer {
-                val navState = it ?: return@Observer
-
-                val transaction = supportFragmentManager.beginTransaction()
-                val fragment = when (navState.fragmentId) {
-                    R.id.nav_home -> HomeFragment()
-                    R.id.nav_albums -> AlbumsFragment()
-                    R.id.nav_artists -> ArtistsFragment()
-                    else -> HomeFragment()
-                }
-
-                transaction.replace(R.id.main_fragment_container, fragment)
-                if (navState.showBack) {
-                    transaction.addToBackStack(null)
-                }
-                transaction.commit()
-
-                toggle.isDrawerIndicatorEnabled = !navState.showBack
-                toggle.syncState()
-            }
-        )
-
-        mainViewModel.isRefreshing.observe(
-            this,
-            Observer {
-                val refreshState = it ?: return@Observer
-
-                swipeRefreshLayout.isRefreshing = refreshState
             }
         )
 
@@ -163,15 +114,11 @@ class MainActivity :
                     slidingUpPanelLayout.panelState = SlidingUpPanelLayout.PanelState.EXPANDED
                     bottomBarFragmentHolder.visibility = View.GONE
                     playerToolbar.visibility = View.VISIBLE
-
-                    toggle.syncState()
                 } else {
                     slidingUpPanelLayout.setDragView(bottomBarFragmentHolder)
                     slidingUpPanelLayout.panelState = SlidingUpPanelLayout.PanelState.COLLAPSED
                     bottomBarFragmentHolder.visibility = View.VISIBLE
                     playerToolbar.visibility = View.GONE
-                    supportActionBar?.apply { setDisplayShowTitleEnabled(true) }
-                    toggle.syncState()
                 }
             }
         )
@@ -183,6 +130,12 @@ class MainActivity :
                 playerToolbar.subtitle = it ?: "0/0"
             }
         )
+
+        findViewById<ComposeView>(R.id.compose_view).setContent {
+            AccentorTheme {
+                Content()
+            }
+        }
     }
 
     override fun onNewIntent(intent: Intent?) {
@@ -203,49 +156,11 @@ class MainActivity :
     }
 
     override fun onBackPressed() {
-        val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
-        val slidingUpPanelLayout: SlidingUpPanelLayout = findViewById(R.id.sliding_layout)
         when {
             slidingUpPanelLayout.panelState == SlidingUpPanelLayout.PanelState.EXPANDED ->
-                slidingUpPanelLayout.panelState =
-                    SlidingUpPanelLayout.PanelState.COLLAPSED
-            drawerLayout.isDrawerOpen(GravityCompat.START) -> drawerLayout.closeDrawer(GravityCompat.START)
+                slidingUpPanelLayout.panelState = SlidingUpPanelLayout.PanelState.COLLAPSED
             else -> super.onBackPressed()
         }
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.main_toolbar_menu, menu)
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.action_sign_out -> {
-                mainViewModel.logout()
-                true
-            }
-            R.id.action_refresh -> {
-                if (mainViewModel.isRefreshing.value == false) {
-                    mainViewModel.refresh()
-                    true
-                } else {
-                    false
-                }
-            }
-            else -> super.onOptionsItemSelected(item)
-        }
-    }
-
-    override fun onNavigationItemSelected(item: MenuItem): Boolean {
-        mainViewModel.navigate(item.itemId)
-        val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
-        drawerLayout.closeDrawer(GravityCompat.START)
-        return true
-    }
-
-    override fun onRefresh() {
-        mainViewModel.refresh()
     }
 
     override fun onPanelSlide(panel: View?, slideOffset: Float) {
@@ -262,7 +177,89 @@ class MainActivity :
             mainViewModel.setPlayerOpen(true)
         }
     }
+}
 
-    fun setCanChildScrollUpCallback(callback: SwipeRefreshLayout.OnChildScrollUpCallback?) =
-        swipeRefreshLayout.setOnChildScrollUpCallback(callback)
+@Composable
+fun Content(mainViewModel: MainViewModel = viewModel()) {
+    val scaffoldState = rememberScaffoldState()
+    val scope = rememberCoroutineScope()
+    val navController = rememberNavController()
+    val currentNavigation = navController.currentBackStackEntryAsState()
+    Scaffold(
+        scaffoldState = scaffoldState,
+        drawerContent = {
+            DrawerRow(stringResource(R.string.home), currentNavigation.value?.destination?.route == "home", R.drawable.ic_menu_home) {
+                navController.navigate("home")
+                scope.launch { scaffoldState.drawerState.close() }
+            }
+            DrawerRow(stringResource(R.string.menu_artists), currentNavigation.value?.destination?.route == "artists", R.drawable.ic_menu_artists) {
+                navController.navigate("artists")
+                scope.launch { scaffoldState.drawerState.close() }
+            }
+            DrawerRow(stringResource(R.string.menu_albums), currentNavigation.value?.destination?.route == "albums", R.drawable.ic_menu_albums) {
+                navController.navigate("albums")
+                scope.launch { scaffoldState.drawerState.close() }
+            }
+        },
+        topBar = {
+            TopAppBar(
+                title = { Text(stringResource(R.string.app_name)) },
+                navigationIcon = {
+                    IconButton(onClick = { scope.launch { scaffoldState.drawerState.open() } }) {
+                        Icon(Icons.Filled.Menu, contentDescription = null)
+                    }
+                },
+                actions = {
+                    val expanded = remember { mutableStateOf(false) }
+                    Box(modifier = Modifier.height(40.dp).aspectRatio(1f).wrapContentSize(Alignment.TopStart)) {
+                        IconButton(onClick = { expanded.value = true }) {
+                            Icon(Icons.Default.MoreVert, contentDescription = null)
+                        }
+                        DropdownMenu(expanded = expanded.value, onDismissRequest = { expanded.value = false }) {
+                            DropdownMenuItem(
+                                onClick = {
+                                    mainViewModel.refresh()
+                                    expanded.value = false
+                                }
+                            ) {
+                                Text(stringResource(R.string.action_refresh))
+                            }
+                            DropdownMenuItem(
+                                onClick = {
+                                    mainViewModel.logout()
+                                    expanded.value = false
+                                }
+                            ) {
+                                Text(stringResource(R.string.action_sign_out))
+                            }
+                        }
+                    }
+                }
+            )
+        },
+    ) { _ ->
+        val isRefreshing = mainViewModel.isRefreshing.observeAsState()
+        SwipeRefresh(
+            state = rememberSwipeRefreshState(isRefreshing.value ?: false),
+            onRefresh = { mainViewModel.refresh() },
+        ) {
+            NavHost(navController = navController, startDestination = "home") {
+                composable("home") { Home() }
+                composable("artists") { ArtistGrid() }
+                composable("albums") { AlbumGrid() }
+            }
+        }
+    }
+}
+
+@Composable
+fun DrawerRow(title: String, selected: Boolean, @DrawableRes icon: Int, onClick: () -> Unit) {
+    val background = if (selected) MaterialTheme.colors.primary.copy(alpha = 0.12f) else Color.Transparent
+    val textColor = if (selected) MaterialTheme.colors.primary else MaterialTheme.colors.onSurface
+    ListItem(modifier = Modifier.clickable(onClick = onClick).background(background)) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(painterResource(icon), contentDescription = null, tint = textColor)
+            Text(title, modifier = Modifier.padding(16.dp, 8.dp), color = textColor)
+        }
+    }
 }
