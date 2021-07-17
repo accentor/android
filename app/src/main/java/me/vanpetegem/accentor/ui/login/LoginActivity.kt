@@ -15,6 +15,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
@@ -50,7 +51,6 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
@@ -61,13 +61,9 @@ import me.vanpetegem.accentor.ui.AccentorTheme
 import me.vanpetegem.accentor.ui.main.MainActivity
 
 class LoginActivity : ComponentActivity() {
-
-    private lateinit var loginViewModel: LoginViewModel
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        loginViewModel = ViewModelProvider(this).get(LoginViewModel::class.java)
         setContent {
             AccentorTheme() {
                 Content()
@@ -185,7 +181,7 @@ fun Content(loginViewModel: LoginViewModel = viewModel()) {
                     enabled = formState.value?.isDataValid ?: false,
                     modifier = Modifier.padding(bottom = 16.dp, start = 16.dp, end = 16.dp, top = 8.dp),
                 ) {
-                    Text(stringResource(R.string.sign_in))
+                    Text(stringResource(R.string.sign_in), style = MaterialTheme.typography.button)
                 }
                 if (loading.value ?: false) {
                     CircularProgressIndicator()
