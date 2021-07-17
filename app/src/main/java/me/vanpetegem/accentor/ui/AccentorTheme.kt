@@ -12,8 +12,8 @@ fun AccentorTheme(content: @Composable () -> Unit) {
     val lightColors = lightColors(
         primary = Color(0xFF2196F3),
         primaryVariant = Color(0xFF1976D2),
-        secondary = Color(0xFFEF9A9A),
-        secondaryVariant = Color(0xFFF44336),
+        secondary = Color(0xFFF44336),
+        secondaryVariant = Color(0xFFEF9A9A),
     )
     val darkColors = darkColors(
         primary = Color(0xFF90CAF9),

@@ -54,7 +54,7 @@ fun ScrollBar(
         targetValue = targetAlpha,
         animationSpec = tween(duration),
     )
-    val color = MaterialTheme.colors.secondaryVariant
+    val color = MaterialTheme.colors.secondary
     val firstVisibleElementIndex = state.layoutInfo.visibleItemsInfo.firstOrNull()?.index
     val totalItemsCount = state.layoutInfo.totalItemsCount
     val coroutineScope = rememberCoroutineScope()
