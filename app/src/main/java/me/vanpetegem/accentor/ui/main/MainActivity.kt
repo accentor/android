@@ -49,6 +49,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.SwipeRefreshIndicator
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.sothree.slidinguppanel.SlidingUpPanelLayout
 import kotlinx.coroutines.launch
@@ -242,6 +243,7 @@ fun Content(mainViewModel: MainViewModel = viewModel()) {
         SwipeRefresh(
             state = rememberSwipeRefreshState(isRefreshing.value ?: false),
             onRefresh = { mainViewModel.refresh() },
+            indicator = { state, trigger -> SwipeRefreshIndicator(state, trigger, contentColor = MaterialTheme.colors.secondary) }
         ) {
             NavHost(navController = navController, startDestination = "home") {
                 composable("home") { Home() }
