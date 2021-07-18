@@ -55,17 +55,17 @@ fun ToolBar(playerViewModel: PlayerViewModel = viewModel(), mediaSessionConnecti
         },
         navigationIcon = {
             IconButton(onClick = closePlayer) {
-                Icon(Icons.Filled.ArrowBack, contentDescription = null)
+                Icon(Icons.Filled.ArrowBack, contentDescription = stringResource(R.string.close_player))
             }
         },
         actions = {
             IconButton(onClick = { playerViewModel.toggleQueue() }) {
-                Icon(painterResource(R.drawable.ic_play_queue), contentDescription = null)
+                Icon(painterResource(R.drawable.ic_play_queue), contentDescription = stringResource(R.string.toggle_queue))
             }
             val expanded = remember { mutableStateOf(false) }
             Box(modifier = Modifier.height(56.dp).aspectRatio(1f).wrapContentSize(Alignment.CenterStart)) {
                 IconButton(onClick = { expanded.value = true }) {
-                    Icon(Icons.Default.MoreVert, contentDescription = stringResource(R.string.toggle_queue))
+                    Icon(Icons.Default.MoreVert, contentDescription = stringResource(R.string.open_menu))
                 }
                 DropdownMenu(expanded = expanded.value, onDismissRequest = { expanded.value = false }) {
                     DropdownMenuItem(

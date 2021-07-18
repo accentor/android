@@ -15,6 +15,12 @@
     <string name="notification_channel_description">Shows what music is currently playing in Accentor</string>
 
     <string name="home">Home</string>
+    <string name="open_menu">Open menu</string>
+    <string name="open_drawer">Open drawer</string>
+    <string name="navigation_icon">Navigation icon</string>
+    <string name="artist_image">Image showing artist</string>
+    <string name="album_image">Image showing album</string>
+    <string name="close_player">Close player</string>
     <string name="various_artists">Various Artists</string>
     <string name="now_playing">Now playing</string>
     <string name="play_next">Play next</string>

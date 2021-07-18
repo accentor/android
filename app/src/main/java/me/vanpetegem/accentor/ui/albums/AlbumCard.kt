@@ -51,7 +51,7 @@ public fun AlbumCard(album: Album, mediaSessionConnection: MediaSessionConnectio
                 } else {
                     painterResource(R.drawable.ic_album)
                 },
-                contentDescription = null,
+                contentDescription = stringResource(R.string.album_image),
                 modifier = Modifier.fillMaxWidth().aspectRatio(1f),
                 contentScale = ContentScale.Crop,
             )
@@ -77,7 +77,7 @@ public fun AlbumCard(album: Album, mediaSessionConnection: MediaSessionConnectio
                 val expanded = remember { mutableStateOf(false) }
                 Box(modifier = Modifier.height(40.dp).aspectRatio(1f).wrapContentSize(Alignment.TopStart)) {
                     IconButton(onClick = { expanded.value = true }) {
-                        Icon(Icons.Default.MoreVert, contentDescription = null)
+                        Icon(Icons.Default.MoreVert, contentDescription = stringResource(R.string.open_menu))
                     }
                     DropdownMenu(expanded = expanded.value, onDismissRequest = { expanded.value = false }) {
                         DropdownMenuItem(

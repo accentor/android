@@ -114,14 +114,14 @@ fun Content(mainViewModel: MainViewModel = viewModel(), playerViewModel: PlayerV
                     title = { Text(stringResource(R.string.app_name)) },
                     navigationIcon = {
                         IconButton(onClick = { scope.launch { scaffoldState.drawerState.open() } }) {
-                            Icon(Icons.Filled.Menu, contentDescription = null)
+                            Icon(Icons.Filled.Menu, contentDescription = stringResource(R.string.open_drawer))
                         }
                     },
                     actions = {
                         val expanded = remember { mutableStateOf(false) }
                         Box(modifier = Modifier.height(40.dp).aspectRatio(1f).wrapContentSize(Alignment.TopStart)) {
                             IconButton(onClick = { expanded.value = true }) {
-                                Icon(Icons.Default.MoreVert, contentDescription = null)
+                                Icon(Icons.Default.MoreVert, contentDescription = stringResource(R.string.open_menu))
                             }
                             DropdownMenu(expanded = expanded.value, onDismissRequest = { expanded.value = false }) {
                                 DropdownMenuItem(
@@ -168,7 +168,7 @@ fun DrawerRow(title: String, selected: Boolean, @DrawableRes icon: Int, onClick:
     val textColor = if (selected) MaterialTheme.colors.primary else MaterialTheme.colors.onSurface
     ListItem(modifier = Modifier.clickable(onClick = onClick).background(background)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(painterResource(icon), contentDescription = null, tint = textColor)
+            Icon(painterResource(icon), contentDescription = stringResource(R.string.navigation_icon), tint = textColor)
             Text(title, modifier = Modifier.padding(16.dp, 8.dp), color = textColor)
         }
     }
