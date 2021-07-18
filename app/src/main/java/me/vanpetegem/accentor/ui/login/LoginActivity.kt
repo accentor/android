@@ -22,11 +22,13 @@ import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.autofill.Autofill
@@ -100,24 +102,24 @@ fun Content(loginViewModel: LoginViewModel = viewModel()) {
                 Modifier.fillMaxSize().padding(innerPadding).verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                var server = rememberSaveable { mutableStateOf("https://") }
-                var username = rememberSaveable { mutableStateOf("") }
-                var password = rememberSaveable { mutableStateOf("") }
-                val formState = loginViewModel.loginFormState.observeAsState()
+                var server by rememberSaveable { mutableStateOf("https://") }
+                var username by rememberSaveable { mutableStateOf("") }
+                var password by rememberSaveable { mutableStateOf("") }
+                val formState by loginViewModel.loginFormState.observeAsState()
                 val usernameFocusRequester = remember { FocusRequester() }
                 OutlinedTextField(
-                    value = server.value,
+                    value = server,
                     onValueChange = { value ->
-                        server.value = value
-                        loginViewModel.loginDataChanged(server.value, username.value, password.value)
+                        server = value
+                        loginViewModel.loginDataChanged(server, username, password)
                     },
                     modifier = Modifier.semantics {
-                        if (formState.value?.serverError != null) {
-                            error(context.getString(formState.value!!.serverError!!))
+                        if (formState?.serverError != null) {
+                            error(context.getString(formState!!.serverError!!))
                         }
                     }.fillMaxWidth().padding(top = 16.dp, start = 16.dp, end = 16.dp),
                     label = { Text(stringResource(R.string.prompt_server)) },
-                    isError = !(formState.value?.serverError == null),
+                    isError = !(formState?.serverError == null),
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(
                         autoCorrect = false,
@@ -129,15 +131,15 @@ fun Content(loginViewModel: LoginViewModel = viewModel()) {
                 )
                 val passwordFocusRequester = remember { FocusRequester() }
                 OutlinedTextField(
-                    value = username.value,
+                    value = username,
                     onValueChange = {
-                        username.value = it
-                        loginViewModel.loginDataChanged(server.value, username.value, password.value)
+                        username = it
+                        loginViewModel.loginDataChanged(server, username, password)
                     },
                     label = { Text(stringResource(R.string.prompt_username)) },
                     modifier = Modifier.autofill(LocalAutofill.current, LocalAutofillTree.current, listOf(AutofillType.Username)) {
-                        username.value = it
-                        loginViewModel.loginDataChanged(server.value, username.value, password.value)
+                        username = it
+                        loginViewModel.loginDataChanged(server, username, password)
                     }.fillMaxWidth().padding(start = 16.dp, end = 16.dp).focusRequester(usernameFocusRequester),
                     keyboardOptions = KeyboardOptions(
                         autoCorrect = false,
@@ -148,18 +150,18 @@ fun Content(loginViewModel: LoginViewModel = viewModel()) {
                     singleLine = true,
                 )
                 val keyboardController = LocalSoftwareKeyboardController.current
-                val loading = loginViewModel.loading.observeAsState()
+                val loading by loginViewModel.loading.observeAsState()
                 OutlinedTextField(
-                    value = password.value,
+                    value = password,
                     onValueChange = {
-                        password.value = it
-                        loginViewModel.loginDataChanged(server.value, username.value, password.value)
+                        password = it
+                        loginViewModel.loginDataChanged(server, username, password)
                     },
                     label = { Text(stringResource(R.string.prompt_password)) },
                     singleLine = true,
                     modifier = Modifier.autofill(LocalAutofill.current, LocalAutofillTree.current, listOf(AutofillType.Password)) {
-                        password.value = it
-                        loginViewModel.loginDataChanged(server.value, username.value, password.value)
+                        password = it
+                        loginViewModel.loginDataChanged(server, username, password)
                     }.fillMaxWidth().padding(start = 16.dp, end = 16.dp).focusRequester(passwordFocusRequester),
                     visualTransformation = PasswordVisualTransformation(),
                     keyboardOptions = KeyboardOptions(
@@ -170,20 +172,20 @@ fun Content(loginViewModel: LoginViewModel = viewModel()) {
                     ),
                     keyboardActions = KeyboardActions {
                         keyboardController?.hide()
-                        scope.launch(IO) { tryLogin(server.value, username.value, password.value) }
+                        scope.launch(IO) { tryLogin(server, username, password) }
                     },
                 )
                 Button(
                     onClick = {
                         keyboardController?.hide()
-                        scope.launch(IO) { tryLogin(server.value, username.value, password.value) }
+                        scope.launch(IO) { tryLogin(server, username, password) }
                     },
-                    enabled = formState.value?.isDataValid ?: false,
+                    enabled = formState?.isDataValid ?: false,
                     modifier = Modifier.padding(bottom = 16.dp, start = 16.dp, end = 16.dp, top = 8.dp),
                 ) {
                     Text(stringResource(R.string.sign_in), style = MaterialTheme.typography.button)
                 }
-                if (loading.value ?: false) {
+                if (loading ?: false) {
                     CircularProgressIndicator()
                 }
             }

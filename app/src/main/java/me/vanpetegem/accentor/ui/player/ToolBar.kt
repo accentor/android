@@ -16,10 +16,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -35,7 +37,7 @@ import me.vanpetegem.accentor.media.MediaSessionConnection
 @Composable
 fun ToolBar(playerViewModel: PlayerViewModel = viewModel(), mediaSessionConnection: MediaSessionConnection = viewModel(), closePlayer: (() -> Unit)) {
     val scope = rememberCoroutineScope()
-    val queuePosStr = mediaSessionConnection.queuePosStr.observeAsState()
+    val queuePosStr by mediaSessionConnection.queuePosStr.observeAsState()
     TopAppBar(
         title = {
             Column {
@@ -46,7 +48,7 @@ fun ToolBar(playerViewModel: PlayerViewModel = viewModel(), mediaSessionConnecti
                     style = MaterialTheme.typography.h6,
                 )
                 Text(
-                    queuePosStr.value ?: "0/0",
+                    queuePosStr ?: "0/0",
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     style = MaterialTheme.typography.subtitle1,
@@ -62,15 +64,15 @@ fun ToolBar(playerViewModel: PlayerViewModel = viewModel(), mediaSessionConnecti
             IconButton(onClick = { playerViewModel.toggleQueue() }) {
                 Icon(painterResource(R.drawable.ic_play_queue), contentDescription = stringResource(R.string.toggle_queue))
             }
-            val expanded = remember { mutableStateOf(false) }
+            var expanded by remember { mutableStateOf(false) }
             Box(modifier = Modifier.height(56.dp).aspectRatio(1f).wrapContentSize(Alignment.CenterStart)) {
-                IconButton(onClick = { expanded.value = true }) {
+                IconButton(onClick = { expanded = true }) {
                     Icon(Icons.Default.MoreVert, contentDescription = stringResource(R.string.open_menu))
                 }
-                DropdownMenu(expanded = expanded.value, onDismissRequest = { expanded.value = false }) {
+                DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
                     DropdownMenuItem(
                         onClick = {
-                            expanded.value = false
+                            expanded = false
                             scope.launch(IO) { mediaSessionConnection.clearQueue() }
                         }
                     ) {

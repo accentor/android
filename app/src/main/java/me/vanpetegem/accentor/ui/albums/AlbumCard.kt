@@ -20,9 +20,11 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -74,15 +76,15 @@ public fun AlbumCard(album: Album, mediaSessionConnection: MediaSessionConnectio
                         overflow = TextOverflow.Ellipsis,
                     )
                 }
-                val expanded = remember { mutableStateOf(false) }
+                var expanded by remember { mutableStateOf(false) }
                 Box(modifier = Modifier.height(40.dp).aspectRatio(1f).wrapContentSize(Alignment.TopStart)) {
-                    IconButton(onClick = { expanded.value = true }) {
+                    IconButton(onClick = { expanded = true }) {
                         Icon(Icons.Default.MoreVert, contentDescription = stringResource(R.string.open_menu))
                     }
-                    DropdownMenu(expanded = expanded.value, onDismissRequest = { expanded.value = false }) {
+                    DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
                         DropdownMenuItem(
                             onClick = {
-                                expanded.value = false
+                                expanded = false
                                 scope.launch(IO) { mediaSessionConnection.play(album) }
                             }
                         ) {
@@ -90,7 +92,7 @@ public fun AlbumCard(album: Album, mediaSessionConnection: MediaSessionConnectio
                         }
                         DropdownMenuItem(
                             onClick = {
-                                expanded.value = false
+                                expanded = false
                                 scope.launch(IO) { mediaSessionConnection.addTracksToQueue(album, maxOf(0, mediaSessionConnection.queuePosition.value ?: 0)) }
                             }
                         ) {
@@ -98,7 +100,7 @@ public fun AlbumCard(album: Album, mediaSessionConnection: MediaSessionConnectio
                         }
                         DropdownMenuItem(
                             onClick = {
-                                expanded.value = false
+                                expanded = false
                                 scope.launch(IO) { mediaSessionConnection.addTracksToQueue(album) }
                             }
                         ) {

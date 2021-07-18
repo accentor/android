@@ -15,17 +15,17 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.GridCells
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyVerticalGrid
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.Saver
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
@@ -42,15 +42,15 @@ import kotlinx.coroutines.launch
 @Composable
 fun ScrollBar(
     state: LazyListState,
-    scrollableSize: MutableState<IntSize>,
+    scrollableSize: IntSize,
     width: Dp = 8.dp,
     minimumHeight: Dp = 48.dp,
     getSectionName: ((Int) -> String)
 ) {
-    val dragging = remember { mutableStateOf(false) }
-    val targetAlpha = if (state.isScrollInProgress || dragging.value) 1f else 0f
-    val duration = if (state.isScrollInProgress || dragging.value) 150 else 500
-    val alpha = animateFloatAsState(
+    var dragging by remember { mutableStateOf(false) }
+    val targetAlpha = if (state.isScrollInProgress || dragging) 1f else 0f
+    val duration = if (state.isScrollInProgress || dragging) 150 else 500
+    val alpha by animateFloatAsState(
         targetValue = targetAlpha,
         animationSpec = tween(duration),
     )
@@ -58,12 +58,12 @@ fun ScrollBar(
     val firstVisibleElementIndex = state.layoutInfo.visibleItemsInfo.firstOrNull()?.index
     val totalItemsCount = state.layoutInfo.totalItemsCount
     val coroutineScope = rememberCoroutineScope()
-    val scrollbarOffset = remember { mutableStateOf(0.dp) }
+    var scrollbarOffset by remember { mutableStateOf(0.dp) }
 
-    if (alpha.value > 0.0f && firstVisibleElementIndex != null) {
+    if (alpha > 0.0f && firstVisibleElementIndex != null) {
         val sectionName = getSectionName(firstVisibleElementIndex)
-        val topDistance = maxOf(0.dp, scrollbarOffset.value - (minimumHeight / 2))
-        if (dragging.value) {
+        val topDistance = maxOf(0.dp, scrollbarOffset - (minimumHeight / 2))
+        if (dragging) {
             Surface(
                 modifier = Modifier.height(minimumHeight).width(minimumHeight).offset(-width * 2, topDistance),
                 shape = RoundedCornerShape(50, 50, 0, 50),
@@ -79,27 +79,27 @@ fun ScrollBar(
             modifier = Modifier.fillMaxHeight().width(width * 2).draggable(
                 orientation = Orientation.Vertical,
                 state = rememberDraggableState { delta ->
-                    val percentage = delta / scrollableSize.value.height
+                    val percentage = delta / scrollableSize.height
                     coroutineScope.launch {
                         state.scrollToItem(maxOf(0, firstVisibleElementIndex + (percentage * totalItemsCount).toInt()), 0)
                     }
                 },
-                onDragStarted = { _ -> dragging.value = true },
-                onDragStopped = { _ -> dragging.value = false },
+                onDragStarted = { _ -> dragging = true },
+                onDragStopped = { _ -> dragging = false },
             )
         ) {
-            val baseElementHeight = scrollableSize.value.height.toFloat() / state.layoutInfo.totalItemsCount
+            val baseElementHeight = scrollableSize.height.toFloat() / state.layoutInfo.totalItemsCount
             val scrollbarHeight = maxOf(state.layoutInfo.visibleItemsInfo.size * baseElementHeight, minimumHeight.toPx())
-            val elementHeight = (scrollableSize.value.height.toFloat() - scrollbarHeight) / state.layoutInfo.totalItemsCount
+            val elementHeight = (scrollableSize.height.toFloat() - scrollbarHeight) / state.layoutInfo.totalItemsCount
             val scrollbarOffsetY = firstVisibleElementIndex * elementHeight
-            scrollbarOffset.value = (scrollbarOffsetY / 1.dp.toPx()).dp
+            scrollbarOffset = (scrollbarOffsetY / 1.dp.toPx()).dp
 
             drawRoundRect(
                 color = color,
                 cornerRadius = CornerRadius(width.toPx() / 2, width.toPx() / 2),
                 topLeft = Offset(if (layoutDirection == LayoutDirection.Ltr) width.toPx() else 0.0f, scrollbarOffsetY),
                 size = Size(width.toPx(), scrollbarHeight),
-                alpha = alpha.value,
+                alpha = alpha,
             )
         }
     }
@@ -107,14 +107,14 @@ fun ScrollBar(
 
 @Composable
 fun <T> FastScrollableGrid(gridItems: List<T>, getSectionName: (T) -> String, itemView: @Composable (T) -> Unit) {
-    val listState = rememberSaveable(saver = LazyListState.Saver) { LazyListState(0, 0) }
-    val boxSize = remember { mutableStateOf(IntSize.Zero) }
-    val cardsPerRow: Int = with(LocalDensity.current) { boxSize.value.width / 192.dp.toPx().toInt() }
+    val listState = rememberLazyListState()
+    var boxSize by remember { mutableStateOf(IntSize.Zero) }
+    val cardsPerRow: Int = with(LocalDensity.current) { boxSize.width / 192.dp.toPx().toInt() }
     Box(Modifier.fillMaxSize(), Alignment.TopEnd) {
         LazyVerticalGrid(
             cells = GridCells.Adaptive(minSize = 192.dp),
             state = listState,
-            modifier = Modifier.onGloballyPositioned { boxSize.value = it.size },
+            modifier = Modifier.onGloballyPositioned { boxSize = it.size },
         ) {
             items(gridItems.size) { i -> itemView(gridItems[i]) }
         }

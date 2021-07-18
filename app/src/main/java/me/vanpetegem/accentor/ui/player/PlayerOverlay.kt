@@ -15,10 +15,12 @@ import androidx.compose.material.SwipeableDefaults
 import androidx.compose.material.rememberSwipeableState
 import androidx.compose.material.swipeable
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.unit.IntOffset
@@ -34,23 +36,23 @@ fun PlayerOverlay(
     content: @Composable (() -> Unit)
 ) {
     val scope = rememberCoroutineScope()
-    val totalHeight = remember { mutableStateOf<Int?>(null) }
-    val toolbarHeight = remember { mutableStateOf(0) }
-    val height = ((totalHeight.value ?: 0) - toolbarHeight.value).toFloat()
+    var totalHeight by remember { mutableStateOf<Int?>(null) }
+    var toolbarHeight by remember { mutableStateOf(0) }
+    val height = ((totalHeight ?: 0) - toolbarHeight).toFloat()
     val swipeableState = rememberSwipeableState(false) {
         playerViewModel.setOpen(it)
         true
     }
     val anchors = mapOf(0f to true, height to false)
-    val showQueue = playerViewModel.showQueue.observeAsState()
-    val queueLength = mediaSessionConnection.queueLength.observeAsState()
-    val showPlayer = (queueLength.value ?: 0) > 0
+    val showQueue by playerViewModel.showQueue.observeAsState()
+    val queueLength by mediaSessionConnection.queueLength.observeAsState()
+    val showPlayer = (queueLength ?: 0) > 0
 
-    Box(modifier = Modifier.onSizeChanged { size -> totalHeight.value = size.height }) {
+    Box(modifier = Modifier.onSizeChanged { size -> totalHeight = size.height }) {
         Box(modifier = Modifier.fillMaxSize().padding(bottom = if (showPlayer) 56.dp else 0.dp)) {
             content()
         }
-        if (totalHeight.value != null && showPlayer) {
+        if (totalHeight != null && showPlayer) {
             BackHandler(swipeableState.currentValue) {
                 scope.launch {
                     swipeableState.animateTo(false, SwipeableDefaults.AnimationSpec)
@@ -69,7 +71,7 @@ fun PlayerOverlay(
                             orientation = Orientation.Vertical,
                             thresholds = { _, _ -> FixedThreshold(224.dp) }
                         )
-                        .onSizeChanged { size -> toolbarHeight.value = size.height }
+                        .onSizeChanged { size -> toolbarHeight = size.height }
                         .clickable {
                             scope.launch {
                                 swipeableState.animateTo(!swipeableState.currentValue, SwipeableDefaults.AnimationSpec)
@@ -87,7 +89,7 @@ fun PlayerOverlay(
                 Surface(Modifier.fillMaxSize()) {
                     Column(modifier = Modifier.fillMaxSize()) {
                         Box(modifier = Modifier.weight(1f)) {
-                            if (showQueue.value ?: false) {
+                            if (showQueue ?: false) {
                                 Queue()
                             } else {
                                 CurrentTrackInfo()

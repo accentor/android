@@ -29,10 +29,12 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -74,13 +76,13 @@ fun Content(mainViewModel: MainViewModel = viewModel(), playerViewModel: PlayerV
     val scaffoldState = rememberScaffoldState()
     val scope = rememberCoroutineScope()
     val navController = rememberNavController()
-    val currentNavigation = navController.currentBackStackEntryAsState()
-    val isPlayerOpen = playerViewModel.isOpen.observeAsState()
+    val currentNavigation by navController.currentBackStackEntryAsState()
+    val isPlayerOpen by playerViewModel.isOpen.observeAsState()
 
-    val loginState = mainViewModel.loginState.observeAsState()
+    val loginState by mainViewModel.loginState.observeAsState()
     val context = LocalContext.current
-    LaunchedEffect(loginState.value) {
-        val loggedIn = loginState.value
+    LaunchedEffect(loginState) {
+        val loggedIn = loginState
         if (loggedIn != null) {
             if (!loggedIn) {
                 context.startActivity(Intent(context, LoginActivity::class.java))
@@ -95,20 +97,20 @@ fun Content(mainViewModel: MainViewModel = viewModel(), playerViewModel: PlayerV
         Scaffold(
             scaffoldState = scaffoldState,
             drawerContent = {
-                DrawerRow(stringResource(R.string.home), currentNavigation.value?.destination?.route == "home", R.drawable.ic_menu_home) {
+                DrawerRow(stringResource(R.string.home), currentNavigation?.destination?.route == "home", R.drawable.ic_menu_home) {
                     navController.navigate("home")
                     scope.launch { scaffoldState.drawerState.close() }
                 }
-                DrawerRow(stringResource(R.string.menu_artists), currentNavigation.value?.destination?.route == "artists", R.drawable.ic_menu_artists) {
+                DrawerRow(stringResource(R.string.menu_artists), currentNavigation?.destination?.route == "artists", R.drawable.ic_menu_artists) {
                     navController.navigate("artists")
                     scope.launch { scaffoldState.drawerState.close() }
                 }
-                DrawerRow(stringResource(R.string.menu_albums), currentNavigation.value?.destination?.route == "albums", R.drawable.ic_menu_albums) {
+                DrawerRow(stringResource(R.string.menu_albums), currentNavigation?.destination?.route == "albums", R.drawable.ic_menu_albums) {
                     navController.navigate("albums")
                     scope.launch { scaffoldState.drawerState.close() }
                 }
             },
-            drawerGesturesEnabled = !(isPlayerOpen.value ?: false),
+            drawerGesturesEnabled = !(isPlayerOpen ?: false),
             topBar = {
                 TopAppBar(
                     title = { Text(stringResource(R.string.app_name)) },
@@ -118,16 +120,16 @@ fun Content(mainViewModel: MainViewModel = viewModel(), playerViewModel: PlayerV
                         }
                     },
                     actions = {
-                        val expanded = remember { mutableStateOf(false) }
+                        var expanded by remember { mutableStateOf(false) }
                         Box(modifier = Modifier.height(40.dp).aspectRatio(1f).wrapContentSize(Alignment.TopStart)) {
-                            IconButton(onClick = { expanded.value = true }) {
+                            IconButton(onClick = { expanded = true }) {
                                 Icon(Icons.Default.MoreVert, contentDescription = stringResource(R.string.open_menu))
                             }
-                            DropdownMenu(expanded = expanded.value, onDismissRequest = { expanded.value = false }) {
+                            DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
                                 DropdownMenuItem(
                                     onClick = {
                                         mainViewModel.refresh()
-                                        expanded.value = false
+                                        expanded = false
                                     }
                                 ) {
                                     Text(stringResource(R.string.action_refresh))
@@ -135,7 +137,7 @@ fun Content(mainViewModel: MainViewModel = viewModel(), playerViewModel: PlayerV
                                 DropdownMenuItem(
                                     onClick = {
                                         mainViewModel.logout()
-                                        expanded.value = false
+                                        expanded = false
                                     }
                                 ) {
                                     Text(stringResource(R.string.action_sign_out))
@@ -146,9 +148,9 @@ fun Content(mainViewModel: MainViewModel = viewModel(), playerViewModel: PlayerV
                 )
             },
         ) { _ ->
-            val isRefreshing = mainViewModel.isRefreshing.observeAsState()
+            val isRefreshing by mainViewModel.isRefreshing.observeAsState()
             SwipeRefresh(
-                state = rememberSwipeRefreshState(isRefreshing.value ?: false),
+                state = rememberSwipeRefreshState(isRefreshing ?: false),
                 onRefresh = { mainViewModel.refresh() },
                 indicator = { state, trigger -> SwipeRefreshIndicator(state, trigger, contentColor = MaterialTheme.colors.secondary) }
             ) {
