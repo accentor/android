@@ -1,6 +1,5 @@
 <resources>
-    <style name="AppTheme" parent="Theme.MaterialComponents.Light">
-        <item name="colorPrimaryDark">#2196F3</item>
+    <style name="AppTheme" parent="Theme.MaterialComponents">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>

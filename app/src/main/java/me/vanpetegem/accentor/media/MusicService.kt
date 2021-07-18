@@ -13,7 +13,10 @@ import androidx.media2.session.MediaSessionService
 import androidx.media2.session.SessionCommand
 import androidx.media2.session.SessionCommandGroup
 import androidx.media2.session.SessionResult
-import com.bumptech.glide.Glide
+import coil.executeBlocking
+import coil.imageLoader
+import coil.request.CachePolicy
+import coil.request.ImageRequest
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.SimpleExoPlayer
@@ -31,7 +34,6 @@ import com.google.android.exoplayer2.upstream.cache.LeastRecentlyUsedCacheEvicto
 import com.google.android.exoplayer2.upstream.cache.SimpleCache
 import java.io.File
 import java.util.concurrent.Executors
-import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
@@ -113,14 +115,12 @@ class MusicService : MediaSessionService() {
         builder.putString(MediaMetadata.METADATA_KEY_MEDIA_ID, track.id.toString())
 
         if (album.image500 != null) {
-            try {
-                val bitmap = Glide.with(this@MusicService).load(album.image500).onlyRetrieveFromCache(true).submit().get().toBitmap()
+            val bitmap = (this@MusicService).imageLoader.executeBlocking(
+                ImageRequest.Builder(this@MusicService).data(album.image500).networkCachePolicy(CachePolicy.DISABLED).build()
+            ).drawable?.toBitmap()
+            if (bitmap != null) {
                 builder.putBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART, bitmap)
                 builder.putBitmap(MediaMetadata.METADATA_KEY_ART, bitmap)
-            } catch (e: Exception) {
-                mainScope.launch(IO) {
-                    Glide.with(this@MusicService).load(album.image500).preload()
-                }
             }
         }
 

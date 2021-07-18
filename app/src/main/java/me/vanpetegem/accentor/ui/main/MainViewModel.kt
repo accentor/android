@@ -10,7 +10,6 @@ import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import me.vanpetegem.accentor.R
 import me.vanpetegem.accentor.data.AccentorDatabase
 import me.vanpetegem.accentor.data.albums.AlbumRepository
 import me.vanpetegem.accentor.data.artists.ArtistRepository
@@ -30,12 +29,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val refreshing = MutableLiveData<Int>()
     val isRefreshing: LiveData<Boolean> = map(refreshing) { if (it != null) it > 0 else false }
 
-    private val playerOpen = MutableLiveData<Boolean>().apply { value = false }
-    val isPlayerOpen: LiveData<Boolean> = playerOpen
-
     val currentUser: LiveData<User?>
     val loginState: LiveData<Boolean> = authenticationRepository.isLoggedIn
-    val serverURL = authenticationRepository.server
 
     init {
         val database = AccentorDatabase.getDatabase(application)
@@ -45,13 +40,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         trackRepository = TrackRepository(database.trackDao(), authenticationRepository)
         currentUser = userRepository.currentUser
         refreshing.value = 0
-    }
-
-    private val _navState = MutableLiveData<NavState>()
-    val navState: LiveData<NavState> = _navState
-
-    init {
-        _navState.value = NavState(R.id.nav_home, false)
     }
 
     fun refresh() {
@@ -90,13 +78,5 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch(IO) { artistRepository.clear() }
         viewModelScope.launch(IO) { trackRepository.clear() }
         viewModelScope.launch(IO) { authenticationRepository.logout() }
-    }
-
-    fun navigate(item: Int) {
-        _navState.value = NavState(item, false)
-    }
-
-    fun setPlayerOpen(value: Boolean) {
-        playerOpen.value = value
     }
 }

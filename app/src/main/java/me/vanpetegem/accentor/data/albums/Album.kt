@@ -23,6 +23,8 @@ data class Album(
 ) {
     fun stringifyAlbumArtists() =
         albumArtists.sortedBy { aa -> aa.order }.fold("") { acc, aa -> acc + aa.name + (aa.separator ?: "") }
+
+    fun firstCharacter() = String(intArrayOf(title.codePointAt(0)), 0, 1)
 }
 
 data class AlbumArtist(

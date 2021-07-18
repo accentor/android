@@ -23,6 +23,7 @@ android {
         }
     }
     buildFeatures {
+        compose true
         viewBinding true
     }
     buildTypes {
@@ -34,6 +35,18 @@ android {
     compileOptions {
         targetCompatibility "1.8"
         sourceCompatibility "1.8"
+    }
+    composeOptions {
+        kotlinCompilerVersion "$kotlin_version"
+        kotlinCompilerExtensionVersion "$compose_version"
+    }
+    kotlinOptions {
+        jvmTarget = "1.8"
+        freeCompilerArgs += [
+            "-Xuse-experimental=androidx.compose.foundation.ExperimentalFoundationApi",
+            "-Xuse-experimental=androidx.compose.ui.ExperimentalComposeUiApi",
+            "-Xuse-experimental=androidx.compose.material.ExperimentalMaterialApi",
+        ]
     }
     lintOptions {
         quiet true
@@ -68,6 +81,9 @@ dependencies {
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'androidx.annotation:annotation:1.2.0'
 
+    // AndroidX navigation
+    implementation "androidx.navigation:navigation-compose:2.4.0-alpha04"
+
     // AndroidX Room
     implementation "androidx.room:room-runtime:$room_version"
     implementation "androidx.room:room-ktx:$room_version"
@@ -77,13 +93,25 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle_version"
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-compose:1.0.0-alpha07"
     kapt "androidx.lifecycle:lifecycle-compiler:$lifecycle_version"
 
-    // Glide
-    implementation("com.github.bumptech.glide:glide:$glide_version") {
-        exclude group: "com.android.support"
-    }
-    kapt "com.github.bumptech.glide:compiler:$glide_version"
+    // AndroidX Compose
+    implementation "androidx.compose.ui:ui:$compose_version"
+    implementation "androidx.compose.foundation:foundation:$compose_version"
+    implementation "androidx.compose.material:material:$compose_version"
+    implementation "androidx.compose.material:material-icons-core:$compose_version"
+    implementation "androidx.compose.runtime:runtime-livedata:$compose_version"
+    implementation "androidx.activity:activity-compose:1.3.0-rc02"
+
+    // AndroidX Compose SwipeRefresh
+    implementation "com.google.accompanist:accompanist-swiperefresh:0.14.0"
+
+    // Coil (image loading)
+    implementation("io.coil-kt:coil:$coil_version")
+    implementation("io.coil-kt:coil-compose:$coil_version")
+    implementation("io.coil-kt:coil-gif:$coil_version")
+    implementation("com.squareup.okhttp3:okhttp:4.9.1")
 
     // ExoPlayer
     implementation "com.google.android.exoplayer:exoplayer-core:$exoplayer_version"
@@ -100,15 +128,10 @@ dependencies {
     // Material
     implementation 'com.google.android.material:material:1.4.0'
 
-    // Sliding up panel
-    implementation 'com.sothree.slidinguppanel:library:3.4.0'
-
-    // Fast-scrolling recyclerview
-    implementation 'com.simplecityapps:recyclerview-fastscroll:2.0.1'
-
     // Tests
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test:runner:1.4.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
     androidTestImplementation "androidx.arch.core:core-testing:2.1.0"
+    androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_version"
 }
