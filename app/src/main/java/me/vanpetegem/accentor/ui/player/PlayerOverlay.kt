@@ -1,10 +1,13 @@
 package me.vanpetegem.accentor.ui.player
 
+import android.content.res.Configuration
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
@@ -23,6 +26,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -47,6 +51,7 @@ fun PlayerOverlay(
     val showQueue by playerViewModel.showQueue.observeAsState()
     val queueLength by mediaSessionConnection.queueLength.observeAsState()
     val showPlayer = (queueLength ?: 0) > 0
+    val isLandscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
 
     Box(modifier = Modifier.onSizeChanged { size -> totalHeight = size.height }) {
         Box(modifier = Modifier.fillMaxSize().padding(bottom = if (showPlayer) 56.dp else 0.dp)) {
@@ -79,7 +84,7 @@ fun PlayerOverlay(
                         }
                 ) {
                     if (swipeableState.currentValue) {
-                        ToolBar {
+                        ToolBar(!isLandscape) {
                             scope.launch { swipeableState.animateTo(false, SwipeableDefaults.AnimationSpec) }
                         }
                     } else {
@@ -87,15 +92,29 @@ fun PlayerOverlay(
                     }
                 }
                 Surface(Modifier.fillMaxSize()) {
-                    Column(modifier = Modifier.fillMaxSize()) {
-                        Box(modifier = Modifier.weight(1f)) {
-                            if (showQueue ?: false) {
+                    if (isLandscape) {
+                        Row(modifier = Modifier.fillMaxSize()) {
+                            Column(modifier = Modifier.fillMaxHeight().weight(0.4f)) {
+                                Box(modifier = Modifier.weight(1f)) {
+                                    CurrentTrackInfo()
+                                }
+                                Controls()
+                            }
+                            Box(modifier = Modifier.fillMaxHeight().weight(0.6f)) {
                                 Queue()
-                            } else {
-                                CurrentTrackInfo()
                             }
                         }
-                        Controls()
+                    } else {
+                        Column(modifier = Modifier.fillMaxSize()) {
+                            Box(modifier = Modifier.weight(1f)) {
+                                if (showQueue ?: false) {
+                                    Queue()
+                                } else {
+                                    CurrentTrackInfo()
+                                }
+                            }
+                            Controls()
+                        }
                     }
                 }
             }
