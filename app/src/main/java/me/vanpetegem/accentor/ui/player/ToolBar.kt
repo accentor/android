@@ -35,7 +35,12 @@ import me.vanpetegem.accentor.R
 import me.vanpetegem.accentor.media.MediaSessionConnection
 
 @Composable
-fun ToolBar(playerViewModel: PlayerViewModel = viewModel(), mediaSessionConnection: MediaSessionConnection = viewModel(), closePlayer: (() -> Unit)) {
+fun ToolBar(
+    showQueueButton: Boolean,
+    playerViewModel: PlayerViewModel = viewModel(),
+    mediaSessionConnection: MediaSessionConnection = viewModel(),
+    closePlayer: (() -> Unit)
+) {
     val scope = rememberCoroutineScope()
     val queuePosStr by mediaSessionConnection.queuePosStr.observeAsState()
     TopAppBar(
@@ -61,8 +66,10 @@ fun ToolBar(playerViewModel: PlayerViewModel = viewModel(), mediaSessionConnecti
             }
         },
         actions = {
-            IconButton(onClick = { playerViewModel.toggleQueue() }) {
-                Icon(painterResource(R.drawable.ic_play_queue), contentDescription = stringResource(R.string.toggle_queue))
+            if (showQueueButton) {
+                IconButton(onClick = { playerViewModel.toggleQueue() }) {
+                    Icon(painterResource(R.drawable.ic_play_queue), contentDescription = stringResource(R.string.toggle_queue))
+                }
             }
             var expanded by remember { mutableStateOf(false) }
             Box(modifier = Modifier.height(56.dp).aspectRatio(1f).wrapContentSize(Alignment.CenterStart)) {
