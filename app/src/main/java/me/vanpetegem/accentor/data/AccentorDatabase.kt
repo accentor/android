@@ -19,6 +19,8 @@ import me.vanpetegem.accentor.data.tracks.DbTrackGenre
 import me.vanpetegem.accentor.data.tracks.TrackDao
 import me.vanpetegem.accentor.data.users.DbUser
 import me.vanpetegem.accentor.data.users.UserDao
+import me.vanpetegem.accentor.data.codecconversions.DbCodecConversion
+import me.vanpetegem.accentor.data.codecconversions.CodecConversionDao
 import me.vanpetegem.accentor.util.RoomTypeConverters
 
 @TypeConverters(RoomTypeConverters::class)
@@ -29,11 +31,12 @@ import me.vanpetegem.accentor.util.RoomTypeConverters
         DbAlbumArtist::class,
         DbAlbumLabel::class,
         DbArtist::class,
+        DbCodecConversion::class,
         DbTrack::class,
         DbTrackArtist::class,
-        DbTrackGenre::class
+        DbTrackGenre::class,
     ],
-    version = 6
+    version = 7
 )
 abstract class AccentorDatabase : RoomDatabase() {
 
@@ -147,6 +150,27 @@ abstract class AccentorDatabase : RoomDatabase() {
                                 }
                             }
                         })
+                        .addMigrations(object : Migration(6, 7) {
+                            override fun migrate(database: SupportSQLiteDatabase) {
+                                database.beginTransaction()
+                                try {
+                                    database.execSQL(
+                                        """
+                                        CREATE TABLE IF NOT EXISTS `codec_conversions` (
+                                            `id` INTEGER NOT NULL,
+                                            `name` TEXT NOT NULL,
+                                            `ffmpeg_params` TEXT NOT NULL,
+                                            `resulting_codec_id` INTEGER NOT NULL,
+                                            PRIMARY KEY(`id`)
+                                        )
+                                        """
+                                    )
+                                    database.setTransactionSuccessful()
+                                } finally {
+                                    database.endTransaction()
+                                }
+                            }
+            })
                         .build()
                 INSTANCE = instance
                 instance
@@ -158,4 +182,5 @@ abstract class AccentorDatabase : RoomDatabase() {
     abstract fun albumDao(): AlbumDao
     abstract fun artistDao(): ArtistDao
     abstract fun trackDao(): TrackDao
+    abstract fun codecConversionDao(): CodecConversionDao
 }

@@ -5,12 +5,17 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.Divider
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.LocalContentColor
@@ -29,6 +34,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -70,7 +76,8 @@ fun Content(preferencesViewModel: PreferencesViewModel = viewModel()) {
         val server by preferencesViewModel.server.observeAsState()
         val imageCacheSize by preferencesViewModel.imageCacheSize.observeAsState()
         val musicCacheSize by preferencesViewModel.musicCacheSize.observeAsState()
-        val conversionId by preferencesViewModel.conversionId.observeAsState()
+        val conversion by preferencesViewModel.conversion.observeAsState()
+        val possibleConversions by preferencesViewModel.possibleConversions.observeAsState()
         Column(modifier = Modifier.padding(innerPadding)) {
             Setting(stringResource(R.string.logged_in_as, "${currentUser?.name}"), server!!)
             Header(stringResource(R.string.playback_settings))
@@ -112,7 +119,24 @@ fun Content(preferencesViewModel: PreferencesViewModel = viewModel()) {
                 }
             }
             Divider()
-            Setting(stringResource(R.string.codec_conversion), conversionId ?: stringResource(R.string.not_set))
+            var conversionsExpanded by remember { mutableStateOf(false) }
+            Box(modifier = Modifier.fillMaxWidth().wrapContentSize(Alignment.TopStart)) {
+                Setting(stringResource(R.string.codec_conversion), conversion?.name ?: stringResource(R.string.not_set)) {
+                    conversionsExpanded = true
+                }
+                DropdownMenu(expanded = conversionsExpanded, onDismissRequest = { conversionsExpanded = false }) {
+                    if (possibleConversions != null) {
+                    for (pConversion in possibleConversions!!) {
+                        DropdownMenuItem(onClick = {
+                            preferencesViewModel.setConversionId(pConversion.id)
+                            conversionsExpanded = false
+                        }) {
+                            Text(pConversion.name)
+                        }
+                    }
+                    }
+                }
+            }
             Header(stringResource(R.string.about))
             Setting(stringResource(R.string.version_info, version))
         }
@@ -130,10 +154,12 @@ fun Header(text: String) {
 }
 
 @Composable
-fun Setting(text: String, subtext: String? = null, onClick: (() -> Unit) = {}) {
-    Column(
-        modifier = Modifier.fillMaxWidth().clickable(onClick = onClick)
-    ) {
+fun Setting(text: String, subtext: String? = null, onClick: (() -> Unit)? = null) {
+    var modifier = Modifier.fillMaxWidth()
+    if (onClick != null) {
+        modifier = modifier.clickable(onClick = onClick)
+    }
+    Column(modifier = modifier) {
         Text(text, modifier = Modifier.padding(top = 8.dp, start = 8.dp, bottom = if (subtext != null) 0.dp else 8.dp))
         if (subtext != null) {
             Text(

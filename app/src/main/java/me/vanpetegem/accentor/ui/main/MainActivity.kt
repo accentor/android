@@ -34,6 +34,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -83,13 +84,16 @@ fun Content(mainViewModel: MainViewModel = viewModel(), playerViewModel: PlayerV
 
     val loginState by mainViewModel.loginState.observeAsState()
     val context = LocalContext.current
+
+    var isFirstRender by rememberSaveable { mutableStateOf(true) }
     LaunchedEffect(loginState) {
         val loggedIn = loginState
         if (loggedIn != null) {
             if (!loggedIn) {
                 context.startActivity(Intent(context, LoginActivity::class.java))
                 (context as Activity).finish()
-            } else {
+            } else if (isFirstRender) {
+                isFirstRender = false
                 mainViewModel.refresh()
             }
         }

@@ -42,6 +42,7 @@ import me.vanpetegem.accentor.data.AccentorDatabase
 import me.vanpetegem.accentor.data.albums.Album
 import me.vanpetegem.accentor.data.authentication.AuthenticationDataSource
 import me.vanpetegem.accentor.data.preferences.PreferencesDataSource
+import me.vanpetegem.accentor.data.codecconversions.CodecConversionDao
 import me.vanpetegem.accentor.data.tracks.Track
 import me.vanpetegem.accentor.userAgent
 
@@ -50,6 +51,7 @@ class MusicService : MediaSessionService() {
 
     private lateinit var authenticationDataSource: AuthenticationDataSource
     private lateinit var preferencesDataSource: PreferencesDataSource
+    private lateinit var codecConversionDao: CodecConversionDao
 
     private lateinit var notificationManager: NotificationManagerCompat
     private lateinit var notificationBuilder: NotificationBuilder
@@ -102,6 +104,7 @@ class MusicService : MediaSessionService() {
         val database = AccentorDatabase.getDatabase(application)
         val trackDao = database.trackDao()
         val albumDao = database.albumDao()
+        codecConversionDao = database.codecConversionDao()
 
         sessionPlayerConnector = SessionPlayerConnector(exoPlayer)
         sessionCallback = SessionCallbackBuilder(baseContext, sessionPlayerConnector).setMediaItemProvider(
@@ -160,13 +163,19 @@ class MusicService : MediaSessionService() {
     }
 
     private fun convertTrack(track: Track, album: Album): MediaItem {
+        val conversionId = preferencesDataSource.conversionId.value
+        val firstConversion by lazy { codecConversionDao.getFirstCodecConversion() }
+        val conversionParam = if (conversionId != null && codecConversionDao.getCodecConversionById(conversionId) != null) {
+            "&codec_conversion_id=${conversionId}"
+        } else if (firstConversion != null) {
+            "&codec_conversion_id=${firstConversion!!.id}"
+        } else {
+            ""
+        }
         val mediaUri = "${authenticationDataSource.getServer()}/api/tracks/${track.id}/audio" +
             "?secret=${authenticationDataSource.getSecret()}" +
             "&device_id=${authenticationDataSource.getDeviceId()}" +
-            // TODO(chvp): Check that id is valid.
-            // TODO(chvp): Use first codec conversion if invalid or missing
-            // TODO(chvp): Leave out if no known codec conversions
-            "&codec_conversion_id=${preferencesDataSource.conversionId.value ?: "4"}"
+            conversionParam
 
         val builder = MediaMetadata.Builder()
         builder.putString(MediaMetadata.METADATA_KEY_TITLE, track.title)

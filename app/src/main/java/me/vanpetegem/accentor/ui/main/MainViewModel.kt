@@ -18,6 +18,7 @@ import me.vanpetegem.accentor.data.authentication.AuthenticationRepository
 import me.vanpetegem.accentor.data.tracks.TrackRepository
 import me.vanpetegem.accentor.data.users.User
 import me.vanpetegem.accentor.data.users.UserRepository
+import me.vanpetegem.accentor.data.codecconversions.CodecConversionRepository
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val authenticationRepository = AuthenticationRepository(AuthenticationDataSource(application))
@@ -25,6 +26,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val albumRepository: AlbumRepository
     private val artistRepository: ArtistRepository
     private val trackRepository: TrackRepository
+    private val codecConversionRepository: CodecConversionRepository
 
     private val refreshing = MutableLiveData<Int>()
     val isRefreshing: LiveData<Boolean> = map(refreshing) { if (it != null) it > 0 else false }
@@ -38,35 +40,31 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         albumRepository = AlbumRepository(database.albumDao(), authenticationRepository)
         artistRepository = ArtistRepository(database.artistDao(), authenticationRepository)
         trackRepository = TrackRepository(database.trackDao(), authenticationRepository)
+        codecConversionRepository = CodecConversionRepository(database.codecConversionDao(), authenticationRepository)
         currentUser = userRepository.currentUser
         refreshing.value = 0
     }
 
     fun refresh() {
-        refreshing.value?.let { refreshing.value = it + 1 }
+        refreshing.value?.let { refreshing.value = it + 3 }
         viewModelScope.launch(IO) {
+            codecConversionRepository.refresh {
+                withContext(Main) { refreshing.value?.let { refreshing.value = it - 1 } }
+            }
             userRepository.refresh {
                 withContext(Main) { refreshing.value?.let { refreshing.value = it - 1 } }
             }
-        }
-
-        refreshing.value?.let { refreshing.value = it + 1 }
-        viewModelScope.launch(IO) {
-            albumRepository.refresh {
+            trackRepository.refresh {
                 withContext(Main) { refreshing.value?.let { refreshing.value = it - 1 } }
             }
         }
 
-        refreshing.value?.let { refreshing.value = it + 1 }
+        refreshing.value?.let { refreshing.value = it + 2 }
         viewModelScope.launch(IO) {
             artistRepository.refresh {
                 withContext(Main) { refreshing.value?.let { refreshing.value = it - 1 } }
             }
-        }
-
-        refreshing.value?.let { refreshing.value = it + 1 }
-        viewModelScope.launch(IO) {
-            trackRepository.refresh {
+            albumRepository.refresh {
                 withContext(Main) { refreshing.value?.let { refreshing.value = it - 1 } }
             }
         }
@@ -77,6 +75,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch(IO) { albumRepository.clear() }
         viewModelScope.launch(IO) { artistRepository.clear() }
         viewModelScope.launch(IO) { trackRepository.clear() }
+        viewModelScope.launch(IO) { codecConversionRepository.clear() }
         viewModelScope.launch(IO) { authenticationRepository.logout() }
     }
 }
