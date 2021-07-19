@@ -6,9 +6,11 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.ContentAlpha
 import androidx.compose.material.DismissValue
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
+import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.SwipeToDismiss
@@ -87,12 +89,14 @@ fun QueueItem(mediaSessionConnection: MediaSessionConnection, index: Int, item: 
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         style = MaterialTheme.typography.subtitle2,
+                        color = LocalContentColor.current.copy(alpha = ContentAlpha.medium),
                     )
                 }
                 Text(
                     item.second?.length.formatTrackLength(),
                     maxLines = 1,
                     style = MaterialTheme.typography.body2,
+                    color = LocalContentColor.current.copy(alpha = ContentAlpha.medium),
                 )
             }
         },

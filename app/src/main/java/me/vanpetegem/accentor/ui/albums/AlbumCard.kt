@@ -11,10 +11,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.Card
+import androidx.compose.material.ContentAlpha
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
@@ -62,7 +64,7 @@ public fun AlbumCard(album: Album, mediaSessionConnection: MediaSessionConnectio
                     Text(
                         album.title,
                         maxLines = 1,
-                        modifier = Modifier.padding(4.dp),
+                        modifier = Modifier.padding(top = 4.dp, start = 4.dp, end = 4.dp),
                         style = MaterialTheme.typography.body1,
                         overflow = TextOverflow.Ellipsis,
                     )
@@ -71,8 +73,9 @@ public fun AlbumCard(album: Album, mediaSessionConnection: MediaSessionConnectio
                             if (it.isEmpty()) stringResource(R.string.various_artists) else it
                         },
                         maxLines = 1,
-                        modifier = Modifier.padding(4.dp),
+                        modifier = Modifier.padding(bottom = 4.dp, start = 4.dp, end = 4.dp),
                         style = MaterialTheme.typography.body2,
+                        color = LocalContentColor.current.copy(alpha = ContentAlpha.medium),
                         overflow = TextOverflow.Ellipsis,
                     )
                 }
