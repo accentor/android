@@ -220,7 +220,7 @@ abstract class AlbumDao {
         }
     }
 
-    @Query("SELECT * FROM albums ORDER BY normalized_title ASC")
+    @Query("SELECT * FROM albums ORDER BY normalized_title ASC, release ASC, edition ASC, edition_description ASC, id ASC")
     protected abstract fun getAllDbAlbums(): LiveData<List<DbAlbum>>
 
     @Query("SELECT * FROM album_artists")
