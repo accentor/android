@@ -27,8 +27,10 @@ class PreferencesViewModel(application: Application) : AndroidViewModel(applicat
     val server: LiveData<String> = authenticationRepository.server
     val imageCacheSize: LiveData<Long> = preferencesDataSource.imageCacheSize
     val musicCacheSize: LiveData<Long> = preferencesDataSource.musicCacheSize
-    val conversion: LiveData<CodecConversion> = switchMap(codecConversionRepository.allCodecConversionsById) { ccs ->
-        map(conversionId) { it?.let { ccs[it] } }
+    val conversion: LiveData<CodecConversion> = switchMap(codecConversionRepository.allCodecConversionsById) { ccsMap ->
+        switchMap(codecConversionRepository.allCodecConversions) { ccs ->
+            map(conversionId) { it?.let { ccsMap[it] } ?: ccs.firstOrNull() }
+        }
     }
     val possibleConversions = codecConversionRepository.allCodecConversions
 
