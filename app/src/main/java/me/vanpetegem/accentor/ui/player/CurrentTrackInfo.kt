@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.ContentAlpha
+import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -54,6 +56,7 @@ fun CurrentTrackInfo(mediaSessionConnection: MediaSessionConnection = viewModel(
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier.padding(horizontal = 8.dp),
             style = MaterialTheme.typography.subtitle1,
+            color = LocalContentColor.current.copy(alpha = ContentAlpha.medium),
         )
         Text(
             currentAlbum?.title ?: "",
@@ -61,6 +64,7 @@ fun CurrentTrackInfo(mediaSessionConnection: MediaSessionConnection = viewModel(
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier.padding(horizontal = 8.dp),
             style = MaterialTheme.typography.subtitle2,
+            color = LocalContentColor.current.copy(alpha = ContentAlpha.medium),
         )
     }
 }
