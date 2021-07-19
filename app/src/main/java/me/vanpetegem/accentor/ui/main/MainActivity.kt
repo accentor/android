@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.material.Divider
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Icon
@@ -34,6 +35,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -59,6 +61,7 @@ import me.vanpetegem.accentor.ui.home.Home
 import me.vanpetegem.accentor.ui.login.LoginActivity
 import me.vanpetegem.accentor.ui.player.PlayerOverlay
 import me.vanpetegem.accentor.ui.player.PlayerViewModel
+import me.vanpetegem.accentor.ui.preferences.PreferencesActivity
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -81,13 +84,16 @@ fun Content(mainViewModel: MainViewModel = viewModel(), playerViewModel: PlayerV
 
     val loginState by mainViewModel.loginState.observeAsState()
     val context = LocalContext.current
+
+    var isFirstRender by rememberSaveable { mutableStateOf(true) }
     LaunchedEffect(loginState) {
         val loggedIn = loginState
         if (loggedIn != null) {
             if (!loggedIn) {
                 context.startActivity(Intent(context, LoginActivity::class.java))
                 (context as Activity).finish()
-            } else {
+            } else if (isFirstRender) {
+                isFirstRender = false
                 mainViewModel.refresh()
             }
         }
@@ -107,6 +113,11 @@ fun Content(mainViewModel: MainViewModel = viewModel(), playerViewModel: PlayerV
                 }
                 DrawerRow(stringResource(R.string.menu_albums), currentNavigation?.destination?.route == "albums", R.drawable.ic_menu_albums) {
                     navController.navigate("albums")
+                    scope.launch { scaffoldState.drawerState.close() }
+                }
+                Divider()
+                DrawerRow(stringResource(R.string.preferences), false, R.drawable.ic_menu_preferences) {
+                    context.startActivity(Intent(context, PreferencesActivity::class.java))
                     scope.launch { scaffoldState.drawerState.close() }
                 }
             },

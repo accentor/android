@@ -21,9 +21,7 @@
         android:supportsRtl="true"
         android:usesCleartextTraffic="true"
         android:windowSoftInputMode="adjustResize">
-        <activity
-            android:name=".ui.login.LoginActivity"
-             />
+        <activity android:name=".ui.login.LoginActivity" />
         <activity
             android:name=".ui.main.MainActivity"
             android:launchMode="singleInstance">
@@ -32,6 +30,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".ui.preferences.PreferencesActivity" />
 
         <service
             android:name=".media.MusicService"

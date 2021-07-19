@@ -8,6 +8,7 @@ import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
 import com.github.kittinunf.fuel.core.FuelManager
 import java.io.File
+import me.vanpetegem.accentor.data.preferences.PreferencesDataSource
 import okhttp3.Cache
 import okhttp3.OkHttpClient
 
@@ -20,14 +21,14 @@ class Accentor : Application(), ImageLoaderFactory {
     }
 
     override fun newImageLoader(): ImageLoader {
+        val preferences = PreferencesDataSource(applicationContext)
         return ImageLoader.Builder(applicationContext)
             .okHttpClient {
                 OkHttpClient.Builder()
                     .cache(
                         Cache(
                             directory = File(cacheDir, "okhttp_image_cache"),
-                            // Set this to a gigabyte for now. This should be configurable later.
-                            maxSize = 1024L * 1024L * 1024L
+                            maxSize = preferences.imageCacheSize.value!!
                         )
                     )
                     .build()

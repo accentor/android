@@ -52,6 +52,7 @@ android {
         quiet true
         checkAllWarnings true
         disable 'SyntheticAccessor'
+        disable 'VectorPath'
         ignoreWarnings false
         warningsAsErrors true
         textReport true
