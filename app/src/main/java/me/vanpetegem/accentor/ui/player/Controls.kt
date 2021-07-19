@@ -14,7 +14,6 @@ import androidx.compose.material.Slider
 import androidx.compose.material.SliderDefaults
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -29,10 +28,10 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.media2.common.SessionPlayer
 import kotlinx.coroutines.Dispatchers.IO
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import me.vanpetegem.accentor.R
 import me.vanpetegem.accentor.media.MediaSessionConnection
+import me.vanpetegem.accentor.ui.util.Timer
 import me.vanpetegem.accentor.util.formatTrackLength
 
 @Composable
@@ -171,20 +170,5 @@ fun Controls(mediaSessionConnection: MediaSessionConnection = viewModel()) {
             )
             Text(currentTrack?.length.formatTrackLength())
         }
-    }
-}
-
-@Composable
-fun Timer(onTick: suspend () -> Unit) {
-    val scope = rememberCoroutineScope()
-    DisposableEffect(onTick) {
-        var running = true
-        scope.launch(IO) {
-            while (running) {
-                delay(100L)
-                onTick()
-            }
-        }
-        onDispose { running = false }
     }
 }

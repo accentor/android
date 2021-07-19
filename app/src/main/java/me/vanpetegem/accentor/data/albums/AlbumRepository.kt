@@ -3,6 +3,7 @@ package me.vanpetegem.accentor.data.albums
 import android.util.SparseArray
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations.map
+import java.time.LocalDate
 import me.vanpetegem.accentor.api.album.index
 import me.vanpetegem.accentor.data.authentication.AuthenticationRepository
 import me.vanpetegem.accentor.util.Result
@@ -17,14 +18,27 @@ class AlbumRepository(
         it.forEach { a -> map.put(a.id, a) }
         map
     }
-
-    fun findById(id: Int): LiveData<Album?> {
-        return albumDao.findById(id)
+    val albumsByReleased: LiveData<List<Album>> = map(allAlbums) {
+        val copy = it.toMutableList()
+        copy.sortWith({ a1, a2 -> a2.release.compareTo(a1.release) })
+        copy
+    }
+    val albumsByAdded: LiveData<List<Album>> = map(allAlbums) {
+        val copy = it.toMutableList()
+        copy.sortWith({ a1, a2 -> a2.createdAt.compareTo(a1.createdAt) })
+        copy
+    }
+    val randomAlbums: LiveData<List<Album>> = map(allAlbums) {
+        val copy = it.toMutableList()
+        copy.shuffle()
+        copy
     }
 
-    fun findByIds(ids: List<Int>): LiveData<List<Album>> {
-        return albumDao.findByIds(ids)
-    }
+    fun findById(id: Int): LiveData<Album?> = albumDao.findById(id)
+
+    fun findByIds(ids: List<Int>): LiveData<List<Album>> = albumDao.findByIds(ids)
+
+    fun findByDay(day: LocalDate): LiveData<List<Album>> = albumDao.findByDay(day)
 
     suspend fun refresh(handler: suspend (Result<Unit>) -> Unit) {
         when (val result = index(authenticationRepository.server.value!!, authenticationRepository.authData.value!!)) {
