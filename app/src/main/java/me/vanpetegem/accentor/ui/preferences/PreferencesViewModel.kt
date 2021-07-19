@@ -8,9 +8,9 @@ import androidx.lifecycle.Transformations.switchMap
 import me.vanpetegem.accentor.data.AccentorDatabase
 import me.vanpetegem.accentor.data.authentication.AuthenticationDataSource
 import me.vanpetegem.accentor.data.authentication.AuthenticationRepository
-import me.vanpetegem.accentor.data.preferences.PreferencesDataSource
-import me.vanpetegem.accentor.data.codecconversions.CodecConversionRepository
 import me.vanpetegem.accentor.data.codecconversions.CodecConversion
+import me.vanpetegem.accentor.data.codecconversions.CodecConversionRepository
+import me.vanpetegem.accentor.data.preferences.PreferencesDataSource
 import me.vanpetegem.accentor.data.users.User
 import me.vanpetegem.accentor.data.users.UserRepository
 
@@ -19,7 +19,7 @@ class PreferencesViewModel(application: Application) : AndroidViewModel(applicat
     private val authenticationRepository = AuthenticationRepository(AuthenticationDataSource(application))
     private val userRepository = UserRepository(database.userDao(), authenticationRepository)
     private val preferencesDataSource = PreferencesDataSource(application)
-    private val codecConversionRepository= CodecConversionRepository(database.codecConversionDao(), authenticationRepository)
+    private val codecConversionRepository = CodecConversionRepository(database.codecConversionDao(), authenticationRepository)
 
     private val conversionId: LiveData<Int> = preferencesDataSource.conversionId
 
@@ -28,7 +28,7 @@ class PreferencesViewModel(application: Application) : AndroidViewModel(applicat
     val imageCacheSize: LiveData<Long> = preferencesDataSource.imageCacheSize
     val musicCacheSize: LiveData<Long> = preferencesDataSource.musicCacheSize
     val conversion: LiveData<CodecConversion> = switchMap(codecConversionRepository.allCodecConversionsById) { ccs ->
-        map(conversionId) { it?.let { ccs[it] } } 
+        map(conversionId) { it?.let { ccs[it] } }
     }
     val possibleConversions = codecConversionRepository.allCodecConversions
 

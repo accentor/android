@@ -15,10 +15,10 @@ import me.vanpetegem.accentor.data.albums.AlbumRepository
 import me.vanpetegem.accentor.data.artists.ArtistRepository
 import me.vanpetegem.accentor.data.authentication.AuthenticationDataSource
 import me.vanpetegem.accentor.data.authentication.AuthenticationRepository
+import me.vanpetegem.accentor.data.codecconversions.CodecConversionRepository
 import me.vanpetegem.accentor.data.tracks.TrackRepository
 import me.vanpetegem.accentor.data.users.User
 import me.vanpetegem.accentor.data.users.UserRepository
-import me.vanpetegem.accentor.data.codecconversions.CodecConversionRepository
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val authenticationRepository = AuthenticationRepository(AuthenticationDataSource(application))

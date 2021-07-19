@@ -3,7 +3,6 @@ package me.vanpetegem.accentor.data.codecconversions
 import android.util.SparseArray
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations.map
-import androidx.lifecycle.Transformations.switchMap
 import me.vanpetegem.accentor.api.codecconversion.index
 import me.vanpetegem.accentor.data.authentication.AuthenticationRepository
 import me.vanpetegem.accentor.util.Result

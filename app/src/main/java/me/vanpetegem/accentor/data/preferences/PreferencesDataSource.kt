@@ -2,8 +2,8 @@ package me.vanpetegem.accentor.data.preferences
 
 import android.content.Context
 import androidx.lifecycle.LiveData
-import me.vanpetegem.accentor.util.longLiveData
 import me.vanpetegem.accentor.util.intLiveData
+import me.vanpetegem.accentor.util.longLiveData
 
 const val CONVERSION_ID_KEY = "conversion_id"
 const val IMAGE_CACHE_SIZE_KEY = "image_cache_size"

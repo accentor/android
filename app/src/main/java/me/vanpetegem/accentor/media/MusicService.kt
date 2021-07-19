@@ -41,8 +41,8 @@ import me.vanpetegem.accentor.R
 import me.vanpetegem.accentor.data.AccentorDatabase
 import me.vanpetegem.accentor.data.albums.Album
 import me.vanpetegem.accentor.data.authentication.AuthenticationDataSource
-import me.vanpetegem.accentor.data.preferences.PreferencesDataSource
 import me.vanpetegem.accentor.data.codecconversions.CodecConversionDao
+import me.vanpetegem.accentor.data.preferences.PreferencesDataSource
 import me.vanpetegem.accentor.data.tracks.Track
 import me.vanpetegem.accentor.userAgent
 
@@ -166,7 +166,7 @@ class MusicService : MediaSessionService() {
         val conversionId = preferencesDataSource.conversionId.value
         val firstConversion by lazy { codecConversionDao.getFirstCodecConversion() }
         val conversionParam = if (conversionId != null && codecConversionDao.getCodecConversionById(conversionId) != null) {
-            "&codec_conversion_id=${conversionId}"
+            "&codec_conversion_id=$conversionId"
         } else if (firstConversion != null) {
             "&codec_conversion_id=${firstConversion!!.id}"
         } else {

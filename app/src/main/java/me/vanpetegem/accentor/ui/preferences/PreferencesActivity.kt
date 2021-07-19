@@ -8,9 +8,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.Divider
@@ -126,14 +125,16 @@ fun Content(preferencesViewModel: PreferencesViewModel = viewModel()) {
                 }
                 DropdownMenu(expanded = conversionsExpanded, onDismissRequest = { conversionsExpanded = false }) {
                     if (possibleConversions != null) {
-                    for (pConversion in possibleConversions!!) {
-                        DropdownMenuItem(onClick = {
-                            preferencesViewModel.setConversionId(pConversion.id)
-                            conversionsExpanded = false
-                        }) {
-                            Text(pConversion.name)
+                        for (pConversion in possibleConversions!!) {
+                            DropdownMenuItem(
+                                onClick = {
+                                    preferencesViewModel.setConversionId(pConversion.id)
+                                    conversionsExpanded = false
+                                }
+                            ) {
+                                Text(pConversion.name)
+                            }
                         }
-                    }
                     }
                 }
             }

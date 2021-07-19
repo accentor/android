@@ -13,14 +13,14 @@ import me.vanpetegem.accentor.data.albums.DbAlbumArtist
 import me.vanpetegem.accentor.data.albums.DbAlbumLabel
 import me.vanpetegem.accentor.data.artists.ArtistDao
 import me.vanpetegem.accentor.data.artists.DbArtist
+import me.vanpetegem.accentor.data.codecconversions.CodecConversionDao
+import me.vanpetegem.accentor.data.codecconversions.DbCodecConversion
 import me.vanpetegem.accentor.data.tracks.DbTrack
 import me.vanpetegem.accentor.data.tracks.DbTrackArtist
 import me.vanpetegem.accentor.data.tracks.DbTrackGenre
 import me.vanpetegem.accentor.data.tracks.TrackDao
 import me.vanpetegem.accentor.data.users.DbUser
 import me.vanpetegem.accentor.data.users.UserDao
-import me.vanpetegem.accentor.data.codecconversions.DbCodecConversion
-import me.vanpetegem.accentor.data.codecconversions.CodecConversionDao
 import me.vanpetegem.accentor.util.RoomTypeConverters
 
 @TypeConverters(RoomTypeConverters::class)
@@ -170,7 +170,7 @@ abstract class AccentorDatabase : RoomDatabase() {
                                     database.endTransaction()
                                 }
                             }
-            })
+                        })
                         .build()
                 INSTANCE = instance
                 instance
