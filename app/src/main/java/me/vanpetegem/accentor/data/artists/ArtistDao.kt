@@ -50,7 +50,7 @@ abstract class ArtistDao {
         }
     }
 
-    @Query("SELECT * FROM artists ORDER BY normalized_name ASC")
+    @Query("SELECT * FROM artists ORDER BY normalized_name ASC, id ASC")
     protected abstract fun getAllDbArtists(): LiveData<List<DbArtist>>
 
     @Insert
