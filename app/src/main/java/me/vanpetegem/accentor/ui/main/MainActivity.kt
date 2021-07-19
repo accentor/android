@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.material.Divider
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Icon
@@ -59,6 +60,7 @@ import me.vanpetegem.accentor.ui.home.Home
 import me.vanpetegem.accentor.ui.login.LoginActivity
 import me.vanpetegem.accentor.ui.player.PlayerOverlay
 import me.vanpetegem.accentor.ui.player.PlayerViewModel
+import me.vanpetegem.accentor.ui.preferences.PreferencesActivity
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -107,6 +109,11 @@ fun Content(mainViewModel: MainViewModel = viewModel(), playerViewModel: PlayerV
                 }
                 DrawerRow(stringResource(R.string.menu_albums), currentNavigation?.destination?.route == "albums", R.drawable.ic_menu_albums) {
                     navController.navigate("albums")
+                    scope.launch { scaffoldState.drawerState.close() }
+                }
+                Divider()
+                DrawerRow(stringResource(R.string.preferences), false, R.drawable.ic_menu_preferences) {
+                    context.startActivity(Intent(context, PreferencesActivity::class.java))
                     scope.launch { scaffoldState.drawerState.close() }
                 }
             },
