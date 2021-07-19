@@ -17,7 +17,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -145,13 +148,19 @@ fun Controls(mediaSessionConnection: MediaSessionConnection = viewModel()) {
         Row(modifier = Modifier.padding(start = 12.dp, end = 12.dp, bottom = 12.dp), verticalAlignment = Alignment.CenterVertically) {
             val buffering by mediaSessionConnection.buffering.observeAsState(false)
             val currentPosition by mediaSessionConnection.currentPosition.observeAsState()
+            var seekPosition by remember { mutableStateOf<Int?>(null) }
             val currentTrack by mediaSessionConnection.currentTrack.observeAsState()
             val trackLength = currentTrack?.length ?: 1
             Timer { mediaSessionConnection.updateCurrentPosition() }
-            Text(currentPosition.formatTrackLength())
+            Text(if (seekPosition != null) seekPosition.formatTrackLength() else currentPosition.formatTrackLength())
             Slider(
-                currentPosition?.toFloat() ?: 0f,
-                onValueChange = { scope.launch(IO) { mediaSessionConnection.seekTo(it.toInt()) } },
+                seekPosition?.toFloat() ?: (currentPosition?.toFloat() ?: 0f),
+                onValueChange = { seekPosition = it.toInt() },
+                onValueChangeFinished = {
+                    val positionCopy = seekPosition!!
+                    scope.launch(IO) { mediaSessionConnection.seekTo(positionCopy) }
+                    seekPosition = null
+                },
                 enabled = !buffering,
                 modifier = Modifier.weight(1f).padding(horizontal = 8.dp),
                 valueRange = 0f..(trackLength.toFloat()),
