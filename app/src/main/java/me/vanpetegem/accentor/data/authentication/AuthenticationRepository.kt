@@ -11,7 +11,6 @@ import me.vanpetegem.accentor.util.Result
 class AuthenticationRepository(
     private val prefsSource: AuthenticationDataSource
 ) {
-
     val authData: LiveData<AuthenticationData> = prefsSource.authData
     val server: LiveData<String> = prefsSource.server
 

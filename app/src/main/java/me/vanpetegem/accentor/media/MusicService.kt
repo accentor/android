@@ -41,6 +41,7 @@ import me.vanpetegem.accentor.R
 import me.vanpetegem.accentor.data.AccentorDatabase
 import me.vanpetegem.accentor.data.albums.Album
 import me.vanpetegem.accentor.data.authentication.AuthenticationDataSource
+import me.vanpetegem.accentor.data.preferences.PreferencesDataSource
 import me.vanpetegem.accentor.data.tracks.Track
 import me.vanpetegem.accentor.userAgent
 
@@ -48,6 +49,7 @@ class MusicService : MediaSessionService() {
     private val mainScope = MainScope()
 
     private lateinit var authenticationDataSource: AuthenticationDataSource
+    private lateinit var preferencesDataSource: PreferencesDataSource
 
     private lateinit var notificationManager: NotificationManagerCompat
     private lateinit var notificationBuilder: NotificationBuilder
@@ -71,7 +73,7 @@ class MusicService : MediaSessionService() {
                         val base = DefaultDataSourceFactory(this@MusicService.application, DefaultHttpDataSource.Factory().setUserAgent(userAgent))
                         val cache = SimpleCache(
                             File(this@MusicService.application.cacheDir, "audio"),
-                            LeastRecentlyUsedCacheEvictor(10 * 1024L * 1024L * 1024L),
+                            LeastRecentlyUsedCacheEvictor(preferencesDataSource.musicCacheSize.value!!),
                             ExoDatabaseProvider(this@MusicService.application)
                         )
 
@@ -92,45 +94,11 @@ class MusicService : MediaSessionService() {
         }
     }
 
-    private fun convertTrack(track: Track, album: Album): MediaItem {
-        val mediaUri = "${authenticationDataSource.getServer()}/api/tracks/${track.id}/audio" +
-            "?secret=${authenticationDataSource.getSecret()}" +
-            "&device_id=${authenticationDataSource.getDeviceId()}" +
-            "&codec_conversion_id=4"
-
-        val builder = MediaMetadata.Builder()
-        builder.putString(MediaMetadata.METADATA_KEY_TITLE, track.title)
-        builder.putString(MediaMetadata.METADATA_KEY_ALBUM, album.title)
-        builder.putString(MediaMetadata.METADATA_KEY_ARTIST, track.stringifyTrackArtists())
-        builder.putString(MediaMetadata.METADATA_KEY_DATE, album.release.toString())
-        builder.putString(
-            MediaMetadata.METADATA_KEY_ALBUM_ARTIST,
-            album.stringifyAlbumArtists().let {
-                if (it.isEmpty()) application.getString(R.string.various_artists) else it
-            }
-        )
-        builder.putString(MediaMetadata.METADATA_KEY_ART_URI, album.image500)
-        builder.putString(MediaMetadata.METADATA_KEY_ALBUM_ART_URI, album.image500)
-        builder.putString(MediaMetadata.METADATA_KEY_MEDIA_URI, mediaUri)
-        builder.putString(MediaMetadata.METADATA_KEY_MEDIA_ID, track.id.toString())
-
-        if (album.image500 != null) {
-            val bitmap = (this@MusicService).imageLoader.executeBlocking(
-                ImageRequest.Builder(this@MusicService).data(album.image500).networkCachePolicy(CachePolicy.DISABLED).build()
-            ).drawable?.toBitmap()
-            if (bitmap != null) {
-                builder.putBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART, bitmap)
-                builder.putBitmap(MediaMetadata.METADATA_KEY_ART, bitmap)
-            }
-        }
-
-        return MediaItem.Builder().setMetadata(builder.build()).build()
-    }
-
     override fun onCreate() {
         super.onCreate()
 
         authenticationDataSource = AuthenticationDataSource(application)
+        preferencesDataSource = PreferencesDataSource(application)
         val database = AccentorDatabase.getDatabase(application)
         val trackDao = database.trackDao()
         val albumDao = database.albumDao()
@@ -189,6 +157,44 @@ class MusicService : MediaSessionService() {
 
         notificationManager = NotificationManagerCompat.from(this)
         notificationBuilder = NotificationBuilder(this)
+    }
+
+    private fun convertTrack(track: Track, album: Album): MediaItem {
+        val mediaUri = "${authenticationDataSource.getServer()}/api/tracks/${track.id}/audio" +
+            "?secret=${authenticationDataSource.getSecret()}" +
+            "&device_id=${authenticationDataSource.getDeviceId()}" +
+            // TODO(chvp): Check that id is valid.
+            // TODO(chvp): Use first codec conversion if invalid or missing
+            // TODO(chvp): Leave out if no known codec conversions
+            "&codec_conversion_id=${preferencesDataSource.conversionId.value ?: "4"}"
+
+        val builder = MediaMetadata.Builder()
+        builder.putString(MediaMetadata.METADATA_KEY_TITLE, track.title)
+        builder.putString(MediaMetadata.METADATA_KEY_ALBUM, album.title)
+        builder.putString(MediaMetadata.METADATA_KEY_ARTIST, track.stringifyTrackArtists())
+        builder.putString(MediaMetadata.METADATA_KEY_DATE, album.release.toString())
+        builder.putString(
+            MediaMetadata.METADATA_KEY_ALBUM_ARTIST,
+            album.stringifyAlbumArtists().let {
+                if (it.isEmpty()) application.getString(R.string.various_artists) else it
+            }
+        )
+        builder.putString(MediaMetadata.METADATA_KEY_ART_URI, album.image500)
+        builder.putString(MediaMetadata.METADATA_KEY_ALBUM_ART_URI, album.image500)
+        builder.putString(MediaMetadata.METADATA_KEY_MEDIA_URI, mediaUri)
+        builder.putString(MediaMetadata.METADATA_KEY_MEDIA_ID, track.id.toString())
+
+        if (album.image500 != null) {
+            val bitmap = (this@MusicService).imageLoader.executeBlocking(
+                ImageRequest.Builder(this@MusicService).data(album.image500).networkCachePolicy(CachePolicy.DISABLED).build()
+            ).drawable?.toBitmap()
+            if (bitmap != null) {
+                builder.putBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART, bitmap)
+                builder.putBitmap(MediaMetadata.METADATA_KEY_ART, bitmap)
+            }
+        }
+
+        return MediaItem.Builder().setMetadata(builder.build()).build()
     }
 
     override fun onGetSession(info: MediaSession.ControllerInfo): MediaSession? = mediaSession

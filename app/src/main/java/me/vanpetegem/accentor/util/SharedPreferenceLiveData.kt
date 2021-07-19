@@ -7,11 +7,6 @@ abstract class SharedPreferenceLiveData<T>(
     protected val sharedPrefs: SharedPreferences,
     private val key: String
 ) : LiveData<T>(), SharedPreferences.OnSharedPreferenceChangeListener {
-
-    init {
-        value = this.getValueFromPreferences(key)
-    }
-
     abstract fun getValueFromPreferences(key: String): T?
 
     override fun onActive() {
@@ -32,52 +27,73 @@ abstract class SharedPreferenceLiveData<T>(
     }
 }
 
-class SharedPreferenceIntLiveData(sharedPrefs: SharedPreferences, key: String) :
+class SharedPreferenceIntLiveData(sharedPrefs: SharedPreferences, key: String, private val default: Int?) :
     SharedPreferenceLiveData<Int>(sharedPrefs, key) {
+    init {
+        value = this.getValueFromPreferences(key)
+    }
+
     override fun getValueFromPreferences(key: String): Int? =
-        if (sharedPrefs.contains(key)) sharedPrefs.getInt(key, 0) else null
+        if (sharedPrefs.contains(key)) sharedPrefs.getInt(key, 0) else default
 }
 
-class SharedPreferenceStringLiveData(sharedPrefs: SharedPreferences, key: String) :
+class SharedPreferenceStringLiveData(sharedPrefs: SharedPreferences, key: String, private val default: String?) :
     SharedPreferenceLiveData<String>(sharedPrefs, key) {
+    init {
+        value = this.getValueFromPreferences(key)
+    }
+
     override fun getValueFromPreferences(key: String): String? =
-        if (sharedPrefs.contains(key)) sharedPrefs.getString(key, null) else null
+        if (sharedPrefs.contains(key)) sharedPrefs.getString(key, default) else default
 }
 
-class SharedPreferenceBooleanLiveData(sharedPrefs: SharedPreferences, key: String) :
+class SharedPreferenceBooleanLiveData(sharedPrefs: SharedPreferences, key: String, private val default: Boolean?) :
     SharedPreferenceLiveData<Boolean>(sharedPrefs, key) {
+    init {
+        value = this.getValueFromPreferences(key)
+    }
+
     override fun getValueFromPreferences(key: String): Boolean? =
-        if (sharedPrefs.contains(key)) sharedPrefs.getBoolean(key, false) else null
+        if (sharedPrefs.contains(key)) sharedPrefs.getBoolean(key, false) else default
 }
 
-class SharedPreferenceFloatLiveData(sharedPrefs: SharedPreferences, key: String) :
+class SharedPreferenceFloatLiveData(sharedPrefs: SharedPreferences, key: String, private val default: Float?) :
     SharedPreferenceLiveData<Float>(sharedPrefs, key) {
+    init {
+        value = this.getValueFromPreferences(key)
+    }
+
     override fun getValueFromPreferences(key: String): Float? =
-        if (sharedPrefs.contains(key)) sharedPrefs.getFloat(key, .0f) else null
+        if (sharedPrefs.contains(key)) sharedPrefs.getFloat(key, .0f) else default
 }
 
-class SharedPreferenceLongLiveData(sharedPrefs: SharedPreferences, key: String) :
+class SharedPreferenceLongLiveData(sharedPrefs: SharedPreferences, key: String, private val default: Long?) :
     SharedPreferenceLiveData<Long>(sharedPrefs, key) {
-    override fun getValueFromPreferences(key: String): Long? =
-        if (sharedPrefs.contains(key)) sharedPrefs.getLong(key, 0) else null
+    init {
+        value = this.getValueFromPreferences(key)
+    }
+
+    override fun getValueFromPreferences(key: String): Long? {
+        return if (sharedPrefs.contains(key)) sharedPrefs.getLong(key, 0L) else default
+    }
 }
 
-fun SharedPreferences.intLiveData(key: String): SharedPreferenceLiveData<Int> {
-    return SharedPreferenceIntLiveData(this, key)
+fun SharedPreferences.intLiveData(key: String, default: Int? = null): SharedPreferenceLiveData<Int> {
+    return SharedPreferenceIntLiveData(this, key, default)
 }
 
-fun SharedPreferences.stringLiveData(key: String): SharedPreferenceLiveData<String> {
-    return SharedPreferenceStringLiveData(this, key)
+fun SharedPreferences.stringLiveData(key: String, default: String? = null): SharedPreferenceLiveData<String> {
+    return SharedPreferenceStringLiveData(this, key, default)
 }
 
-fun SharedPreferences.booleanLiveData(key: String): SharedPreferenceLiveData<Boolean> {
-    return SharedPreferenceBooleanLiveData(this, key)
+fun SharedPreferences.booleanLiveData(key: String, default: Boolean? = null): SharedPreferenceLiveData<Boolean> {
+    return SharedPreferenceBooleanLiveData(this, key, default)
 }
 
-fun SharedPreferences.floatLiveData(key: String): SharedPreferenceLiveData<Float> {
-    return SharedPreferenceFloatLiveData(this, key)
+fun SharedPreferences.floatLiveData(key: String, default: Float? = null): SharedPreferenceLiveData<Float> {
+    return SharedPreferenceFloatLiveData(this, key, default)
 }
 
-fun SharedPreferences.longLiveData(key: String): SharedPreferenceLiveData<Long> {
-    return SharedPreferenceLongLiveData(this, key)
+fun SharedPreferences.longLiveData(key: String, default: Long? = null): SharedPreferenceLiveData<Long> {
+    return SharedPreferenceLongLiveData(this, key, default)
 }
