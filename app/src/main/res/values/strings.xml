@@ -39,4 +39,19 @@
     <string name="shuffle_all">Shuffle on</string>
     <string name="shuffle_none">Shuffle off</string>
     <string name="preferences">Preferences</string>
+    <string name="close_preferences">Close preferences</string>
+    <string name="playback_settings">Playback settings</string>
+    <string name="about">About</string>
+    <string name="logged_in_as">Logged in as %s</string>
+    <string name="version_info">Accentor version %s</string>
+    <string name="music_cache_size">Music cache size</string>
+    <string name="image_cache_size">Image cache size</string>
+    <string name="codec_conversion">Codec conversion</string>
+    <string name="not_set">Not set</string>
+    <string name="cancel">Cancel</string>
+    <string name="save">Save</string>
+    <string name="change_music_cache_size">Change music cache size</string>
+    <string name="music_cache_explanation">Needs to be at least 1024 MiB. Note that Accentor needs to be restarted after this is changed.</string>
+    <string name="change_image_cache_size">Change image cache size</string>
+    <string name="image_cache_explanation">Needs to be at least 100 MiB. Note that Accentor needs to be restarted after this is changed.</string>
 </resources>
