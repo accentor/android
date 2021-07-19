@@ -8,6 +8,8 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Transaction
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 @Dao
 abstract class AlbumDao {
@@ -95,6 +97,34 @@ abstract class AlbumDao {
         }
     }
 
+    open fun findByDay(day: LocalDate): LiveData<List<Album>> =
+        switchMap(findDbAlbumsByDay(day.format(DateTimeFormatter.ISO_LOCAL_DATE).substring(4))) { albums ->
+            switchMap(albumArtistsByAlbumId()) { albumArtists ->
+                map(albumLabelsByAlbumId()) { albumLabels ->
+                    albums.map { a ->
+                        Album(
+                            a.id,
+                            a.title,
+                            a.normalizedTitle,
+                            a.release,
+                            a.reviewComment,
+                            a.edition,
+                            a.editionDescription,
+                            a.createdAt,
+                            a.updatedAt,
+                            a.image,
+                            a.image500,
+                            a.image250,
+                            a.image100,
+                            a.imageType,
+                            albumLabels.get(a.id, ArrayList()),
+                            albumArtists.get(a.id, ArrayList())
+                        )
+                    }
+                }
+            }
+        }
+
     @Transaction
     open fun getAlbumById(id: Int): Album? {
         val dbAlbum = getDbAlbumById(id)
@@ -130,6 +160,18 @@ abstract class AlbumDao {
 
     @Query("SELECT * FROM albums WHERE id IN (:ids)")
     protected abstract fun findDbAlbumsByIds(ids: List<Int>): LiveData<List<DbAlbum>>
+
+    @Query(
+        """
+           SELECT * FROM albums WHERE release LIKE '%' || :day || '%'
+             ORDER BY release DESC,
+                      normalized_title ASC,
+                      edition ASC,
+                      edition_description ASC,
+                      id ASC
+           """
+    )
+    protected abstract fun findDbAlbumsByDay(day: String): LiveData<List<DbAlbum>>
 
     @Query("SELECT * FROM album_artists WHERE album_id = :id")
     protected abstract fun getDbAlbumArtistsById(id: Int): List<DbAlbumArtist>
