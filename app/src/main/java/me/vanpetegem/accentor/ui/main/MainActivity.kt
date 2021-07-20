@@ -44,9 +44,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.navArgument
 import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.SwipeRefreshIndicator
@@ -56,6 +58,7 @@ import me.vanpetegem.accentor.R
 import me.vanpetegem.accentor.ui.AccentorTheme
 import me.vanpetegem.accentor.ui.albums.AlbumGrid
 import me.vanpetegem.accentor.ui.artists.ArtistGrid
+import me.vanpetegem.accentor.ui.artists.ArtistView
 import me.vanpetegem.accentor.ui.home.Home
 import me.vanpetegem.accentor.ui.login.LoginActivity
 import me.vanpetegem.accentor.ui.player.PlayerOverlay
@@ -106,11 +109,11 @@ fun Content(mainViewModel: MainViewModel = viewModel(), playerViewModel: PlayerV
                     navController.navigate("home")
                     scope.launch { scaffoldState.drawerState.close() }
                 }
-                DrawerRow(stringResource(R.string.menu_artists), currentNavigation?.destination?.route == "artists", R.drawable.ic_menu_artists) {
+                DrawerRow(stringResource(R.string.artists), currentNavigation?.destination?.route == "artists", R.drawable.ic_menu_artists) {
                     navController.navigate("artists")
                     scope.launch { scaffoldState.drawerState.close() }
                 }
-                DrawerRow(stringResource(R.string.menu_albums), currentNavigation?.destination?.route == "albums", R.drawable.ic_menu_albums) {
+                DrawerRow(stringResource(R.string.albums), currentNavigation?.destination?.route == "albums", R.drawable.ic_menu_albums) {
                     navController.navigate("albums")
                     scope.launch { scaffoldState.drawerState.close() }
                 }
@@ -166,7 +169,10 @@ fun Content(mainViewModel: MainViewModel = viewModel(), playerViewModel: PlayerV
             ) {
                 NavHost(navController = navController, startDestination = "home") {
                     composable("home") { Home() }
-                    composable("artists") { ArtistGrid() }
+                    composable("artists") { ArtistGrid(navController) }
+                    composable("artists/{artistId}", arguments = listOf(navArgument("artistId") { type = NavType.IntType })) { entry ->
+                        ArtistView(entry.arguments!!.getInt("artistId"))
+                    }
                     composable("albums") { AlbumGrid() }
                 }
             }

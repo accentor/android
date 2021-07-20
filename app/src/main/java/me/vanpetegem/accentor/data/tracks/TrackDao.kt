@@ -9,6 +9,7 @@ import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Transaction
 import me.vanpetegem.accentor.data.albums.Album
+import me.vanpetegem.accentor.data.artists.Artist
 
 @Dao
 abstract class TrackDao {
@@ -91,6 +92,32 @@ abstract class TrackDao {
         }
     }
 
+    open fun findByArtist(artist: Artist): LiveData<List<Track>> = switchMap(findDbTracksByArtistId(artist.id)) { tracks ->
+        val ids = tracks.map { it.id }
+        switchMap(findTrackArtistsByTrackIdWhereTrackIds(ids)) { trackArtists ->
+            map(findTrackGenresByTrackIdWhereTrackIds(ids)) { trackGenres ->
+                tracks.map { t ->
+                    Track(
+                        t.id,
+                        t.title,
+                        t.normalizedTitle,
+                        t.number,
+                        t.albumId,
+                        t.reviewComment,
+                        t.createdAt,
+                        t.updatedAt,
+                        trackGenres.get(t.id, ArrayList()),
+                        trackArtists.get(t.id, ArrayList()),
+                        t.codecId,
+                        t.length,
+                        t.bitrate,
+                        t.locationId
+                    )
+                }
+            }
+        }
+    }
+
     @Transaction
     open fun getTrackById(id: Int): Track? {
         val dbTrack = getDbTrackById(id)
@@ -127,6 +154,9 @@ abstract class TrackDao {
 
     @Query("SELECT * FROM tracks WHERE id IN (:ids)")
     protected abstract fun findDbTracksByIds(ids: List<Int>): LiveData<List<DbTrack>>
+
+    @Query("SELECT * FROM tracks WHERE id IN (SELECT track_id FROM track_artists WHERE artist_id = :id)")
+    protected abstract fun findDbTracksByArtistId(id: Int): LiveData<List<DbTrack>>
 
     @Query("SELECT * FROM track_artists WHERE track_id = :id")
     protected abstract fun getDbTrackArtistsById(id: Int): List<DbTrackArtist>
