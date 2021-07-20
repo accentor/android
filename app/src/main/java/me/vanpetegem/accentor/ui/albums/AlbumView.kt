@@ -9,12 +9,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.ContentAlpha
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,18 +26,22 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberImagePainter
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.launch
 import me.vanpetegem.accentor.R
+import me.vanpetegem.accentor.media.MediaSessionConnection
 import me.vanpetegem.accentor.ui.tracks.TrackRow
 
 @Composable
-fun AlbumView(id: Int, albumViewModel: AlbumViewModel = viewModel()) {
+fun AlbumView(id: Int, albumViewModel: AlbumViewModel = viewModel(), mediaSessionConnection: MediaSessionConnection = viewModel()) {
+    val scope = rememberCoroutineScope()
     val albumState by albumViewModel.getAlbum(id).observeAsState()
     if (albumState != null) {
         val album = albumState!!
         val tracks by albumViewModel.tracksForAlbum(album).observeAsState()
         LazyColumn(modifier = Modifier.fillMaxSize()) {
             item {
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(bottom = 8.dp)) {
                     Image(
                         painter = if (album.image500 != null) {
                             rememberImagePainter(album.image500) {
@@ -44,7 +51,7 @@ fun AlbumView(id: Int, albumViewModel: AlbumViewModel = viewModel()) {
                             painterResource(R.drawable.ic_album)
                         },
                         contentDescription = stringResource(R.string.artist_image),
-                        modifier = Modifier.width(192.dp).aspectRatio(1f),
+                        modifier = Modifier.width(128.dp).aspectRatio(1f),
                     )
                     Column {
                         Text(album.title, style = MaterialTheme.typography.h4, modifier = Modifier.padding(start = 8.dp))
@@ -54,6 +61,14 @@ fun AlbumView(id: Int, albumViewModel: AlbumViewModel = viewModel()) {
                             color = LocalContentColor.current.copy(alpha = ContentAlpha.medium),
                             modifier = Modifier.padding(start = 8.dp),
                         )
+                        Row(modifier = Modifier.padding(8.dp)) {
+                            IconButton(onClick = { scope.launch(IO) { mediaSessionConnection.play(album) } }) {
+                                Icon(painterResource(R.drawable.ic_play), contentDescription = stringResource(R.string.play_now))
+                            }
+                            IconButton(onClick = { scope.launch(IO) { mediaSessionConnection.addTracksToQueue(album) } }) {
+                                Icon(painterResource(R.drawable.ic_queue_add), contentDescription = stringResource(R.string.play_last))
+                            }
+                        }
                     }
                 }
             }
