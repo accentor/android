@@ -57,6 +57,7 @@ import kotlinx.coroutines.launch
 import me.vanpetegem.accentor.R
 import me.vanpetegem.accentor.ui.AccentorTheme
 import me.vanpetegem.accentor.ui.albums.AlbumGrid
+import me.vanpetegem.accentor.ui.albums.AlbumView
 import me.vanpetegem.accentor.ui.artists.ArtistGrid
 import me.vanpetegem.accentor.ui.artists.ArtistView
 import me.vanpetegem.accentor.ui.home.Home
@@ -168,12 +169,15 @@ fun Content(mainViewModel: MainViewModel = viewModel(), playerViewModel: PlayerV
                 indicator = { state, trigger -> SwipeRefreshIndicator(state, trigger, contentColor = MaterialTheme.colors.secondary) }
             ) {
                 NavHost(navController = navController, startDestination = "home") {
-                    composable("home") { Home() }
+                    composable("home") { Home(navController) }
                     composable("artists") { ArtistGrid(navController) }
                     composable("artists/{artistId}", arguments = listOf(navArgument("artistId") { type = NavType.IntType })) { entry ->
-                        ArtistView(entry.arguments!!.getInt("artistId"))
+                        ArtistView(entry.arguments!!.getInt("artistId"), navController)
                     }
-                    composable("albums") { AlbumGrid() }
+                    composable("albums") { AlbumGrid(navController) }
+                    composable("albums/{albumId}", arguments = listOf(navArgument("albumId") { type = NavType.IntType })) { entry ->
+                        AlbumView(entry.arguments!!.getInt("albumId"))
+                    }
                 }
             }
         }

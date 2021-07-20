@@ -14,6 +14,7 @@ class TrackRepository(
     fun findById(id: Int): LiveData<Track?> = trackDao.findById(id)
     fun findByIds(ids: List<Int>): LiveData<List<Track>> = trackDao.findByIds(ids)
     fun findByArtist(artist: Artist): LiveData<List<Track>> = trackDao.findByArtist(artist)
+    fun findByAlbum(album: Album): LiveData<List<Track>> = trackDao.findByAlbum(album)
     fun getByAlbum(album: Album): List<Track> = trackDao.getByAlbum(album)
 
     suspend fun refresh(handler: suspend (Result<Unit>) -> Unit) {

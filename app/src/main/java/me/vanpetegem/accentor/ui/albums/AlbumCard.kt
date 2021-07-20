@@ -1,6 +1,7 @@
 package me.vanpetegem.accentor.ui.albums
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -35,6 +36,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
@@ -43,9 +45,9 @@ import me.vanpetegem.accentor.data.albums.Album
 import me.vanpetegem.accentor.media.MediaSessionConnection
 
 @Composable
-public fun AlbumCard(album: Album, mediaSessionConnection: MediaSessionConnection = viewModel()) {
+public fun AlbumCard(album: Album, navController: NavController, mediaSessionConnection: MediaSessionConnection = viewModel()) {
     val scope = rememberCoroutineScope()
-    Card(modifier = Modifier.padding(8.dp)) {
+    Card(modifier = Modifier.padding(8.dp).clickable { navController.navigate("albums/${album.id}") }) {
         Column {
             Image(
                 painter = if (album.image500 != null) {

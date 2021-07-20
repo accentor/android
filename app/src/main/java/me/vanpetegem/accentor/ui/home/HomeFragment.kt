@@ -15,12 +15,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import me.vanpetegem.accentor.R
 import me.vanpetegem.accentor.ui.albums.AlbumCard
 import me.vanpetegem.accentor.ui.util.Timer
 
 @Composable
-fun Home(homeViewModel: HomeViewModel = viewModel()) {
+fun Home(navController: NavController, homeViewModel: HomeViewModel = viewModel()) {
     LazyColumn(modifier = Modifier.fillMaxSize()) {
         item {
             val albums by homeViewModel.recentlyReleasedAlbums.observeAsState()
@@ -29,7 +30,7 @@ fun Home(homeViewModel: HomeViewModel = viewModel()) {
                 LazyRow {
                     items(albums!!.size) { i ->
                         Box(modifier = Modifier.width(192.dp)) {
-                            AlbumCard(albums!![i])
+                            AlbumCard(albums!![i], navController)
                         }
                     }
                 }
@@ -42,7 +43,7 @@ fun Home(homeViewModel: HomeViewModel = viewModel()) {
                 LazyRow {
                     items(albums!!.size) { i ->
                         Box(modifier = Modifier.width(192.dp)) {
-                            AlbumCard(albums!![i])
+                            AlbumCard(albums!![i], navController)
                         }
                     }
                 }
@@ -59,7 +60,7 @@ fun Home(homeViewModel: HomeViewModel = viewModel()) {
                 LazyRow {
                     items(albums!!.size) { i ->
                         Box(modifier = Modifier.width(192.dp)) {
-                            AlbumCard(albums!![i])
+                            AlbumCard(albums!![i], navController)
                         }
                     }
                 }
@@ -72,7 +73,7 @@ fun Home(homeViewModel: HomeViewModel = viewModel()) {
                 LazyRow {
                     items(albums!!.size) { i ->
                         Box(modifier = Modifier.width(192.dp)) {
-                            AlbumCard(albums!![i])
+                            AlbumCard(albums!![i], navController)
                         }
                     }
                 }
