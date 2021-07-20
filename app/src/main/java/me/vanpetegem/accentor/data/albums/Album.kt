@@ -25,6 +25,22 @@ data class Album(
         albumArtists.sortedBy { aa -> aa.order }.fold("") { acc, aa -> acc + aa.name + (aa.separator ?: "") }
 
     fun firstCharacter() = String(intArrayOf(title.codePointAt(0)), 0, 1)
+
+    fun compareToByName(other: Album): Int {
+        var order = this.normalizedTitle.compareTo(other.normalizedTitle)
+        order = if (order == 0) this.release.compareTo(other.release) else order
+        order = if (order == 0) compareAlbumEditions(this, other) else order
+        order = if (order == 0) this.id - other.id else order
+        return order
+    }
+}
+
+fun compareAlbumEditions(a1: Album, a2: Album): Int {
+    if (a1.edition == null && a2.edition == null) { return 0 }
+    if (a1.edition == null) { return -1 }
+    if (a2.edition == null) { return 1 }
+    val order = a1.edition.compareTo(a2.edition)
+    return if (order == 0) a1.editionDescription!!.compareTo(a2.editionDescription!!) else order
 }
 
 data class AlbumArtist(

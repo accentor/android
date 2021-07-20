@@ -3,9 +3,6 @@
     <string name="action_refresh">Refresh</string>
     <string name="action_sign_out">Sign out</string>
 
-    <string name="menu_albums">Albums</string>
-    <string name="menu_artists">Artists</string>
-
     <string name="prompt_server">Server</string>
     <string name="prompt_username">Username</string>
     <string name="prompt_password">Password</string>
@@ -58,6 +55,7 @@
     <string name="on_this_day">On this day</string>
     <string name="recently_added">Recently added albums</string>
     <string name="random_albums">Random albums</string>
+    <string name="artists">Artists</string>
     <string name="albums">Albums</string>
     <string name="tracks">Tracks</string>
 </resources>

@@ -35,41 +35,8 @@ class ArtistViewModel(application: Application) : AndroidViewModel(application) 
     fun tracksForArtist(artist: Artist): LiveData<List<Track>> = switchMap(trackRepository.findByArtist(artist)) { tracks ->
         map(albumRepository.allAlbumsById) { albums ->
             val copy = tracks.toMutableList()
-            copy.sortWith({ t1, t2 ->
-                val a1 = albums[t1.albumId]
-                val a2 = albums[t2.albumId]
-                if (a1 == null && a2 == null) {
-                    t1.number - t2.number
-                } else if (a1 == null) {
-                    1
-                } else if (a2 == null) {
-                    -1
-                } else {
-                    val order = compareAlbums(a1, a2)
-                    if (order == 0) {
-                        t1.number - t2.number
-                    } else {
-                        order
-                    }
-                }
-            })
+            copy.sortWith({ t1, t2 -> t1.compareTo(t2, albums) })
             copy
         }
-    }
-
-    private fun compareAlbums(a1: Album, a2: Album): Int {
-        var order = a1.normalizedTitle.compareTo(a2.normalizedTitle)
-        order = if (order == 0) a1.release.compareTo(a2.release) else order
-        order = if (order == 0) compareAlbumEditions(a1, a2) else order
-        order = if (order == 0) a1.id - a2.id else order
-        return order
-    }
-
-    private fun compareAlbumEditions(a1: Album, a2: Album): Int {
-        if (a1.edition == null && a2.edition == null) { return 0 }
-        if (a1.edition == null) { return -1 }
-        if (a2.edition == null) { return 1 }
-        val order = a1.edition.compareTo(a2.edition)
-        return if (order == 0) a1.editionDescription!!.compareTo(a2.editionDescription!!) else order
     }
 }

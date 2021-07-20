@@ -109,11 +109,11 @@ fun Content(mainViewModel: MainViewModel = viewModel(), playerViewModel: PlayerV
                     navController.navigate("home")
                     scope.launch { scaffoldState.drawerState.close() }
                 }
-                DrawerRow(stringResource(R.string.menu_artists), currentNavigation?.destination?.route == "artists", R.drawable.ic_menu_artists) {
+                DrawerRow(stringResource(R.string.artists), currentNavigation?.destination?.route == "artists", R.drawable.ic_menu_artists) {
                     navController.navigate("artists")
                     scope.launch { scaffoldState.drawerState.close() }
                 }
-                DrawerRow(stringResource(R.string.menu_albums), currentNavigation?.destination?.route == "albums", R.drawable.ic_menu_albums) {
+                DrawerRow(stringResource(R.string.albums), currentNavigation?.destination?.route == "albums", R.drawable.ic_menu_albums) {
                     navController.navigate("albums")
                     scope.launch { scaffoldState.drawerState.close() }
                 }
