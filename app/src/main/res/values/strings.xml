@@ -58,4 +58,6 @@
     <string name="on_this_day">On this day</string>
     <string name="recently_added">Recently added albums</string>
     <string name="random_albums">Random albums</string>
+    <string name="albums">Albums</string>
+    <string name="tracks">Tracks</string>
 </resources>

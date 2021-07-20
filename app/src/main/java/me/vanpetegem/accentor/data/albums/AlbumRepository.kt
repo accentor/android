@@ -35,6 +35,7 @@ class AlbumRepository(
     }
 
     fun findById(id: Int): LiveData<Album?> = albumDao.findById(id)
+    fun getById(id: Int): Album? = albumDao.getAlbumById(id)
 
     fun findByIds(ids: List<Int>): LiveData<List<Album>> = albumDao.findByIds(ids)
 

@@ -178,8 +178,18 @@ class MediaSessionConnection(application: Application) : AndroidViewModel(applic
         play(tracks)
     }
 
+    suspend fun play(track: Track) {
+        val album = albumRepository.getById(track.albumId)
+        album?.let { play(listOf(Pair(track, it))) }
+    }
+
+    suspend fun addTrackToQueue(track: Track) = addTrackToQueue(track, _queue.value?.size ?: 0)
     suspend fun addTracksToQueue(album: Album) = addTracksToQueue(album, _queue.value?.size ?: 0)
 
+    suspend fun addTrackToQueue(track: Track, index: Int) {
+        val album = albumRepository.getById(track.albumId)
+        album?.let { addTracksToQueue(listOf(Pair(track, album)), index) }
+    }
     suspend fun addTracksToQueue(album: Album, index: Int) {
         val tracks = trackRepository.getByAlbum(album).map { Pair(it, album) }
         addTracksToQueue(tracks, index)
