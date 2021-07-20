@@ -20,47 +20,13 @@ abstract class TrackDao {
         val ids = tracks.map { it.id }
         val trackGenres = getTrackGenresByTrackIdWhereTrackIds(ids)
         val trackArtists = getTrackArtistsByTrackIdWhereTrackIds(ids)
-        return tracks.map { t ->
-            Track(
-                t.id,
-                t.title,
-                t.normalizedTitle,
-                t.number,
-                t.albumId,
-                t.reviewComment,
-                t.createdAt,
-                t.updatedAt,
-                trackGenres.get(t.id, ArrayList()),
-                trackArtists.get(t.id, ArrayList()),
-                t.codecId,
-                t.length,
-                t.bitrate,
-                t.locationId
-            )
-        }
+        return tracks.map { t -> Track.fromDbTrack(t, trackArtists, trackGenres) }
     }
 
     open fun findByIds(ids: List<Int>): LiveData<List<Track>> = switchMap(findDbTracksByIds(ids)) { tracks ->
         switchMap(findTrackArtistsByTrackIdWhereTrackIds(ids)) { trackArtists ->
             map(findTrackGenresByTrackIdWhereTrackIds(ids)) { trackGenres ->
-                tracks.map { t ->
-                    Track(
-                        t.id,
-                        t.title,
-                        t.normalizedTitle,
-                        t.number,
-                        t.albumId,
-                        t.reviewComment,
-                        t.createdAt,
-                        t.updatedAt,
-                        trackGenres.get(t.id, ArrayList()),
-                        trackArtists.get(t.id, ArrayList()),
-                        t.codecId,
-                        t.length,
-                        t.bitrate,
-                        t.locationId
-                    )
-                }
+                tracks.map { t -> Track.fromDbTrack(t, trackArtists, trackGenres) }
             }
         }
     }
@@ -68,25 +34,23 @@ abstract class TrackDao {
     open fun findById(id: Int): LiveData<Track?> = switchMap(findDbTrackById(id)) { dbTrack ->
         switchMap(findDbTrackArtistsById(id)) { trackArtists ->
             map(findDbTrackGenresById(id)) { trackGenres ->
-                if (dbTrack != null) {
+                dbTrack?.let {
                     Track(
-                        dbTrack.id,
-                        dbTrack.title,
-                        dbTrack.normalizedTitle,
-                        dbTrack.number,
-                        dbTrack.albumId,
-                        dbTrack.reviewComment,
-                        dbTrack.createdAt,
-                        dbTrack.updatedAt,
+                        it.id,
+                        it.title,
+                        it.normalizedTitle,
+                        it.number,
+                        it.albumId,
+                        it.reviewComment,
+                        it.createdAt,
+                        it.updatedAt,
                         trackGenres.map { it.genreId },
                         trackArtists.map { TrackArtist(it.artistId, it.name, it.normalizedName, it.role, it.order) },
-                        dbTrack.codecId,
-                        dbTrack.length,
-                        dbTrack.bitrate,
-                        dbTrack.locationId
+                        it.codecId,
+                        it.length,
+                        it.bitrate,
+                        it.locationId
                     )
-                } else {
-                    null
                 }
             }
         }
@@ -96,24 +60,16 @@ abstract class TrackDao {
         val ids = tracks.map { it.id }
         switchMap(findTrackArtistsByTrackIdWhereTrackIds(ids)) { trackArtists ->
             map(findTrackGenresByTrackIdWhereTrackIds(ids)) { trackGenres ->
-                tracks.map { t ->
-                    Track(
-                        t.id,
-                        t.title,
-                        t.normalizedTitle,
-                        t.number,
-                        t.albumId,
-                        t.reviewComment,
-                        t.createdAt,
-                        t.updatedAt,
-                        trackGenres.get(t.id, ArrayList()),
-                        trackArtists.get(t.id, ArrayList()),
-                        t.codecId,
-                        t.length,
-                        t.bitrate,
-                        t.locationId
-                    )
-                }
+                tracks.map { Track.fromDbTrack(it, trackArtists, trackGenres) }
+            }
+        }
+    }
+
+    open fun findByAlbum(album: Album): LiveData<List<Track>> = switchMap(findDbTracksByAlbumId(album.id)) { tracks ->
+        val ids = tracks.map { it.id }
+        switchMap(findTrackArtistsByTrackIdWhereTrackIds(ids)) { trackArtists ->
+            map(findTrackGenresByTrackIdWhereTrackIds(ids)) { trackGenres ->
+                tracks.map { Track.fromDbTrack(it, trackArtists, trackGenres) }
             }
         }
     }
@@ -154,6 +110,9 @@ abstract class TrackDao {
 
     @Query("SELECT * FROM tracks WHERE id IN (:ids)")
     protected abstract fun findDbTracksByIds(ids: List<Int>): LiveData<List<DbTrack>>
+
+    @Query("SELECT * FROM tracks WHERE album_id = :id")
+    protected abstract fun findDbTracksByAlbumId(id: Int): LiveData<List<DbTrack>>
 
     @Query("SELECT * FROM tracks WHERE id IN (SELECT track_id FROM track_artists WHERE artist_id = :id)")
     protected abstract fun findDbTracksByArtistId(id: Int): LiveData<List<DbTrack>>
