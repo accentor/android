@@ -5,7 +5,6 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -176,7 +175,7 @@ fun Content(mainViewModel: MainViewModel = viewModel(), playerViewModel: PlayerV
 }
 
 @Composable
-fun DrawerRow(title: String, selected: Boolean, @DrawableRes icon: Int, onClick: () -> Unit) {
+fun DrawerRow(title: String, selected: Boolean, icon: Int, onClick: () -> Unit) {
     val background = if (selected) MaterialTheme.colors.primary.copy(alpha = 0.12f) else Color.Transparent
     val textColor = if (selected) MaterialTheme.colors.primary else MaterialTheme.colors.onSurface
     ListItem(modifier = Modifier.clickable(onClick = onClick).background(background)) {
