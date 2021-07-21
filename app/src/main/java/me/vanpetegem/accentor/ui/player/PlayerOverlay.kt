@@ -18,6 +18,7 @@ import androidx.compose.material.SwipeableDefaults
 import androidx.compose.material.rememberSwipeableState
 import androidx.compose.material.swipeable
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -52,6 +53,11 @@ fun PlayerOverlay(
     val queueLength by mediaSessionConnection.queueLength.observeAsState()
     val showPlayer = (queueLength ?: 0) > 0
     val isLandscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
+    LaunchedEffect(queueLength) {
+        if (queueLength == 0) {
+            scope.launch { swipeableState.snapTo(false) }
+        }
+    }
 
     Box(modifier = Modifier.onSizeChanged { size -> totalHeight = size.height }) {
         Box(modifier = Modifier.fillMaxSize().padding(bottom = if (showPlayer) 56.dp else 0.dp)) {
@@ -118,8 +124,6 @@ fun PlayerOverlay(
                     }
                 }
             }
-        } else {
-            scope.launch { swipeableState.snapTo(false) }
         }
     }
 }
