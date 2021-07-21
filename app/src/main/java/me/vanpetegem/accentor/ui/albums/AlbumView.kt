@@ -27,6 +27,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberImagePainter
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
 import me.vanpetegem.accentor.R
@@ -56,7 +58,7 @@ fun AlbumView(id: Int, albumViewModel: AlbumViewModel = viewModel(), mediaSessio
                     )
                     Column {
                         Text(
-                            album.title,
+                            if (album.editionDescription == null) album.title else "${album.title} (${album.editionDescription})",
                             style = MaterialTheme.typography.h5,
                             modifier = Modifier.padding(start = 8.dp),
                             maxLines = 2,
@@ -65,6 +67,14 @@ fun AlbumView(id: Int, albumViewModel: AlbumViewModel = viewModel(), mediaSessio
                         Text(
                             album.stringifyAlbumArtists(),
                             style = MaterialTheme.typography.subtitle1,
+                            color = LocalContentColor.current.copy(alpha = ContentAlpha.medium),
+                            modifier = Modifier.padding(start = 8.dp),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                        Text(
+                            if (album.edition == null) album.release.format() else "${album.release.format()} (${album.edition.format()})",
+                            style = MaterialTheme.typography.subtitle2,
                             color = LocalContentColor.current.copy(alpha = ContentAlpha.medium),
                             modifier = Modifier.padding(start = 8.dp),
                             maxLines = 1,
@@ -87,3 +97,5 @@ fun AlbumView(id: Int, albumViewModel: AlbumViewModel = viewModel(), mediaSessio
         }
     }
 }
+
+fun LocalDate.format(): String = format(DateTimeFormatter.ISO_LOCAL_DATE)
