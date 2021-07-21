@@ -53,8 +53,10 @@
     <string name="image_cache_explanation">Needs to be at least 100 MiB. Note that Accentor needs to be restarted after this is changed.</string>
     <string name="recently_released">Recently released albums</string>
     <string name="on_this_day">On this day</string>
-    <string name="recently_added">Recently added albums</string>
+    <string name="recently_added_albums">Recently added albums</string>
+    <string name="recently_added_artists">Recently added artists</string>
     <string name="random_albums">Random albums</string>
+    <string name="random_artists">Random artists</string>
     <string name="artists">Artists</string>
     <string name="albums">Albums</string>
     <string name="tracks">Tracks</string>

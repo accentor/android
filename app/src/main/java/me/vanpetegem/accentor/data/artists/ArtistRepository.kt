@@ -17,6 +17,16 @@ class ArtistRepository(
         it.forEach { a -> map.put(a.id, a) }
         map
     }
+    val artistsByAdded: LiveData<List<Artist>> = map(allArtists) {
+        val copy = it.toMutableList()
+        copy.sortWith({ a1, a2 -> a2.createdAt.compareTo(a1.createdAt) })
+        copy
+    }
+    val randomArtists: LiveData<List<Artist>> = map(allArtists) {
+        val copy = it.toMutableList()
+        copy.shuffle()
+        copy
+    }
 
     suspend fun refresh(handler: suspend (Result<Unit>) -> Unit) {
         when (val result = index(authenticationRepository.server.value!!, authenticationRepository.authData.value!!)) {
