@@ -60,4 +60,6 @@
     <string name="artists">Artists</string>
     <string name="albums">Albums</string>
     <string name="tracks">Tracks</string>
+    <string name="go_to_album">Go to album</string>
+    <string name="go_to">Go to %s</string>
 </resources>

@@ -31,11 +31,13 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import kotlinx.coroutines.launch
 import me.vanpetegem.accentor.media.MediaSessionConnection
 
 @Composable
 fun PlayerOverlay(
+    navController: NavController,
     playerViewModel: PlayerViewModel = viewModel(),
     mediaSessionConnection: MediaSessionConnection = viewModel(),
     content: @Composable (() -> Unit)
@@ -107,14 +109,14 @@ fun PlayerOverlay(
                                 Controls()
                             }
                             Box(modifier = Modifier.fillMaxHeight().weight(0.6f)) {
-                                Queue()
+                                Queue(navController)
                             }
                         }
                     } else {
                         Column(modifier = Modifier.fillMaxSize()) {
                             Box(modifier = Modifier.weight(1f)) {
                                 if (showQueue ?: false) {
-                                    Queue()
+                                    Queue(navController)
                                 } else {
                                     CurrentTrackInfo()
                                 }

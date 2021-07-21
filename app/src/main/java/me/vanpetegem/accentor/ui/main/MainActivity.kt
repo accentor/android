@@ -102,7 +102,7 @@ fun Content(mainViewModel: MainViewModel = viewModel(), playerViewModel: PlayerV
         }
     }
 
-    PlayerOverlay() {
+    PlayerOverlay(navController) {
         Scaffold(
             scaffoldState = scaffoldState,
             drawerContent = {
@@ -176,7 +176,7 @@ fun Content(mainViewModel: MainViewModel = viewModel(), playerViewModel: PlayerV
                     }
                     composable("albums") { AlbumGrid(navController) }
                     composable("albums/{albumId}", arguments = listOf(navArgument("albumId") { type = NavType.IntType })) { entry ->
-                        AlbumView(entry.arguments!!.getInt("albumId"))
+                        AlbumView(entry.arguments!!.getInt("albumId"), navController)
                     }
                 }
             }

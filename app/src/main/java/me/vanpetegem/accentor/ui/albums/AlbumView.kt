@@ -26,6 +26,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -36,7 +37,12 @@ import me.vanpetegem.accentor.media.MediaSessionConnection
 import me.vanpetegem.accentor.ui.tracks.TrackRow
 
 @Composable
-fun AlbumView(id: Int, albumViewModel: AlbumViewModel = viewModel(), mediaSessionConnection: MediaSessionConnection = viewModel()) {
+fun AlbumView(
+    id: Int,
+    navController: NavController,
+    albumViewModel: AlbumViewModel = viewModel(),
+    mediaSessionConnection: MediaSessionConnection = viewModel()
+) {
     val scope = rememberCoroutineScope()
     val albumState by albumViewModel.getAlbum(id).observeAsState()
     if (albumState != null) {
@@ -92,7 +98,7 @@ fun AlbumView(id: Int, albumViewModel: AlbumViewModel = viewModel(), mediaSessio
                 }
             }
             if (tracks != null && tracks!!.size > 0) {
-                items(tracks!!.size) { i -> TrackRow(tracks!![i]) }
+                items(tracks!!.size) { i -> TrackRow(tracks!![i], navController, hideAlbum = true) }
             }
         }
     }
