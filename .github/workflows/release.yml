@@ -29,13 +29,16 @@ jobs:
         echo "${{ secrets.KEYSTORE_FILE }}" | base64 -d > keystore.jks
         echo "${{ secrets.KEYSTORE_PASSWORD }}" | $ANDROID_SDK_ROOT/build-tools/30.0.2/apksigner sign --ks keystore.jks --out app-release.apk app/build/outputs/apk/release/app-release-unsigned-aligned.apk
         $ANDROID_SDK_ROOT/build-tools/30.0.2/apksigner verify app-release.apk
+    - name: Parse tag
+      id: parse_tag
+      run: "echo ${{ github.ref }} | sed 's#^refs/tags/#::set-output name=version::#'"
     - name: Create release
       id: create_release
       uses: release-drafter/release-drafter@v5
       with:
-        name: ${{ github.ref }}
-        tag: ${{ github.ref }}
-        version: ${{ github.ref }}
+        name: ${{ steps.parse_tag.outputs.version }}
+        tag: ${{ steps.parse_tag.outputs.version }}
+        version: ${{ steps.parse_tag.outputs.version }}
         publish: true
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
