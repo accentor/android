@@ -18,6 +18,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import me.vanpetegem.accentor.R
 import me.vanpetegem.accentor.ui.albums.AlbumCard
+import me.vanpetegem.accentor.ui.artists.ArtistCard
 import me.vanpetegem.accentor.ui.util.Timer
 
 @Composable
@@ -39,7 +40,7 @@ fun Home(navController: NavController, homeViewModel: HomeViewModel = viewModel(
         item {
             val albums by homeViewModel.recentlyAddedAlbums.observeAsState()
             if (albums != null) {
-                Text(stringResource(R.string.recently_added), style = MaterialTheme.typography.h5, modifier = Modifier.padding(8.dp))
+                Text(stringResource(R.string.recently_added_albums), style = MaterialTheme.typography.h5, modifier = Modifier.padding(8.dp))
                 LazyRow {
                     items(albums!!.size) { i ->
                         Box(modifier = Modifier.width(192.dp)) {
@@ -67,6 +68,19 @@ fun Home(navController: NavController, homeViewModel: HomeViewModel = viewModel(
             }
         }
         item {
+            val artists by homeViewModel.recentlyAddedArtists.observeAsState()
+            if (artists != null) {
+                Text(stringResource(R.string.recently_added_artists), style = MaterialTheme.typography.h5, modifier = Modifier.padding(8.dp))
+                LazyRow {
+                    items(artists!!.size) { i ->
+                        Box(modifier = Modifier.width(192.dp)) {
+                            ArtistCard(navController, artists!![i])
+                        }
+                    }
+                }
+            }
+        }
+        item {
             val albums by homeViewModel.randomAlbums.observeAsState()
             if (albums != null) {
                 Text(stringResource(R.string.random_albums), style = MaterialTheme.typography.h5, modifier = Modifier.padding(8.dp))
@@ -74,6 +88,19 @@ fun Home(navController: NavController, homeViewModel: HomeViewModel = viewModel(
                     items(albums!!.size) { i ->
                         Box(modifier = Modifier.width(192.dp)) {
                             AlbumCard(albums!![i], navController)
+                        }
+                    }
+                }
+            }
+        }
+        item {
+            val artists by homeViewModel.randomArtists.observeAsState()
+            if (artists != null) {
+                Text(stringResource(R.string.random_artists), style = MaterialTheme.typography.h5, modifier = Modifier.padding(8.dp))
+                LazyRow {
+                    items(artists!!.size) { i ->
+                        Box(modifier = Modifier.width(192.dp)) {
+                            ArtistCard(navController, artists!![i])
                         }
                     }
                 }
