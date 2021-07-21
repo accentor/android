@@ -112,7 +112,7 @@ fun <T> FastScrollableGrid(gridItems: List<T>, getSectionName: (T) -> String, it
     val cardsPerRow: Int = with(LocalDensity.current) { boxSize.width / 192.dp.toPx().toInt() }
     Box(Modifier.fillMaxSize(), Alignment.TopEnd) {
         LazyVerticalGrid(
-            cells = GridCells.Adaptive(minSize = 192.dp),
+            cells = if (cardsPerRow >= 2) GridCells.Adaptive(minSize = 192.dp) else GridCells.Fixed(2),
             state = listState,
             modifier = Modifier.onGloballyPositioned { boxSize = it.size },
         ) {
