@@ -23,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberImagePainter
@@ -41,7 +42,7 @@ fun AlbumView(id: Int, albumViewModel: AlbumViewModel = viewModel(), mediaSessio
         val tracks by albumViewModel.tracksForAlbum(album).observeAsState()
         LazyColumn(modifier = Modifier.fillMaxSize()) {
             item {
-                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(bottom = 8.dp)) {
+                Row(verticalAlignment = Alignment.Top, modifier = Modifier.padding(bottom = 8.dp)) {
                     Image(
                         painter = if (album.image500 != null) {
                             rememberImagePainter(album.image500) {
@@ -54,12 +55,20 @@ fun AlbumView(id: Int, albumViewModel: AlbumViewModel = viewModel(), mediaSessio
                         modifier = Modifier.width(128.dp).aspectRatio(1f),
                     )
                     Column {
-                        Text(album.title, style = MaterialTheme.typography.h4, modifier = Modifier.padding(start = 8.dp))
+                        Text(
+                            album.title,
+                            style = MaterialTheme.typography.h5,
+                            modifier = Modifier.padding(start = 8.dp),
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis,
+                        )
                         Text(
                             album.stringifyAlbumArtists(),
                             style = MaterialTheme.typography.subtitle1,
                             color = LocalContentColor.current.copy(alpha = ContentAlpha.medium),
                             modifier = Modifier.padding(start = 8.dp),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
                         )
                         Row(modifier = Modifier.padding(8.dp)) {
                             IconButton(onClick = { scope.launch(IO) { mediaSessionConnection.play(album) } }) {
