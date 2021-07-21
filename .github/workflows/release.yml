@@ -29,10 +29,23 @@ jobs:
         echo "${{ secrets.KEYSTORE_FILE }}" | base64 -d > keystore.jks
         echo "${{ secrets.KEYSTORE_PASSWORD }}" | $ANDROID_SDK_ROOT/build-tools/30.0.2/apksigner sign --ks keystore.jks --out app-release.apk app/build/outputs/apk/release/app-release-unsigned-aligned.apk
         $ANDROID_SDK_ROOT/build-tools/30.0.2/apksigner verify app-release.apk
-        mv app-release.apk accentor-$(git describe --tags).apk
     - name: Create release
-      uses: softprops/action-gh-release@v1
+      id: create_release
+      uses: release-drafter/release-drafter@v5
       with:
-        files: "accentor-*.apk"
+        name: ${{ github.ref }}
+        tag: ${{ github.ref }}
+        version: ${{ github.ref }}
+        publish: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Upload Release Asset
+      id: upload-release-asset
+      uses: actions/upload-release-asset@v1
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./app-release.apk
+        asset_name: accentor-${{ steps.create_release.outputs.tag_name }}.apk
+        asset_content_type: application/vnd.android.package-archive
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
