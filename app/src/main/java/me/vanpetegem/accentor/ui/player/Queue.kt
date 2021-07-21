@@ -49,18 +49,24 @@ import me.vanpetegem.accentor.media.MediaSessionConnection
 import me.vanpetegem.accentor.util.formatTrackLength
 
 @Composable
-fun Queue(navController: NavController, mediaSessionConnection: MediaSessionConnection = viewModel()) {
+fun Queue(navController: NavController, closePlayer: (() -> Unit), mediaSessionConnection: MediaSessionConnection = viewModel()) {
     val state = rememberLazyListState()
     val queue by mediaSessionConnection.queue.observeAsState()
     LazyColumn(state = state) {
         items(queue?.size ?: 0, key = { Pair(it, queue!![it].second?.id) }) { i ->
-            QueueItem(mediaSessionConnection, navController, i, queue!![i])
+            QueueItem(mediaSessionConnection, navController, i, queue!![i], closePlayer)
         }
     }
 }
 
 @Composable
-fun QueueItem(mediaSessionConnection: MediaSessionConnection, navController: NavController, index: Int, item: Triple<Boolean, Track?, Album?>) {
+fun QueueItem(
+    mediaSessionConnection: MediaSessionConnection,
+    navController: NavController,
+    index: Int,
+    item: Triple<Boolean, Track?, Album?>,
+    closePlayer: (() -> Unit)
+) {
     if (index != 0) {
         Divider()
     }
@@ -123,6 +129,7 @@ fun QueueItem(mediaSessionConnection: MediaSessionConnection, navController: Nav
                                 onClick = {
                                     expanded = false
                                     navController.navigate("albums/${track.albumId}")
+                                    closePlayer()
                                 }
                             ) {
                                 Text(stringResource(R.string.go_to_album))
@@ -132,6 +139,7 @@ fun QueueItem(mediaSessionConnection: MediaSessionConnection, navController: Nav
                                     onClick = {
                                         expanded = false
                                         navController.navigate("artists/${ta.artistId}")
+                                        closePlayer()
                                     }
                                 ) {
                                     Text(stringResource(R.string.go_to, ta.name))

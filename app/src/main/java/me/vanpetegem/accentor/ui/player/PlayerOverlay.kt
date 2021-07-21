@@ -61,6 +61,8 @@ fun PlayerOverlay(
         }
     }
 
+    val closePlayer: () -> Unit = { scope.launch { swipeableState.animateTo(false, SwipeableDefaults.AnimationSpec) } }
+
     Box(modifier = Modifier.onSizeChanged { size -> totalHeight = size.height }) {
         Box(modifier = Modifier.fillMaxSize().padding(bottom = if (showPlayer) 56.dp else 0.dp)) {
             content()
@@ -92,9 +94,7 @@ fun PlayerOverlay(
                         }
                 ) {
                     if (swipeableState.currentValue) {
-                        ToolBar(!isLandscape) {
-                            scope.launch { swipeableState.animateTo(false, SwipeableDefaults.AnimationSpec) }
-                        }
+                        ToolBar(!isLandscape, closePlayer = closePlayer)
                     } else {
                         ControlBar()
                     }
@@ -109,14 +109,14 @@ fun PlayerOverlay(
                                 Controls()
                             }
                             Box(modifier = Modifier.fillMaxHeight().weight(0.6f)) {
-                                Queue(navController)
+                                Queue(navController, closePlayer = closePlayer)
                             }
                         }
                     } else {
                         Column(modifier = Modifier.fillMaxSize()) {
                             Box(modifier = Modifier.weight(1f)) {
                                 if (showQueue ?: false) {
-                                    Queue(navController)
+                                    Queue(navController, closePlayer = closePlayer)
                                 } else {
                                     CurrentTrackInfo()
                                 }
