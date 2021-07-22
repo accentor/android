@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.ContentAlpha
+import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.LocalContentColor
@@ -99,6 +100,24 @@ fun AlbumView(
             }
             if (tracks != null && tracks!!.size > 0) {
                 items(tracks!!.size) { i -> TrackRow(tracks!![i], navController, hideAlbum = true) }
+            }
+        }
+    }
+}
+
+@Composable
+fun AlbumViewDropdown(id: Int, navController: NavController, dismiss: (() -> Unit), albumViewModel: AlbumViewModel = viewModel()) {
+    val albumState by albumViewModel.getAlbum(id).observeAsState()
+    if (albumState != null) {
+        val album = albumState!!
+        for (aa in album.albumArtists.sortedBy { it.order }) {
+            DropdownMenuItem(
+                onClick = {
+                    dismiss()
+                    navController.navigate("artists/${aa.artistId}")
+                }
+            ) {
+                Text(stringResource(R.string.go_to, aa.name))
             }
         }
     }

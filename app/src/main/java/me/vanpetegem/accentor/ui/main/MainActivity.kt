@@ -59,6 +59,7 @@ import me.vanpetegem.accentor.R
 import me.vanpetegem.accentor.ui.AccentorTheme
 import me.vanpetegem.accentor.ui.albums.AlbumGrid
 import me.vanpetegem.accentor.ui.albums.AlbumView
+import me.vanpetegem.accentor.ui.albums.AlbumViewDropdown
 import me.vanpetegem.accentor.ui.artists.ArtistGrid
 import me.vanpetegem.accentor.ui.artists.ArtistView
 import me.vanpetegem.accentor.ui.home.Home
@@ -108,7 +109,9 @@ fun Content(mainViewModel: MainViewModel = viewModel()) {
             }
             composable("albums") { Base(navController, mainViewModel) { AlbumGrid(navController) } }
             composable("albums/{albumId}", arguments = listOf(navArgument("albumId") { type = NavType.IntType })) { entry ->
-                Base(navController, mainViewModel) { AlbumView(entry.arguments!!.getInt("albumId"), navController) }
+                Base(navController, mainViewModel, extraDropdownItems = { AlbumViewDropdown(entry.arguments!!.getInt("albumId"), navController, it) }) {
+                    AlbumView(entry.arguments!!.getInt("albumId"), navController)
+                }
             }
         }
     }
@@ -119,6 +122,7 @@ fun Base(
     navController: NavController,
     mainViewModel: MainViewModel = viewModel(),
     playerViewModel: PlayerViewModel = viewModel(),
+    extraDropdownItems: @Composable ((() -> Unit) -> Unit)? = null,
     mainContent: @Composable (() -> Unit)
 ) {
     val scaffoldState = rememberScaffoldState()
@@ -163,6 +167,9 @@ fun Base(
                             Icon(Icons.Default.MoreVert, contentDescription = stringResource(R.string.open_menu))
                         }
                         DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+                            if (extraDropdownItems != null) {
+                                extraDropdownItems { expanded = false }
+                            }
                             DropdownMenuItem(
                                 onClick = {
                                     mainViewModel.refresh()
