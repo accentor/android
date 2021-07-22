@@ -153,6 +153,28 @@ class MusicService : MediaSessionService() {
                         .build()
                 }
             }
+        ).setAllowedCommandProvider(
+            object : SessionCallbackBuilder.AllowedCommandProvider by SessionCallbackBuilder.DefaultAllowedCommandProvider(this@MusicService) {
+                override fun getAllowedCommands(
+                    session: MediaSession,
+                    controllerInfo: MediaSession.ControllerInfo,
+                    base: SessionCommandGroup
+                ): SessionCommandGroup {
+                    // This is a work-around. ExoPlayer reports that previous is not possible on the first track, because it only looks at if there is a
+                    // previous track, even though previous item skips back to the start of the track after three seconds. I tried to take these three seconds
+                    // into account, but this method isn't called often enough.
+                    if (!base.hasCommand(SessionCommand(SessionCommand.COMMAND_CODE_PLAYER_SKIP_TO_PREVIOUS_PLAYLIST_ITEM))) {
+                        val builder = SessionCommandGroup.Builder()
+                        for (command in base.getCommands()) {
+                            builder.addCommand(command)
+                        }
+                        builder.addCommand(SessionCommand(SessionCommand.COMMAND_CODE_PLAYER_SKIP_TO_PREVIOUS_PLAYLIST_ITEM))
+                        return builder.build()
+                    } else {
+                        return base
+                    }
+                }
+            }
         ).build()
         mediaSession = MediaSession.Builder(baseContext, sessionPlayerConnector)
             .setSessionCallback(Executors.newSingleThreadExecutor(), sessionCallback)
