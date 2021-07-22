@@ -31,11 +31,13 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import kotlinx.coroutines.launch
 import me.vanpetegem.accentor.media.MediaSessionConnection
 
 @Composable
 fun PlayerOverlay(
+    navController: NavController,
     playerViewModel: PlayerViewModel = viewModel(),
     mediaSessionConnection: MediaSessionConnection = viewModel(),
     content: @Composable (() -> Unit)
@@ -58,6 +60,8 @@ fun PlayerOverlay(
             scope.launch { swipeableState.snapTo(false) }
         }
     }
+
+    val closePlayer: () -> Unit = { scope.launch { swipeableState.animateTo(false, SwipeableDefaults.AnimationSpec) } }
 
     Box(modifier = Modifier.onSizeChanged { size -> totalHeight = size.height }) {
         Box(modifier = Modifier.fillMaxSize().padding(bottom = if (showPlayer) 56.dp else 0.dp)) {
@@ -90,9 +94,7 @@ fun PlayerOverlay(
                         }
                 ) {
                     if (swipeableState.currentValue) {
-                        ToolBar(!isLandscape) {
-                            scope.launch { swipeableState.animateTo(false, SwipeableDefaults.AnimationSpec) }
-                        }
+                        ToolBar(!isLandscape, closePlayer = closePlayer)
                     } else {
                         ControlBar()
                     }
@@ -107,14 +109,14 @@ fun PlayerOverlay(
                                 Controls()
                             }
                             Box(modifier = Modifier.fillMaxHeight().weight(0.6f)) {
-                                Queue()
+                                Queue(navController, closePlayer = closePlayer)
                             }
                         }
                     } else {
                         Column(modifier = Modifier.fillMaxSize()) {
                             Box(modifier = Modifier.weight(1f)) {
                                 if (showQueue ?: false) {
-                                    Queue()
+                                    Queue(navController, closePlayer = closePlayer)
                                 } else {
                                     CurrentTrackInfo()
                                 }

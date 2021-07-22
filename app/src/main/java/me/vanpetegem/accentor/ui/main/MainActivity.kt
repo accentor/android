@@ -44,6 +44,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -58,6 +59,7 @@ import me.vanpetegem.accentor.R
 import me.vanpetegem.accentor.ui.AccentorTheme
 import me.vanpetegem.accentor.ui.albums.AlbumGrid
 import me.vanpetegem.accentor.ui.albums.AlbumView
+import me.vanpetegem.accentor.ui.albums.AlbumViewDropdown
 import me.vanpetegem.accentor.ui.artists.ArtistGrid
 import me.vanpetegem.accentor.ui.artists.ArtistView
 import me.vanpetegem.accentor.ui.home.Home
@@ -78,12 +80,8 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Content(mainViewModel: MainViewModel = viewModel(), playerViewModel: PlayerViewModel = viewModel()) {
-    val scaffoldState = rememberScaffoldState()
-    val scope = rememberCoroutineScope()
+fun Content(mainViewModel: MainViewModel = viewModel()) {
     val navController = rememberNavController()
-    val currentNavigation by navController.currentBackStackEntryAsState()
-    val isPlayerOpen by playerViewModel.isOpen.observeAsState()
 
     val loginState by mainViewModel.loginState.observeAsState()
     val context = LocalContext.current
@@ -102,85 +100,105 @@ fun Content(mainViewModel: MainViewModel = viewModel(), playerViewModel: PlayerV
         }
     }
 
-    PlayerOverlay() {
-        Scaffold(
-            scaffoldState = scaffoldState,
-            drawerContent = {
-                DrawerRow(stringResource(R.string.home), currentNavigation?.destination?.route == "home", R.drawable.ic_menu_home) {
-                    navController.navigate("home")
-                    scope.launch { scaffoldState.drawerState.close() }
-                }
-                DrawerRow(stringResource(R.string.artists), currentNavigation?.destination?.route == "artists", R.drawable.ic_menu_artists) {
-                    navController.navigate("artists")
-                    scope.launch { scaffoldState.drawerState.close() }
-                }
-                DrawerRow(stringResource(R.string.albums), currentNavigation?.destination?.route == "albums", R.drawable.ic_menu_albums) {
-                    navController.navigate("albums")
-                    scope.launch { scaffoldState.drawerState.close() }
-                }
-                Divider()
-                DrawerRow(stringResource(R.string.preferences), false, R.drawable.ic_menu_preferences) {
-                    context.startActivity(Intent(context, PreferencesActivity::class.java))
-                    scope.launch { scaffoldState.drawerState.close() }
-                }
-            },
-            drawerGesturesEnabled = !(isPlayerOpen ?: false),
-            topBar = {
-                TopAppBar(
-                    title = { Text(stringResource(R.string.app_name)) },
-                    navigationIcon = {
-                        IconButton(onClick = { scope.launch { scaffoldState.drawerState.open() } }) {
-                            Icon(Icons.Filled.Menu, contentDescription = stringResource(R.string.open_drawer))
-                        }
-                    },
-                    actions = {
-                        var expanded by remember { mutableStateOf(false) }
-                        Box(modifier = Modifier.height(40.dp).aspectRatio(1f).wrapContentSize(Alignment.TopStart)) {
-                            IconButton(onClick = { expanded = true }) {
-                                Icon(Icons.Default.MoreVert, contentDescription = stringResource(R.string.open_menu))
-                            }
-                            DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-                                DropdownMenuItem(
-                                    onClick = {
-                                        mainViewModel.refresh()
-                                        expanded = false
-                                    }
-                                ) {
-                                    Text(stringResource(R.string.action_refresh))
-                                }
-                                DropdownMenuItem(
-                                    onClick = {
-                                        mainViewModel.logout()
-                                        expanded = false
-                                    }
-                                ) {
-                                    Text(stringResource(R.string.action_sign_out))
-                                }
-                            }
-                        }
-                    }
-                )
-            },
-        ) { _ ->
-            val isRefreshing by mainViewModel.isRefreshing.observeAsState()
-            SwipeRefresh(
-                state = rememberSwipeRefreshState(isRefreshing ?: false),
-                onRefresh = { mainViewModel.refresh() },
-                indicator = { state, trigger -> SwipeRefreshIndicator(state, trigger, contentColor = MaterialTheme.colors.secondary) }
-            ) {
-                NavHost(navController = navController, startDestination = "home") {
-                    composable("home") { Home(navController) }
-                    composable("artists") { ArtistGrid(navController) }
-                    composable("artists/{artistId}", arguments = listOf(navArgument("artistId") { type = NavType.IntType })) { entry ->
-                        ArtistView(entry.arguments!!.getInt("artistId"), navController)
-                    }
-                    composable("albums") { AlbumGrid(navController) }
-                    composable("albums/{albumId}", arguments = listOf(navArgument("albumId") { type = NavType.IntType })) { entry ->
-                        AlbumView(entry.arguments!!.getInt("albumId"))
-                    }
+    PlayerOverlay(navController) {
+        NavHost(navController = navController, startDestination = "home") {
+            composable("home") { Base(navController, mainViewModel) { Home(navController) } }
+            composable("artists") { Base(navController, mainViewModel) { ArtistGrid(navController) } }
+            composable("artists/{artistId}", arguments = listOf(navArgument("artistId") { type = NavType.IntType })) { entry ->
+                Base(navController, mainViewModel) { ArtistView(entry.arguments!!.getInt("artistId"), navController) }
+            }
+            composable("albums") { Base(navController, mainViewModel) { AlbumGrid(navController) } }
+            composable("albums/{albumId}", arguments = listOf(navArgument("albumId") { type = NavType.IntType })) { entry ->
+                Base(navController, mainViewModel, extraDropdownItems = { AlbumViewDropdown(entry.arguments!!.getInt("albumId"), navController, it) }) {
+                    AlbumView(entry.arguments!!.getInt("albumId"), navController)
                 }
             }
         }
+    }
+}
+
+@Composable
+fun Base(
+    navController: NavController,
+    mainViewModel: MainViewModel = viewModel(),
+    playerViewModel: PlayerViewModel = viewModel(),
+    extraDropdownItems: @Composable ((() -> Unit) -> Unit)? = null,
+    mainContent: @Composable (() -> Unit)
+) {
+    val scaffoldState = rememberScaffoldState()
+    val scope = rememberCoroutineScope()
+    val currentNavigation by navController.currentBackStackEntryAsState()
+    val isPlayerOpen by playerViewModel.isOpen.observeAsState()
+    val context = LocalContext.current
+    Scaffold(
+        scaffoldState = scaffoldState,
+        drawerContent = {
+            DrawerRow(stringResource(R.string.home), currentNavigation?.destination?.route == "home", R.drawable.ic_menu_home) {
+                navController.navigate("home")
+                scope.launch { scaffoldState.drawerState.close() }
+            }
+            DrawerRow(stringResource(R.string.artists), currentNavigation?.destination?.route == "artists", R.drawable.ic_menu_artists) {
+                navController.navigate("artists")
+                scope.launch { scaffoldState.drawerState.close() }
+            }
+            DrawerRow(stringResource(R.string.albums), currentNavigation?.destination?.route == "albums", R.drawable.ic_menu_albums) {
+                navController.navigate("albums")
+                scope.launch { scaffoldState.drawerState.close() }
+            }
+            Divider()
+            DrawerRow(stringResource(R.string.preferences), false, R.drawable.ic_menu_preferences) {
+                context.startActivity(Intent(context, PreferencesActivity::class.java))
+                scope.launch { scaffoldState.drawerState.close() }
+            }
+        },
+        drawerGesturesEnabled = !(isPlayerOpen ?: false),
+        topBar = {
+            TopAppBar(
+                title = { Text(stringResource(R.string.app_name)) },
+                navigationIcon = {
+                    IconButton(onClick = { scope.launch { scaffoldState.drawerState.open() } }) {
+                        Icon(Icons.Filled.Menu, contentDescription = stringResource(R.string.open_drawer))
+                    }
+                },
+                actions = {
+                    var expanded by remember { mutableStateOf(false) }
+                    Box(modifier = Modifier.height(40.dp).aspectRatio(1f).wrapContentSize(Alignment.TopStart)) {
+                        IconButton(onClick = { expanded = true }) {
+                            Icon(Icons.Default.MoreVert, contentDescription = stringResource(R.string.open_menu))
+                        }
+                        DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+                            if (extraDropdownItems != null) {
+                                extraDropdownItems { expanded = false }
+                            }
+                            DropdownMenuItem(
+                                onClick = {
+                                    mainViewModel.refresh()
+                                    expanded = false
+                                }
+                            ) {
+                                Text(stringResource(R.string.action_refresh))
+                            }
+                            DropdownMenuItem(
+                                onClick = {
+                                    mainViewModel.logout()
+                                    expanded = false
+                                }
+                            ) {
+                                Text(stringResource(R.string.action_sign_out))
+                            }
+                        }
+                    }
+                }
+            )
+        },
+    ) { _ ->
+        val isRefreshing by mainViewModel.isRefreshing.observeAsState()
+        SwipeRefresh(
+            state = rememberSwipeRefreshState(isRefreshing ?: false),
+            onRefresh = { mainViewModel.refresh() },
+            indicator = { state, trigger -> SwipeRefreshIndicator(state, trigger, contentColor = MaterialTheme.colors.secondary) },
+            content = mainContent,
+        )
     }
 }
 

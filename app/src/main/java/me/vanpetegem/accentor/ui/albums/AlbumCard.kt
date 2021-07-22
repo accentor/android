@@ -45,7 +45,7 @@ import me.vanpetegem.accentor.data.albums.Album
 import me.vanpetegem.accentor.media.MediaSessionConnection
 
 @Composable
-public fun AlbumCard(album: Album, navController: NavController, mediaSessionConnection: MediaSessionConnection = viewModel()) {
+public fun AlbumCard(album: Album, navController: NavController, hideArtist: Int? = null, mediaSessionConnection: MediaSessionConnection = viewModel()) {
     val scope = rememberCoroutineScope()
     Card(modifier = Modifier.padding(8.dp).clickable { navController.navigate("albums/${album.id}") }) {
         Column {
@@ -110,6 +110,18 @@ public fun AlbumCard(album: Album, navController: NavController, mediaSessionCon
                             }
                         ) {
                             Text(stringResource(R.string.play_last))
+                        }
+                        for (aa in album.albumArtists.sortedBy { it.order }) {
+                            if (aa.artistId != hideArtist) {
+                                DropdownMenuItem(
+                                    onClick = {
+                                        expanded = false
+                                        navController.navigate("artists/${aa.artistId}")
+                                    }
+                                ) {
+                                    Text(stringResource(R.string.go_to, aa.name))
+                                }
+                            }
                         }
                     }
                 }

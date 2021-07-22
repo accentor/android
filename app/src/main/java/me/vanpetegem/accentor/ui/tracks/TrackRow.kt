@@ -32,6 +32,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
 import me.vanpetegem.accentor.R
@@ -39,7 +40,13 @@ import me.vanpetegem.accentor.data.tracks.Track
 import me.vanpetegem.accentor.media.MediaSessionConnection
 
 @Composable
-fun TrackRow(track: Track, mediaSessionConnection: MediaSessionConnection = viewModel()) {
+fun TrackRow(
+    track: Track,
+    navController: NavController,
+    hideAlbum: Boolean = false,
+    hideArtist: Int? = null,
+    mediaSessionConnection: MediaSessionConnection = viewModel()
+) {
     val scope = rememberCoroutineScope()
     Row(
         modifier = Modifier.fillMaxWidth().padding(8.dp).clickable {
@@ -82,6 +89,28 @@ fun TrackRow(track: Track, mediaSessionConnection: MediaSessionConnection = view
                     }
                 ) {
                     Text(stringResource(R.string.play_last))
+                }
+                if (!hideAlbum) {
+                    DropdownMenuItem(
+                        onClick = {
+                            expanded = false
+                            navController.navigate("albums/${track.albumId}")
+                        }
+                    ) {
+                        Text(stringResource(R.string.go_to_album))
+                    }
+                }
+                for (ta in track.trackArtists.sortedBy { ta -> ta.order }) {
+                    if (ta.artistId != hideArtist) {
+                        DropdownMenuItem(
+                            onClick = {
+                                expanded = false
+                                navController.navigate("artists/${ta.artistId}")
+                            }
+                        ) {
+                            Text(stringResource(R.string.go_to, ta.name))
+                        }
+                    }
                 }
             }
         }

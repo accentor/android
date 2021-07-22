@@ -59,7 +59,7 @@ fun ArtistView(id: Int, navController: NavController, artistViewModel: ArtistVie
                     LazyRow {
                         items(albums!!.size) { i ->
                             Box(modifier = Modifier.width(192.dp)) {
-                                AlbumCard(albums!![i], navController)
+                                AlbumCard(albums!![i], navController, hideArtist = id)
                             }
                         }
                     }
@@ -69,7 +69,7 @@ fun ArtistView(id: Int, navController: NavController, artistViewModel: ArtistVie
                 item {
                     Text(stringResource(R.string.tracks), style = MaterialTheme.typography.h5, modifier = Modifier.padding(8.dp))
                 }
-                items(tracks!!.size) { i -> TrackRow(tracks!![i]) }
+                items(tracks!!.size) { i -> TrackRow(tracks!![i], navController, hideArtist = id) }
             }
         }
     }
