@@ -4,17 +4,19 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import dagger.hilt.android.lifecycle.HiltViewModel
 import java.net.URI
 import java.net.URISyntaxException
+import javax.inject.Inject
 import me.vanpetegem.accentor.R
-import me.vanpetegem.accentor.data.authentication.AuthenticationDataSource
 import me.vanpetegem.accentor.data.authentication.AuthenticationRepository
 import me.vanpetegem.accentor.util.Result
 
-class LoginViewModel(application: Application) : AndroidViewModel(application) {
-
-    private val repository: AuthenticationRepository = AuthenticationRepository(AuthenticationDataSource(application))
-
+@HiltViewModel
+class LoginViewModel @Inject constructor(
+    application: Application,
+    private val repository: AuthenticationRepository,
+) : AndroidViewModel(application) {
     private val _loginForm = MutableLiveData<LoginFormState>()
     val loginFormState: LiveData<LoginFormState> = _loginForm
 

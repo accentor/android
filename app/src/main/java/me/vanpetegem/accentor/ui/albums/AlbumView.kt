@@ -26,7 +26,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
 import java.time.LocalDate
@@ -41,8 +41,8 @@ import me.vanpetegem.accentor.ui.tracks.TrackRow
 fun AlbumView(
     id: Int,
     navController: NavController,
-    albumViewModel: AlbumViewModel = viewModel(),
-    mediaSessionConnection: MediaSessionConnection = viewModel()
+    albumViewModel: AlbumViewModel = hiltViewModel(),
+    mediaSessionConnection: MediaSessionConnection = hiltViewModel()
 ) {
     val scope = rememberCoroutineScope()
     val albumState by albumViewModel.getAlbum(id).observeAsState()
@@ -106,7 +106,7 @@ fun AlbumView(
 }
 
 @Composable
-fun AlbumViewDropdown(id: Int, navController: NavController, dismiss: (() -> Unit), albumViewModel: AlbumViewModel = viewModel()) {
+fun AlbumViewDropdown(id: Int, navController: NavController, dismiss: (() -> Unit), albumViewModel: AlbumViewModel = hiltViewModel()) {
     val albumState by albumViewModel.getAlbum(id).observeAsState()
     if (albumState != null) {
         val album = albumState!!

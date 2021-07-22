@@ -4,6 +4,8 @@ import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.Observer
+import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
 import me.vanpetegem.accentor.util.intLiveData
 import me.vanpetegem.accentor.util.stringLiveData
 
@@ -13,7 +15,7 @@ const val USER_ID_KEY = "user_id"
 const val DEVICE_ID_KEY = "device_id"
 const val SECRET_KEY = "secret"
 
-class AuthenticationDataSource(context: Context) {
+class AuthenticationDataSource @Inject constructor(@ApplicationContext context: Context) {
     private val sharedPreferences =
         context.getSharedPreferences("me.vanpetegem.accentor.authenticationData", Context.MODE_PRIVATE)
 
@@ -62,6 +64,8 @@ class AuthenticationDataSource(context: Context) {
             addSource(userIdData, observer)
             addSource(deviceIdData, observer)
             addSource(secretData, observer)
+            // If we don't do this, the value will start out as null even if we have data in the prefs.
+            observer.onChanged(null)
         }
     }
 

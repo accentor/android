@@ -5,23 +5,22 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations.map
 import androidx.lifecycle.Transformations.switchMap
-import me.vanpetegem.accentor.data.AccentorDatabase
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import me.vanpetegem.accentor.data.albums.Album
 import me.vanpetegem.accentor.data.albums.AlbumRepository
 import me.vanpetegem.accentor.data.artists.Artist
 import me.vanpetegem.accentor.data.artists.ArtistRepository
-import me.vanpetegem.accentor.data.authentication.AuthenticationDataSource
-import me.vanpetegem.accentor.data.authentication.AuthenticationRepository
 import me.vanpetegem.accentor.data.tracks.Track
 import me.vanpetegem.accentor.data.tracks.TrackRepository
 
-class ArtistViewModel(application: Application) : AndroidViewModel(application) {
-    private val database = AccentorDatabase.getDatabase(application)
-    private val authenticationRepository = AuthenticationRepository(AuthenticationDataSource(application))
-    private val artistRepository = ArtistRepository(database.artistDao(), authenticationRepository)
-    private val albumRepository = AlbumRepository(database.albumDao(), authenticationRepository)
-    private val trackRepository = TrackRepository(database.trackDao(), authenticationRepository)
-
+@HiltViewModel
+class ArtistViewModel @Inject constructor(
+    application: Application,
+    private val artistRepository: ArtistRepository,
+    private val albumRepository: AlbumRepository,
+    private val trackRepository: TrackRepository,
+) : AndroidViewModel(application) {
     fun getArtist(id: Int): LiveData<Artist> = map(artistRepository.allArtistsById) { artists ->
         artists[id]
     }

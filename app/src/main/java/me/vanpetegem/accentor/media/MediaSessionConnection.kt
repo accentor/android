@@ -15,19 +15,20 @@ import androidx.media2.session.MediaController
 import androidx.media2.session.SessionCommand
 import androidx.media2.session.SessionCommandGroup
 import androidx.media2.session.SessionToken
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.guava.await
-import me.vanpetegem.accentor.data.AccentorDatabase
 import me.vanpetegem.accentor.data.albums.Album
 import me.vanpetegem.accentor.data.albums.AlbumRepository
-import me.vanpetegem.accentor.data.authentication.AuthenticationDataSource
-import me.vanpetegem.accentor.data.authentication.AuthenticationRepository
 import me.vanpetegem.accentor.data.tracks.Track
 import me.vanpetegem.accentor.data.tracks.TrackRepository
 
-class MediaSessionConnection(application: Application) : AndroidViewModel(application) {
-
-    private val authenticationDataSource = AuthenticationDataSource(application)
-
+@HiltViewModel
+class MediaSessionConnection @Inject constructor(
+    application: Application,
+    private val albumRepository: AlbumRepository,
+    private val trackRepository: TrackRepository,
+) : AndroidViewModel(application) {
     private val mediaController: MediaController = MediaController.Builder(application)
         .setSessionToken(SessionToken(application, ComponentName(application, MusicService::class.java)))
         .setControllerCallback(
@@ -127,7 +128,19 @@ class MediaSessionConnection(application: Application) : AndroidViewModel(applic
 
     private val _queue = MutableLiveData<List<MediaItem>>().apply { postValue(ArrayList()) }
     private val _queueIds: LiveData<List<Int>> = map(_queue) { it.map { item -> item.metadata?.mediaId!!.toInt() } }
-    val queue: LiveData<List<Triple<Boolean, Track?, Album?>>>
+    val queue: LiveData<List<Triple<Boolean, Track?, Album?>>> = switchMap(_queueIds) { q ->
+        switchMap(queuePosition) { qPos ->
+            switchMap(trackRepository.findByIds(q)) { tracks ->
+                map(albumRepository.findByIds(tracks.map { it.albumId })) { albums ->
+                    q.mapIndexed { pos, id ->
+                        val track = tracks.find { it.id == id }
+                        val album = albums.find { it.id == track?.albumId }
+                        Triple(qPos == pos + 1, track, album)
+                    }
+                }
+            }
+        }
+    }
 
     val _queuePosition: MutableLiveData<Int> = MutableLiveData<Int>().apply {
         postValue(0)
@@ -138,30 +151,6 @@ class MediaSessionConnection(application: Application) : AndroidViewModel(applic
     val queuePosStr: LiveData<String> = switchMap(_queue) { q ->
         map(queuePosition) {
             "$it/${q.size}"
-        }
-    }
-
-    private val albumRepository: AlbumRepository
-    private val trackRepository: TrackRepository
-
-    init {
-        val database = AccentorDatabase.getDatabase(application)
-        val trackDao = database.trackDao()
-        val albumDao = database.albumDao()
-        albumRepository = AlbumRepository(albumDao, AuthenticationRepository(authenticationDataSource))
-        trackRepository = TrackRepository(trackDao, AuthenticationRepository(authenticationDataSource))
-        queue = switchMap(_queueIds) { q ->
-            switchMap(queuePosition) { qPos ->
-                switchMap(trackRepository.findByIds(q)) { tracks ->
-                    map(albumRepository.findByIds(tracks.map { it.albumId })) { albums ->
-                        q.mapIndexed { pos, id ->
-                            val track = tracks.find { it.id == id }
-                            val album = albums.find { it.id == track?.albumId }
-                            Triple(qPos == pos + 1, track, album)
-                        }
-                    }
-                }
-            }
         }
     }
 

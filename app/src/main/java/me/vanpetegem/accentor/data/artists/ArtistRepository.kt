@@ -3,11 +3,14 @@ package me.vanpetegem.accentor.data.artists
 import android.util.SparseArray
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations.map
+import dagger.Reusable
+import javax.inject.Inject
 import me.vanpetegem.accentor.api.artist.index
 import me.vanpetegem.accentor.data.authentication.AuthenticationRepository
 import me.vanpetegem.accentor.util.Result
 
-class ArtistRepository(
+@Reusable
+class ArtistRepository @Inject constructor(
     private val artistDao: ArtistDao,
     private val authenticationRepository: AuthenticationRepository
 ) {

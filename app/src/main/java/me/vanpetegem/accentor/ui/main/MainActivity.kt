@@ -54,6 +54,7 @@ import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.SwipeRefreshIndicator
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import me.vanpetegem.accentor.R
 import me.vanpetegem.accentor.ui.AccentorTheme
@@ -68,6 +69,7 @@ import me.vanpetegem.accentor.ui.player.PlayerOverlay
 import me.vanpetegem.accentor.ui.player.PlayerViewModel
 import me.vanpetegem.accentor.ui.preferences.PreferencesActivity
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

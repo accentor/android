@@ -31,7 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
@@ -45,7 +45,7 @@ fun TrackRow(
     navController: NavController,
     hideAlbum: Boolean = false,
     hideArtist: Int? = null,
-    mediaSessionConnection: MediaSessionConnection = viewModel()
+    mediaSessionConnection: MediaSessionConnection = hiltViewModel()
 ) {
     val scope = rememberCoroutineScope()
     Row(
