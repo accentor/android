@@ -3,12 +3,14 @@ package me.vanpetegem.accentor.data.albums
 import android.util.SparseArray
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations.map
+import dagger.Reusable
 import java.time.LocalDate
 import javax.inject.Inject
 import me.vanpetegem.accentor.api.album.index
 import me.vanpetegem.accentor.data.authentication.AuthenticationRepository
 import me.vanpetegem.accentor.util.Result
 
+@Reusable
 class AlbumRepository @Inject constructor(
     private val albumDao: AlbumDao,
     private val authenticationRepository: AuthenticationRepository

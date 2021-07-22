@@ -1,6 +1,7 @@
 package me.vanpetegem.accentor.data.tracks
 
 import androidx.lifecycle.LiveData
+import dagger.Reusable
 import javax.inject.Inject
 import me.vanpetegem.accentor.api.track.index
 import me.vanpetegem.accentor.data.albums.Album
@@ -8,6 +9,7 @@ import me.vanpetegem.accentor.data.artists.Artist
 import me.vanpetegem.accentor.data.authentication.AuthenticationRepository
 import me.vanpetegem.accentor.util.Result
 
+@Reusable
 class TrackRepository @Inject constructor(
     private val trackDao: TrackDao,
     private val authenticationRepository: AuthenticationRepository
