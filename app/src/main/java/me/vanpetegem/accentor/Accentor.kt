@@ -7,12 +7,17 @@ import coil.ImageLoaderFactory
 import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
 import com.github.kittinunf.fuel.core.FuelManager
+import dagger.hilt.android.HiltAndroidApp
 import java.io.File
+import javax.inject.Inject
 import me.vanpetegem.accentor.data.preferences.PreferencesDataSource
 import okhttp3.Cache
 import okhttp3.OkHttpClient
 
+@HiltAndroidApp
 class Accentor : Application(), ImageLoaderFactory {
+    @Inject lateinit var preferences: PreferencesDataSource
+
     override fun onCreate() {
         super.onCreate()
         version = applicationContext.packageManager.getPackageInfo(packageName, 0).versionName
@@ -21,7 +26,6 @@ class Accentor : Application(), ImageLoaderFactory {
     }
 
     override fun newImageLoader(): ImageLoader {
-        val preferences = PreferencesDataSource(applicationContext)
         return ImageLoader.Builder(applicationContext)
             .okHttpClient {
                 OkHttpClient.Builder()

@@ -2,6 +2,7 @@ plugins {
     id('com.android.application')
     id('kotlin-android')
     id('kotlin-kapt')
+    id('dagger.hilt.android.plugin')
     id('org.jlleitschuh.gradle.ktlint')
 }
 
@@ -104,6 +105,11 @@ dependencies {
 
     // AndroidX Compose SwipeRefresh
     implementation "com.google.accompanist:accompanist-swiperefresh:0.14.0"
+
+    // AndroidX Hilt (dependency injection)
+    implementation "com.google.dagger:hilt-android:$hilt_version"
+    kapt "com.google.dagger:hilt-compiler:$hilt_version"
+    implementation "androidx.hilt:hilt-navigation-compose:1.0.0-alpha03"
 
     // Coil (image loading)
     implementation("io.coil-kt:coil:$coil_version")

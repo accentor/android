@@ -4,19 +4,18 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import dagger.hilt.android.lifecycle.HiltViewModel
 import java.time.LocalDate
-import me.vanpetegem.accentor.data.AccentorDatabase
+import javax.inject.Inject
 import me.vanpetegem.accentor.data.albums.AlbumRepository
 import me.vanpetegem.accentor.data.artists.ArtistRepository
-import me.vanpetegem.accentor.data.authentication.AuthenticationDataSource
-import me.vanpetegem.accentor.data.authentication.AuthenticationRepository
 
-class HomeViewModel(application: Application) : AndroidViewModel(application) {
-    private val authenticationRepository = AuthenticationRepository(AuthenticationDataSource(application))
-    private val database = AccentorDatabase.getDatabase(application)
-    private val albumRepository = AlbumRepository(database.albumDao(), authenticationRepository)
-    private val artistRepository = ArtistRepository(database.artistDao(), authenticationRepository)
-
+@HiltViewModel
+class HomeViewModel @Inject constructor(
+    application: Application,
+    private val albumRepository: AlbumRepository,
+    private val artistRepository: ArtistRepository,
+) : AndroidViewModel(application) {
     private val _currentDay = MutableLiveData<LocalDate>(LocalDate.now())
 
     val recentlyReleasedAlbums = albumRepository.albumsByReleased

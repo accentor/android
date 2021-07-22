@@ -27,27 +27,33 @@ import com.google.android.exoplayer2.upstream.DefaultHttpDataSource
 import com.google.android.exoplayer2.upstream.cache.CacheDataSource
 import com.google.android.exoplayer2.upstream.cache.LeastRecentlyUsedCacheEvictor
 import com.google.android.exoplayer2.upstream.cache.SimpleCache
+import dagger.hilt.android.AndroidEntryPoint
 import java.io.File
 import java.util.concurrent.Executors
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import me.vanpetegem.accentor.R
-import me.vanpetegem.accentor.data.AccentorDatabase
 import me.vanpetegem.accentor.data.albums.Album
+import me.vanpetegem.accentor.data.albums.AlbumDao
 import me.vanpetegem.accentor.data.authentication.AuthenticationDataSource
 import me.vanpetegem.accentor.data.codecconversions.CodecConversionDao
 import me.vanpetegem.accentor.data.preferences.PreferencesDataSource
 import me.vanpetegem.accentor.data.tracks.Track
+import me.vanpetegem.accentor.data.tracks.TrackDao
 import me.vanpetegem.accentor.userAgent
 
+@AndroidEntryPoint
 class MusicService : MediaSessionService() {
     private val mainScope = MainScope()
 
-    private lateinit var authenticationDataSource: AuthenticationDataSource
-    private lateinit var preferencesDataSource: PreferencesDataSource
-    private lateinit var codecConversionDao: CodecConversionDao
+    @Inject lateinit var authenticationDataSource: AuthenticationDataSource
+    @Inject lateinit var preferencesDataSource: PreferencesDataSource
+    @Inject lateinit var codecConversionDao: CodecConversionDao
+    @Inject lateinit var trackDao: TrackDao
+    @Inject lateinit var albumDao: AlbumDao
 
     private lateinit var notificationManager: NotificationManagerCompat
     private lateinit var notificationBuilder: NotificationBuilder
@@ -94,13 +100,6 @@ class MusicService : MediaSessionService() {
 
     override fun onCreate() {
         super.onCreate()
-
-        authenticationDataSource = AuthenticationDataSource(application)
-        preferencesDataSource = PreferencesDataSource(application)
-        val database = AccentorDatabase.getDatabase(application)
-        val trackDao = database.trackDao()
-        val albumDao = database.albumDao()
-        codecConversionDao = database.codecConversionDao()
 
         sessionPlayerConnector = SessionPlayerConnector(exoPlayer)
         sessionCallback = SessionCallbackBuilder(baseContext, sessionPlayerConnector).setMediaItemProvider(

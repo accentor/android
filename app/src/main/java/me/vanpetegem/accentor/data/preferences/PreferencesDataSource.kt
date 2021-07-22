@@ -2,6 +2,8 @@ package me.vanpetegem.accentor.data.preferences
 
 import android.content.Context
 import androidx.lifecycle.LiveData
+import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
 import me.vanpetegem.accentor.util.intLiveData
 import me.vanpetegem.accentor.util.longLiveData
 
@@ -9,7 +11,7 @@ const val CONVERSION_ID_KEY = "conversion_id"
 const val IMAGE_CACHE_SIZE_KEY = "image_cache_size"
 const val MUSIC_CACHE_SIZE_KEY = "music_cache_size"
 
-class PreferencesDataSource(context: Context) {
+class PreferencesDataSource @Inject constructor(@ApplicationContext private val context: Context) {
     private val sharedPreferences = context.getSharedPreferences("me.vanpetegem.accentor.preferences", Context.MODE_PRIVATE)
 
     private val conversionIdData = sharedPreferences.intLiveData(CONVERSION_ID_KEY)

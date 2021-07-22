@@ -2,13 +2,14 @@ package me.vanpetegem.accentor.data.authentication
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.withContext
 import me.vanpetegem.accentor.api.auth.create
 import me.vanpetegem.accentor.api.auth.destroy
 import me.vanpetegem.accentor.util.Result
 
-class AuthenticationRepository(
+class AuthenticationRepository @Inject constructor(
     private val prefsSource: AuthenticationDataSource
 ) {
     val authData: LiveData<AuthenticationData> = prefsSource.authData

@@ -4,11 +4,12 @@ import android.util.SparseArray
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations.map
 import androidx.lifecycle.Transformations.switchMap
+import javax.inject.Inject
 import me.vanpetegem.accentor.api.user.index
 import me.vanpetegem.accentor.data.authentication.AuthenticationRepository
 import me.vanpetegem.accentor.util.Result
 
-class UserRepository(
+class UserRepository @Inject constructor(
     private val userDao: UserDao,
     private val authenticationRepository: AuthenticationRepository
 ) {

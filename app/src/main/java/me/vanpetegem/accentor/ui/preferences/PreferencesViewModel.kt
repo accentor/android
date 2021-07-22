@@ -5,8 +5,8 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations.map
 import androidx.lifecycle.Transformations.switchMap
-import me.vanpetegem.accentor.data.AccentorDatabase
-import me.vanpetegem.accentor.data.authentication.AuthenticationDataSource
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import me.vanpetegem.accentor.data.authentication.AuthenticationRepository
 import me.vanpetegem.accentor.data.codecconversions.CodecConversion
 import me.vanpetegem.accentor.data.codecconversions.CodecConversionRepository
@@ -14,13 +14,14 @@ import me.vanpetegem.accentor.data.preferences.PreferencesDataSource
 import me.vanpetegem.accentor.data.users.User
 import me.vanpetegem.accentor.data.users.UserRepository
 
-class PreferencesViewModel(application: Application) : AndroidViewModel(application) {
-    private val database = AccentorDatabase.getDatabase(application)
-    private val authenticationRepository = AuthenticationRepository(AuthenticationDataSource(application))
-    private val userRepository = UserRepository(database.userDao(), authenticationRepository)
-    private val preferencesDataSource = PreferencesDataSource(application)
-    private val codecConversionRepository = CodecConversionRepository(database.codecConversionDao(), authenticationRepository)
-
+@HiltViewModel
+class PreferencesViewModel @Inject constructor(
+    application: Application,
+    private val preferencesDataSource: PreferencesDataSource,
+    private val userRepository: UserRepository,
+    private val authenticationRepository: AuthenticationRepository,
+    private val codecConversionRepository: CodecConversionRepository,
+) : AndroidViewModel(application) {
     private val conversionId: LiveData<Int> = preferencesDataSource.conversionId
 
     val currentUser: LiveData<User?> = userRepository.currentUser

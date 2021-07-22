@@ -3,11 +3,12 @@ package me.vanpetegem.accentor.data.codecconversions
 import android.util.SparseArray
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations.map
+import javax.inject.Inject
 import me.vanpetegem.accentor.api.codecconversion.index
 import me.vanpetegem.accentor.data.authentication.AuthenticationRepository
 import me.vanpetegem.accentor.util.Result
 
-class CodecConversionRepository(
+class CodecConversionRepository @Inject constructor(
     private val codecConversionDao: CodecConversionDao,
     private val authenticationRepository: AuthenticationRepository
 ) {
