@@ -4,7 +4,6 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
-import androidx.core.graphics.drawable.toBitmap
 import androidx.media2.common.MediaItem
 import androidx.media2.common.MediaMetadata
 import androidx.media2.common.SessionPlayer
@@ -13,10 +12,6 @@ import androidx.media2.session.MediaSessionService
 import androidx.media2.session.SessionCommand
 import androidx.media2.session.SessionCommandGroup
 import androidx.media2.session.SessionResult
-import coil.executeBlocking
-import coil.imageLoader
-import coil.request.CachePolicy
-import coil.request.ImageRequest
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.SimpleExoPlayer
@@ -34,6 +29,7 @@ import com.google.android.exoplayer2.upstream.cache.LeastRecentlyUsedCacheEvicto
 import com.google.android.exoplayer2.upstream.cache.SimpleCache
 import java.io.File
 import java.util.concurrent.Executors
+import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
@@ -215,50 +211,42 @@ class MusicService : MediaSessionService() {
         builder.putString(MediaMetadata.METADATA_KEY_MEDIA_URI, mediaUri)
         builder.putString(MediaMetadata.METADATA_KEY_MEDIA_ID, track.id.toString())
 
-        if (album.image500 != null) {
-            val bitmap = (this@MusicService).imageLoader.executeBlocking(
-                ImageRequest.Builder(this@MusicService).data(album.image500).networkCachePolicy(CachePolicy.DISABLED).build()
-            ).drawable?.toBitmap()
-            if (bitmap != null) {
-                builder.putBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART, bitmap)
-                builder.putBitmap(MediaMetadata.METADATA_KEY_ART, bitmap)
-            }
-        }
-
         return MediaItem.Builder().setMetadata(builder.build()).build()
     }
 
     override fun onGetSession(info: MediaSession.ControllerInfo): MediaSession? = mediaSession
 
     override fun onUpdateNotification(session: MediaSession): MediaSessionService.MediaNotification? {
-        val notification = if (session.player.currentMediaItem?.metadata != null) {
-            notificationBuilder.buildNotification(session)
-        } else { null }
+        mainScope.launch(IO) {
+            val notification = if (session.player.currentMediaItem?.metadata != null) {
+                notificationBuilder.buildNotification(session)
+            } else { null }
 
-        when (session.player.playerState) {
-            SessionPlayer.PLAYER_STATE_PLAYING -> {
-                if (notification != null) {
-                    notificationManager.notify(NOW_PLAYING_NOTIFICATION, notification)
-                    if (!isForegroudService) {
-                        ContextCompat.startForegroundService(application, Intent(application, this.javaClass))
-                        startForeground(NOW_PLAYING_NOTIFICATION, notification)
-                        isForegroudService = true
-                    }
-                }
-            }
-            else -> {
-                if (isForegroudService) {
-                    stopForeground(false)
-                    isForegroudService = false
-
-                    if (session.player.playerState == SessionPlayer.PLAYER_STATE_IDLE) {
-                        stopSelf()
-                    }
-
+            when (session.player.playerState) {
+                SessionPlayer.PLAYER_STATE_PLAYING -> {
                     if (notification != null) {
                         notificationManager.notify(NOW_PLAYING_NOTIFICATION, notification)
-                    } else {
-                        notificationManager.cancel(NOW_PLAYING_NOTIFICATION)
+                        if (!isForegroudService) {
+                            ContextCompat.startForegroundService(application, Intent(application, this.javaClass))
+                            startForeground(NOW_PLAYING_NOTIFICATION, notification)
+                            isForegroudService = true
+                        }
+                    }
+                }
+                else -> {
+                    if (isForegroudService) {
+                        stopForeground(false)
+                        isForegroudService = false
+
+                        if (session.player.playerState == SessionPlayer.PLAYER_STATE_IDLE) {
+                            stopSelf()
+                        }
+
+                        if (notification != null) {
+                            notificationManager.notify(NOW_PLAYING_NOTIFICATION, notification)
+                        } else {
+                            notificationManager.cancel(NOW_PLAYING_NOTIFICATION)
+                        }
                     }
                 }
             }

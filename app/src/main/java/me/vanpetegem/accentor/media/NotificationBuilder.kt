@@ -10,10 +10,13 @@ import android.content.Intent
 import android.support.v4.media.session.PlaybackStateCompat
 import android.view.KeyEvent
 import androidx.core.app.NotificationCompat
+import androidx.core.graphics.drawable.toBitmap
 import androidx.media.app.NotificationCompat.MediaStyle
 import androidx.media2.common.MediaMetadata
 import androidx.media2.common.SessionPlayer
 import androidx.media2.session.MediaSession
+import coil.imageLoader
+import coil.request.ImageRequest
 import me.vanpetegem.accentor.R
 import me.vanpetegem.accentor.ui.main.MainActivity
 
@@ -50,7 +53,7 @@ class NotificationBuilder(private val context: Context) {
     private val stopPendingIntent =
         createPendingIntent(PlaybackStateCompat.ACTION_STOP)
 
-    fun buildNotification(session: MediaSession): Notification {
+    suspend fun buildNotification(session: MediaSession): Notification {
         if (shouldCreateNowPlayingChannel()) {
             createNowPlayingChannel()
         }
@@ -77,11 +80,15 @@ class NotificationBuilder(private val context: Context) {
         val openIntent = Intent(context, MainActivity::class.java)
         val pendingIntent = PendingIntent.getActivity(context, 0, openIntent, 0)
 
+        val bitmap = metadata?.getString(MediaMetadata.METADATA_KEY_ALBUM_ART_URI)?.let {
+            context.imageLoader.execute(ImageRequest.Builder(context).data(it).build()).drawable?.toBitmap()
+        }
+
         return builder.setContentIntent(pendingIntent)
             .setContentTitle(metadata?.getString(MediaMetadata.METADATA_KEY_TITLE))
             .setContentText(metadata?.getString(MediaMetadata.METADATA_KEY_ARTIST))
             .setDeleteIntent(stopPendingIntent)
-            .setLargeIcon(metadata?.getBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART))
+            .setLargeIcon(bitmap)
             .setOnlyAlertOnce(true)
             .setSmallIcon(R.drawable.ic_notification)
             .setStyle(mediaStyle)
