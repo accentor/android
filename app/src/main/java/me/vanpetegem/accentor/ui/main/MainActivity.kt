@@ -81,6 +81,7 @@ import me.vanpetegem.accentor.ui.albums.AlbumViewDropdown
 import me.vanpetegem.accentor.ui.artists.ArtistGrid
 import me.vanpetegem.accentor.ui.artists.ArtistToolbar
 import me.vanpetegem.accentor.ui.artists.ArtistView
+import me.vanpetegem.accentor.ui.devices.Devices
 import me.vanpetegem.accentor.ui.home.Home
 import me.vanpetegem.accentor.ui.login.LoginActivity
 import me.vanpetegem.accentor.ui.player.PlayerOverlay
@@ -154,6 +155,7 @@ fun Content(mainViewModel: MainViewModel = viewModel(), playerViewModel: PlayerV
                     AlbumView(entry.arguments!!.getInt("albumId"), navController, playerViewModel)
                 }
             }
+            composable("devices") { Base(navController, mainViewModel) { Devices() } }
         }
     }
 }
@@ -184,6 +186,10 @@ fun Base(
             }
             DrawerRow(stringResource(R.string.albums), currentNavigation?.destination?.route == "albums", R.drawable.ic_menu_albums) {
                 navController.navigate("albums")
+                scope.launch { scaffoldState.drawerState.close() }
+            }
+            DrawerRow(stringResource(R.string.devices), currentNavigation?.destination?.route == "devices", R.drawable.ic_menu_devices) {
+                navController.navigate("devices")
                 scope.launch { scaffoldState.drawerState.close() }
             }
             Divider()
