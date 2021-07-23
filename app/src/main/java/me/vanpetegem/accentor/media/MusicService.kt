@@ -14,6 +14,7 @@ import androidx.media2.session.SessionCommandGroup
 import androidx.media2.session.SessionResult
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.ExoPlayer
+import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.audio.AudioAttributes
 import com.google.android.exoplayer2.database.ExoDatabaseProvider
@@ -29,6 +30,7 @@ import com.google.android.exoplayer2.upstream.cache.LeastRecentlyUsedCacheEvicto
 import com.google.android.exoplayer2.upstream.cache.SimpleCache
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.File
+import java.time.Instant
 import java.util.concurrent.Executors
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers.IO
@@ -37,12 +39,13 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import me.vanpetegem.accentor.R
 import me.vanpetegem.accentor.data.albums.Album
-import me.vanpetegem.accentor.data.albums.AlbumDao
+import me.vanpetegem.accentor.data.albums.AlbumRepository
 import me.vanpetegem.accentor.data.authentication.AuthenticationDataSource
-import me.vanpetegem.accentor.data.codecconversions.CodecConversionDao
+import me.vanpetegem.accentor.data.codecconversions.CodecConversionRepository
+import me.vanpetegem.accentor.data.plays.PlayRepository
 import me.vanpetegem.accentor.data.preferences.PreferencesDataSource
 import me.vanpetegem.accentor.data.tracks.Track
-import me.vanpetegem.accentor.data.tracks.TrackDao
+import me.vanpetegem.accentor.data.tracks.TrackRepository
 import me.vanpetegem.accentor.userAgent
 
 @AndroidEntryPoint
@@ -51,9 +54,10 @@ class MusicService : MediaSessionService() {
 
     @Inject lateinit var authenticationDataSource: AuthenticationDataSource
     @Inject lateinit var preferencesDataSource: PreferencesDataSource
-    @Inject lateinit var codecConversionDao: CodecConversionDao
-    @Inject lateinit var trackDao: TrackDao
-    @Inject lateinit var albumDao: AlbumDao
+    @Inject lateinit var codecConversionRepository: CodecConversionRepository
+    @Inject lateinit var trackRepository: TrackRepository
+    @Inject lateinit var albumRepository: AlbumRepository
+    @Inject lateinit var playRepository: PlayRepository
 
     private lateinit var notificationManager: NotificationManagerCompat
     private lateinit var notificationBuilder: NotificationBuilder
@@ -95,6 +99,30 @@ class MusicService : MediaSessionService() {
             setHandleAudioBecomingNoisy(true)
         }.build().apply {
             setAudioAttributes(accentorAudioAttributes, true)
+            addListener(object : Player.Listener {
+                private var trackId: Int? = null
+
+                override fun onMediaItemTransition(item: com.google.android.exoplayer2.MediaItem?, reason: Int) {
+                    trackId = item?.mediaId?.toInt()
+                }
+
+                override fun onPositionDiscontinuity(old: Player.PositionInfo, new: Player.PositionInfo, reason: Int) {
+                    if (trackId != null && reason == Player.DISCONTINUITY_REASON_AUTO_TRANSITION) {
+                        reportPlay()
+                    }
+                }
+
+                override fun onPlaybackStateChanged(state: Int) {
+                    if (trackId != null && state == Player.STATE_ENDED) {
+                        reportPlay()
+                    }
+                }
+
+                private fun reportPlay() {
+                    val savedTrackId = trackId!!
+                    mainScope.launch(IO) { playRepository.reportPlay(savedTrackId, Instant.now()) }
+                }
+            })
         }
     }
 
@@ -109,8 +137,8 @@ class MusicService : MediaSessionService() {
                     info: MediaSession.ControllerInfo,
                     mediaId: String
                 ): MediaItem? {
-                    val track = trackDao.getTrackById(mediaId.toInt())
-                    val album = track?.let { albumDao.getAlbumById(it.albumId) }
+                    val track = trackRepository.getById(mediaId.toInt())
+                    val album = track?.let { albumRepository.getById(it.albumId) }
                     return track?.let { t -> album?.let { a -> convertTrack(t, a) } }
                 }
             }
@@ -181,8 +209,8 @@ class MusicService : MediaSessionService() {
 
     private fun convertTrack(track: Track, album: Album): MediaItem {
         val conversionId = preferencesDataSource.conversionId.value
-        val firstConversion by lazy { codecConversionDao.getFirstCodecConversion() }
-        val conversionParam = if (conversionId != null && codecConversionDao.getCodecConversionById(conversionId) != null) {
+        val firstConversion by lazy { codecConversionRepository.getFirst() }
+        val conversionParam = if (conversionId != null && codecConversionRepository.getById(conversionId) != null) {
             "&codec_conversion_id=$conversionId"
         } else if (firstConversion != null) {
             "&codec_conversion_id=${firstConversion!!.id}"

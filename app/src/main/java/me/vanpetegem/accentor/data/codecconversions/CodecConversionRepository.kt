@@ -19,6 +19,9 @@ class CodecConversionRepository @Inject constructor(
         map
     }
 
+    fun getFirst(): CodecConversion? = codecConversionDao.getFirstCodecConversion()
+    fun getById(id: Int): CodecConversion? = codecConversionDao.getCodecConversionById(id)
+
     suspend fun refresh(handler: suspend (Result<Unit>) -> Unit) {
         when (val result = index(authenticationRepository.server.value!!, authenticationRepository.authData.value!!)) {
             is Result.Success -> {
