@@ -50,8 +50,9 @@ import me.vanpetegem.accentor.util.formatTrackLength
 
 @Composable
 fun Queue(navController: NavController, closePlayer: (() -> Unit), mediaSessionConnection: MediaSessionConnection = viewModel()) {
-    val state = rememberLazyListState()
     val queue by mediaSessionConnection.queue.observeAsState()
+    val queuePosition by mediaSessionConnection.queuePosition.observeAsState()
+    val state = rememberLazyListState((queuePosition ?: 1) - 1)
     LazyColumn(state = state) {
         items(queue?.size ?: 0, key = { Pair(it, queue!![it].second?.id) }) { i ->
             QueueItem(mediaSessionConnection, navController, i, queue!![i], closePlayer)
