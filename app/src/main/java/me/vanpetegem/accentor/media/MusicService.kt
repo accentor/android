@@ -37,12 +37,12 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import me.vanpetegem.accentor.R
 import me.vanpetegem.accentor.data.albums.Album
-import me.vanpetegem.accentor.data.albums.AlbumDao
+import me.vanpetegem.accentor.data.albums.AlbumRepository
 import me.vanpetegem.accentor.data.authentication.AuthenticationDataSource
-import me.vanpetegem.accentor.data.codecconversions.CodecConversionDao
+import me.vanpetegem.accentor.data.codecconversions.CodecConversionRepository
 import me.vanpetegem.accentor.data.preferences.PreferencesDataSource
 import me.vanpetegem.accentor.data.tracks.Track
-import me.vanpetegem.accentor.data.tracks.TrackDao
+import me.vanpetegem.accentor.data.tracks.TrackRepository
 import me.vanpetegem.accentor.userAgent
 
 @AndroidEntryPoint
@@ -51,9 +51,9 @@ class MusicService : MediaSessionService() {
 
     @Inject lateinit var authenticationDataSource: AuthenticationDataSource
     @Inject lateinit var preferencesDataSource: PreferencesDataSource
-    @Inject lateinit var codecConversionDao: CodecConversionDao
-    @Inject lateinit var trackDao: TrackDao
-    @Inject lateinit var albumDao: AlbumDao
+    @Inject lateinit var codecConversionRepository: CodecConversionRepository
+    @Inject lateinit var trackRepository: TrackRepository
+    @Inject lateinit var albumRepository: AlbumRepository
 
     private lateinit var notificationManager: NotificationManagerCompat
     private lateinit var notificationBuilder: NotificationBuilder
@@ -109,8 +109,8 @@ class MusicService : MediaSessionService() {
                     info: MediaSession.ControllerInfo,
                     mediaId: String
                 ): MediaItem? {
-                    val track = trackDao.getTrackById(mediaId.toInt())
-                    val album = track?.let { albumDao.getAlbumById(it.albumId) }
+                    val track = trackRepository.getById(mediaId.toInt())
+                    val album = track?.let { albumRepository.getById(it.albumId) }
                     return track?.let { t -> album?.let { a -> convertTrack(t, a) } }
                 }
             }
@@ -181,8 +181,8 @@ class MusicService : MediaSessionService() {
 
     private fun convertTrack(track: Track, album: Album): MediaItem {
         val conversionId = preferencesDataSource.conversionId.value
-        val firstConversion by lazy { codecConversionDao.getFirstCodecConversion() }
-        val conversionParam = if (conversionId != null && codecConversionDao.getCodecConversionById(conversionId) != null) {
+        val firstConversion by lazy { codecConversionRepository.getFirst() }
+        val conversionParam = if (conversionId != null && codecConversionRepository.getById(conversionId) != null) {
             "&codec_conversion_id=$conversionId"
         } else if (firstConversion != null) {
             "&codec_conversion_id=${firstConversion!!.id}"

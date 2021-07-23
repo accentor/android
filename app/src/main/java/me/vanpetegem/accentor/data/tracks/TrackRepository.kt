@@ -15,6 +15,7 @@ class TrackRepository @Inject constructor(
     private val authenticationRepository: AuthenticationRepository
 ) {
     fun findById(id: Int): LiveData<Track?> = trackDao.findById(id)
+    fun getById(id: Int): Track? = trackDao.getTrackById(id)
     fun findByIds(ids: List<Int>): LiveData<List<Track>> = trackDao.findByIds(ids)
     fun findByArtist(artist: Artist): LiveData<List<Track>> = trackDao.findByArtist(artist)
     fun findByAlbum(album: Album): LiveData<List<Track>> = trackDao.findByAlbum(album)
