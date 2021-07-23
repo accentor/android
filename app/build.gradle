@@ -131,6 +131,12 @@ dependencies {
     // Material
     implementation 'com.google.android.material:material:1.4.0'
 
+    // Cling (UPnP/DLNA)
+    implementation "org.fourthline.cling:cling-core:2.1.2"
+    implementation "org.eclipse.jetty:jetty-servlet:8.2.0.v20160908"
+    implementation "org.eclipse.jetty:jetty-client:8.2.0.v20160908"
+    implementation "org.slf4j:slf4j-android:1.7.32"
+
     // Tests
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test:runner:1.4.0'

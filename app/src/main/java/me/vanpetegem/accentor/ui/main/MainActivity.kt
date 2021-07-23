@@ -1,8 +1,12 @@
 package me.vanpetegem.accentor.ui.main
 
 import android.app.Activity
+import android.content.ComponentName
+import android.content.Context
 import android.content.Intent
+import android.content.ServiceConnection
 import android.os.Bundle
+import android.os.IBinder
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
@@ -49,6 +53,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -73,6 +78,9 @@ import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import me.vanpetegem.accentor.R
+import me.vanpetegem.accentor.devices.Device
+import me.vanpetegem.accentor.devices.DeviceRegistryListener
+import me.vanpetegem.accentor.devices.DeviceService
 import me.vanpetegem.accentor.ui.AccentorTheme
 import me.vanpetegem.accentor.ui.albums.AlbumGrid
 import me.vanpetegem.accentor.ui.albums.AlbumToolbar
@@ -87,21 +95,53 @@ import me.vanpetegem.accentor.ui.login.LoginActivity
 import me.vanpetegem.accentor.ui.player.PlayerOverlay
 import me.vanpetegem.accentor.ui.player.PlayerViewModel
 import me.vanpetegem.accentor.ui.preferences.PreferencesActivity
+import org.fourthline.cling.android.AndroidUpnpService
+import org.fourthline.cling.android.FixedAndroidLogHandler
+import org.seamless.util.logging.LoggingUtil
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    private lateinit var deviceService: AndroidUpnpService
+    private var isServiceConnected = false
+    private val registryListener = DeviceRegistryListener()
+
+    private val deviceConnection = object : ServiceConnection {
+        override fun onServiceConnected(className: ComponentName?, service: IBinder?) {
+            deviceService = service!! as AndroidUpnpService
+            isServiceConnected = true
+
+            deviceService.registry.addListener(registryListener)
+            for (device in deviceService.registry.devices) {
+                registryListener.addDevice(device)
+            }
+
+            deviceService.controlPoint.search()
+        }
+
+        override fun onServiceDisconnected(className: ComponentName?) {
+            isServiceConnected = false
+        }
+    }
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             AccentorTheme() {
-                Content()
+                Content(devices = registryListener.devices)
             }
         }
+
+        // Fix the logging integration between java.util.logging and Android internal logging
+        LoggingUtil.resetRootHandler(FixedAndroidLogHandler())
+
+        applicationContext.bindService(Intent(this, DeviceService::class.java), deviceConnection, Context.BIND_AUTO_CREATE)
     }
 }
 
 @Composable
-fun Content(mainViewModel: MainViewModel = viewModel(), playerViewModel: PlayerViewModel = viewModel()) {
+fun Content(mainViewModel: MainViewModel = viewModel(), playerViewModel: PlayerViewModel = viewModel(), devices: SnapshotStateList<Device>) {
     val navController = rememberNavController()
 
     val loginState by mainViewModel.loginState.observeAsState()
@@ -155,7 +195,7 @@ fun Content(mainViewModel: MainViewModel = viewModel(), playerViewModel: PlayerV
                     AlbumView(entry.arguments!!.getInt("albumId"), navController, playerViewModel)
                 }
             }
-            composable("devices") { Base(navController, mainViewModel) { Devices() } }
+            composable("devices") { Base(navController, mainViewModel) { Devices(devices = devices) } }
         }
     }
 }
