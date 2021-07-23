@@ -53,7 +53,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -97,6 +97,10 @@ import me.vanpetegem.accentor.ui.player.PlayerViewModel
 import me.vanpetegem.accentor.ui.preferences.PreferencesActivity
 import org.fourthline.cling.android.AndroidUpnpService
 import org.fourthline.cling.android.FixedAndroidLogHandler
+import org.fourthline.cling.model.message.header.ServiceTypeHeader
+import org.fourthline.cling.model.meta.RemoteDevice
+import org.fourthline.cling.model.types.ServiceType
+import org.fourthline.cling.model.types.UDN
 import org.seamless.util.logging.LoggingUtil
 
 @AndroidEntryPoint
@@ -112,11 +116,12 @@ class MainActivity : ComponentActivity() {
             isServiceConnected = true
 
             deviceService.registry.addListener(registryListener)
-            for (device in deviceService.registry.devices) {
+            for (device in deviceService.registry.devices.filterIsInstance<RemoteDevice>()) {
                 registryListener.addDevice(device)
             }
 
-            deviceService.controlPoint.search()
+            val playerService = ServiceTypeHeader(ServiceType("schemas-upnp-org", "AVTransport", 1))
+            deviceService.controlPoint.search(playerService)
         }
 
         override fun onServiceDisconnected(className: ComponentName?) {
@@ -135,13 +140,14 @@ class MainActivity : ComponentActivity() {
 
         // Fix the logging integration between java.util.logging and Android internal logging
         LoggingUtil.resetRootHandler(FixedAndroidLogHandler())
+        //Logger.getLogger("org.fourthline.cling").level = Level.FINE
 
         applicationContext.bindService(Intent(this, DeviceService::class.java), deviceConnection, Context.BIND_AUTO_CREATE)
     }
 }
 
 @Composable
-fun Content(mainViewModel: MainViewModel = viewModel(), playerViewModel: PlayerViewModel = viewModel(), devices: SnapshotStateList<Device>) {
+fun Content(mainViewModel: MainViewModel = viewModel(), playerViewModel: PlayerViewModel = viewModel(), devices: SnapshotStateMap<UDN, Device>) {
     val navController = rememberNavController()
 
     val loginState by mainViewModel.loginState.observeAsState()

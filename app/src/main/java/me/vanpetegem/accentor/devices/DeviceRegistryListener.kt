@@ -1,13 +1,17 @@
 package me.vanpetegem.accentor.devices
 
 
+import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.lifecycle.LiveData
 import org.fourthline.cling.model.meta.LocalDevice
 import org.fourthline.cling.model.meta.RemoteDevice
 import org.fourthline.cling.model.meta.Service
+import org.fourthline.cling.model.types.UDN
 import org.fourthline.cling.registry.DefaultRegistryListener
 import org.fourthline.cling.registry.Registry
 import java.lang.Exception
@@ -15,41 +19,35 @@ import org.fourthline.cling.model.meta.Device as ClingDevice
 
 class DeviceRegistryListener: DefaultRegistryListener() {
 
-    val devices: SnapshotStateList<Device> = mutableStateListOf()
+    val devices: SnapshotStateMap<UDN, Device> = mutableStateMapOf()
 
-    override fun remoteDeviceDiscoveryStarted(registry: Registry?, device: RemoteDevice?) {
-        addDevice(device)
+    override fun remoteDeviceDiscoveryStarted(registry: Registry?, remote: RemoteDevice?) {
+        // TODO
     }
 
-    override fun remoteDeviceDiscoveryFailed(registry: Registry?, device: RemoteDevice?, ex: Exception?) {
-        removeDevice(device)
+    override fun remoteDeviceDiscoveryFailed(registry: Registry?, remote: RemoteDevice?, ex: Exception?) {
+        // TODO
     }
 
-    override fun remoteDeviceAdded(registry: Registry?, device: RemoteDevice?) {
-        addDevice(device)
+    override fun remoteDeviceUpdated(registry: Registry?, device: RemoteDevice?) {
+        // TODO
     }
 
-    override fun localDeviceAdded(registry: Registry?, device: LocalDevice?) {
-        addDevice(device)
+    override fun remoteDeviceAdded(registry: Registry?, remote: RemoteDevice?) {
+        addDevice(remote)
     }
 
-    override fun localDeviceRemoved(registry: Registry?, device: LocalDevice?) {
-        removeDevice(device)
+    override fun remoteDeviceRemoved(registry: Registry?, remote: RemoteDevice?) {
+        removeDevice(remote)
     }
 
-    fun addDevice(
-        device: ClingDevice<*, out ClingDevice<*, *, *>, out Service<*, *>>?
-    ) {
-        val d = Device(device!!)
-        // update?
-        devices.add(d)
+    fun addDevice(remote: RemoteDevice?) {
+        val device = Device(remote!!)
+        devices[remote.identity.udn] = device
     }
 
-    fun removeDevice(
-        device: org.fourthline.cling.model.meta.Device<*, out org.fourthline.cling.model.meta.Device<*, *, *>, out Service<*, *>>?
-    ) {
-        val d = Device(device!!)
-        devices.remove(d)
+    fun removeDevice(remote: RemoteDevice?) {
+        devices.remove(remote!!.identity.udn)
     }
 
 

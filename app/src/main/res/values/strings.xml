@@ -16,6 +16,7 @@
     <string name="open_drawer">Open drawer</string>
     <string name="navigation_icon">Navigation icon</string>
     <string name="artist_image">Image showing artist</string>
+    <string name="device_image">Image showing casting device</string>
     <string name="album_image">Image showing album</string>
     <string name="close_player">Close player</string>
     <string name="various_artists">Various Artists</string>

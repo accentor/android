@@ -1,19 +1,20 @@
 package me.vanpetegem.accentor.devices
 
 import org.fourthline.cling.model.meta.Device
-import org.fourthline.cling.model.meta.Service
+import org.fourthline.cling.model.meta.RemoteDevice
 
 class Device(
-    private val device: Device<*, *, *>
+    private val clingDevice: RemoteDevice
 ) {
 
-    fun firstCharacter() = String(intArrayOf(displayString().codePointAt(0)), 0, 1)
+    val friendlyName: String = clingDevice.details.friendlyName
+    val firstCharacter: String  = String(intArrayOf(friendlyName.codePointAt(0)), 0, 1)
 
-    fun displayString(): String {
-        return device.details.friendlyName
-    }
+    val type: String = clingDevice.type.displayString
 
-    fun type(): String {
-        return device.type.displayString
-    }
+    val imageURL: String? = clingDevice
+        .icons
+        .maxWithOrNull(compareBy({ it.height * it.width }, { it.mimeType.subtype == "png" }))
+        ?.let { clingDevice.normalizeURI(it.uri).toString() }
+
 }
