@@ -20,6 +20,8 @@ import me.vanpetegem.accentor.data.artists.ArtistDao
 import me.vanpetegem.accentor.data.artists.DbArtist
 import me.vanpetegem.accentor.data.codecconversions.CodecConversionDao
 import me.vanpetegem.accentor.data.codecconversions.DbCodecConversion
+import me.vanpetegem.accentor.data.plays.UnreportedPlay
+import me.vanpetegem.accentor.data.plays.UnreportedPlayDao
 import me.vanpetegem.accentor.data.tracks.DbTrack
 import me.vanpetegem.accentor.data.tracks.DbTrackArtist
 import me.vanpetegem.accentor.data.tracks.DbTrackGenre
@@ -40,8 +42,9 @@ import me.vanpetegem.accentor.util.RoomTypeConverters
         DbTrack::class,
         DbTrackArtist::class,
         DbTrackGenre::class,
+        UnreportedPlay::class,
     ],
-    version = 7
+    version = 8
 )
 abstract class AccentorDatabase : RoomDatabase() {
     abstract fun albumDao(): AlbumDao
@@ -49,6 +52,7 @@ abstract class AccentorDatabase : RoomDatabase() {
     abstract fun codecConversionDao(): CodecConversionDao
     abstract fun trackDao(): TrackDao
     abstract fun userDao(): UserDao
+    abstract fun unreportedPlayDao(): UnreportedPlayDao
 }
 
 @Module
@@ -180,6 +184,25 @@ internal object DatabaseModule {
                     }
                 }
             })
+            .addMigrations(object : Migration(7, 8) {
+                override fun migrate(database: SupportSQLiteDatabase) {
+                    database.beginTransaction()
+                    try {
+                        database.execSQL(
+                            """
+                            CREATE TABLE IF NOT EXISTS `unreported_plays` (
+                                `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                                `track_id` INTEGER NOT NULL,
+                                `played_at` TEXT NOT NULL
+                            )
+                            """
+                        )
+                        database.setTransactionSuccessful()
+                    } finally {
+                        database.endTransaction()
+                    }
+                }
+            })
             .build()
     }
 
@@ -193,4 +216,6 @@ internal object DatabaseModule {
     fun provideTrackDao(database: AccentorDatabase): TrackDao = database.trackDao()
     @Provides
     fun provideUserDao(database: AccentorDatabase): UserDao = database.userDao()
+    @Provides
+    fun provideUnreportedPlayDao(database: AccentorDatabase): UnreportedPlayDao = database.unreportedPlayDao()
 }
