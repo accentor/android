@@ -9,21 +9,23 @@ import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.snapshots.SnapshotStateMap
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberImagePainter
 import me.vanpetegem.accentor.R
 import me.vanpetegem.accentor.devices.Device
 import me.vanpetegem.accentor.ui.util.FastScrollableGrid
-import org.fourthline.cling.model.types.UDN
 
 @Composable
-fun Devices(devices: SnapshotStateMap<UDN, Device>) {
-    FastScrollableGrid(devices.values.sortedBy { it.friendlyName }, { it.firstCharacter.uppercase() }) { DeviceCard(it) }
+fun Devices(devicesViewModel: DevicesViewModel = hiltViewModel()) {
+    val devices: List<Device>? by devicesViewModel.devices().observeAsState()
+    FastScrollableGrid(devices ?: emptyList(), { it.firstCharacter }) { DeviceCard(it) }
 }
 
 @Composable

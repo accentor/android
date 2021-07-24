@@ -79,7 +79,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import me.vanpetegem.accentor.R
 import me.vanpetegem.accentor.devices.Device
-import me.vanpetegem.accentor.devices.DeviceRegistryListener
+import me.vanpetegem.accentor.devices.DeviceManager
 import me.vanpetegem.accentor.devices.DeviceService
 import me.vanpetegem.accentor.ui.AccentorTheme
 import me.vanpetegem.accentor.ui.albums.AlbumGrid
@@ -102,39 +102,19 @@ import org.fourthline.cling.model.meta.RemoteDevice
 import org.fourthline.cling.model.types.ServiceType
 import org.fourthline.cling.model.types.UDN
 import org.seamless.util.logging.LoggingUtil
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-
-    private lateinit var deviceService: AndroidUpnpService
-    private var isServiceConnected = false
-    private val registryListener = DeviceRegistryListener()
-
-    private val deviceConnection = object : ServiceConnection {
-        override fun onServiceConnected(className: ComponentName?, service: IBinder?) {
-            deviceService = service!! as AndroidUpnpService
-            isServiceConnected = true
-
-            deviceService.registry.addListener(registryListener)
-            for (device in deviceService.registry.devices.filterIsInstance<RemoteDevice>()) {
-                registryListener.addDevice(device)
-            }
-
-            val playerService = ServiceTypeHeader(ServiceType("schemas-upnp-org", "AVTransport", 1))
-            deviceService.controlPoint.search(playerService)
-        }
-
-        override fun onServiceDisconnected(className: ComponentName?) {
-            isServiceConnected = false
-        }
-    }
+    @Inject
+    lateinit var deviceManager: DeviceManager
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             AccentorTheme() {
-                Content(devices = registryListener.devices)
+                Content()
             }
         }
 
@@ -142,12 +122,12 @@ class MainActivity : ComponentActivity() {
         LoggingUtil.resetRootHandler(FixedAndroidLogHandler())
         //Logger.getLogger("org.fourthline.cling").level = Level.FINE
 
-        applicationContext.bindService(Intent(this, DeviceService::class.java), deviceConnection, Context.BIND_AUTO_CREATE)
+        applicationContext.bindService(Intent(this, DeviceService::class.java), deviceManager.connection, Context.BIND_AUTO_CREATE)
     }
 }
 
 @Composable
-fun Content(mainViewModel: MainViewModel = viewModel(), playerViewModel: PlayerViewModel = viewModel(), devices: SnapshotStateMap<UDN, Device>) {
+fun Content(mainViewModel: MainViewModel = viewModel(), playerViewModel: PlayerViewModel = viewModel()) {
     val navController = rememberNavController()
 
     val loginState by mainViewModel.loginState.observeAsState()
@@ -201,7 +181,7 @@ fun Content(mainViewModel: MainViewModel = viewModel(), playerViewModel: PlayerV
                     AlbumView(entry.arguments!!.getInt("albumId"), navController, playerViewModel)
                 }
             }
-            composable("devices") { Base(navController, mainViewModel) { Devices(devices = devices) } }
+            composable("devices") { Base(navController, mainViewModel) { Devices() } }
         }
     }
 }

@@ -1,12 +1,21 @@
 package me.vanpetegem.accentor.ui.devices
 
 import android.app.Application
-import android.content.ComponentName
-import android.content.ServiceConnection
-import android.os.IBinder
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Transformations.map
+import dagger.hilt.android.lifecycle.HiltViewModel
 import me.vanpetegem.accentor.devices.Device
-import me.vanpetegem.accentor.devices.DeviceRegistryListener
-import org.fourthline.cling.android.AndroidUpnpService
+import me.vanpetegem.accentor.devices.DeviceManager
+import javax.inject.Inject
 
-class DevicesViewModel(application: Application) : AndroidViewModel(application) {}
+@HiltViewModel
+class DevicesViewModel @Inject constructor(
+    application: Application,
+    private val deviceManager: DeviceManager,
+) : AndroidViewModel(application) {
+
+    fun devices(): LiveData<List<Device>> = map(deviceManager.devices) { devices ->
+        devices.values.sortedWith(compareBy({ it.friendlyName }, { it.firstCharacter.uppercase() }))
+    }
+}
