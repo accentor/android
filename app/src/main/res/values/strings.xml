@@ -72,4 +72,7 @@
     <string name="no_on_this_day">No albums were released on this day</string>
     <string name="no_artists">No artists could be found</string>
     <string name="title_activity_device_view">DeviceView</string>
+    <string name="local_device">Play on this device</string>
+    <string name="local_device_description">Sound coming from your device</string>
+    <string name="devices_available">Stream to devices</string>
 </resources>

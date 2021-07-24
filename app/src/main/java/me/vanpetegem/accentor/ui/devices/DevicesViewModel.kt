@@ -16,6 +16,13 @@ class DevicesViewModel @Inject constructor(
 ) : AndroidViewModel(application) {
 
     fun devices(): LiveData<List<Device>> = map(deviceManager.devices) { devices ->
-        devices.values.sortedWith(compareBy({ it.friendlyName }, { it.firstCharacter.uppercase() }))
+        devices.values.sortedWith(compareBy(
+            { when(it) {
+                is Device.Ready -> 1
+                is Device.Failed -> 2
+                is Device.Discovered -> 3
+            }},
+            { it.friendlyName })
+        )
     }
 }

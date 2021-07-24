@@ -8,7 +8,7 @@ sealed class Device(
 ) {
 
     val friendlyName: String = clingDevice.details.friendlyName
-    val firstCharacter: String  = String(intArrayOf(friendlyName.codePointAt(0)), 0, 1)
+    val displayString: String = clingDevice.displayString
     val type: String = clingDevice.type.displayString
 
     val imageURL: String? = clingDevice
@@ -16,6 +16,10 @@ sealed class Device(
         .maxWithOrNull(compareBy({ it.height * it.width }, { it.mimeType.subtype == "png" }))
         ?.let { clingDevice.normalizeURI(it.uri).toString() }
 
+
+    class Ready(clingDevice: RemoteDevice): Device(clingDevice) {}
+
+    class Failed(clingDevice: RemoteDevice, val exception: Exception?): Device(clingDevice) {}
 
     class Discovered(clingDevice: RemoteDevice): Device(clingDevice) {
         fun failed(exception: Exception?): Failed {
@@ -26,8 +30,6 @@ sealed class Device(
             return Ready(clingDevice)
         }
     }
-    class Failed(clingDevice: RemoteDevice, val exception: Exception?): Device(clingDevice) {}
-    class Ready(clingDevice: RemoteDevice): Device(clingDevice) {}
 }
 
 

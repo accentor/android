@@ -5,11 +5,8 @@ import android.content.ComponentName
 import android.content.ServiceConnection
 import android.os.IBinder
 import android.util.Log
-import androidx.compose.runtime.mutableStateMapOf
-import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import dagger.Reusable
 import org.fourthline.cling.android.AndroidUpnpService
 import org.fourthline.cling.model.message.header.ServiceTypeHeader
 import org.fourthline.cling.model.meta.RemoteDevice
@@ -17,7 +14,6 @@ import org.fourthline.cling.model.types.ServiceType
 import org.fourthline.cling.model.types.UDN
 import org.fourthline.cling.registry.DefaultRegistryListener
 import org.fourthline.cling.registry.Registry
-import java.lang.Exception
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -25,6 +21,8 @@ import javax.inject.Singleton
 class DeviceManager @Inject constructor() {
 
     val devices = MutableLiveData<Map<UDN, Device>>(emptyMap())
+    val selectedDevice = MutableLiveData<Device?>(null)
+
     val connection = DeviceServiceConnection()
 
     private lateinit var upnp: AndroidUpnpService
