@@ -35,13 +35,11 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
-import me.vanpetegem.accentor.media.MediaSessionConnection
 
 @Composable
 fun PlayerOverlay(
     navController: NavController,
     playerViewModel: PlayerViewModel = viewModel(),
-    mediaSessionConnection: MediaSessionConnection = viewModel(),
     content: @Composable (() -> Unit)
 ) {
     val scope = rememberCoroutineScope()
@@ -54,7 +52,7 @@ fun PlayerOverlay(
     }
     val anchors = mapOf(0f to true, height to false)
     val showQueue by playerViewModel.showQueue.observeAsState()
-    val queueLength by mediaSessionConnection.queueLength.observeAsState()
+    val queueLength by playerViewModel.queueLength.observeAsState()
     val showPlayer = (queueLength ?: 0) > 0
     val isLandscape = (LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE)
     val isMultiWindow = (LocalContext.current as Activity).isInMultiWindowMode()

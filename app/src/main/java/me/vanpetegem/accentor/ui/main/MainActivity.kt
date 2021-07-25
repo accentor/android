@@ -43,6 +43,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavType
@@ -123,7 +124,7 @@ fun Content(mainViewModel: MainViewModel = viewModel()) {
 fun Base(
     navController: NavController,
     mainViewModel: MainViewModel = viewModel(),
-    playerViewModel: PlayerViewModel = viewModel(),
+    playerViewModel: PlayerViewModel = hiltViewModel(),
     extraDropdownItems: @Composable ((() -> Unit) -> Unit)? = null,
     mainContent: @Composable (() -> Unit)
 ) {

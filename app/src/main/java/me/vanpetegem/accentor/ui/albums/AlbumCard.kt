@@ -42,10 +42,10 @@ import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
 import me.vanpetegem.accentor.R
 import me.vanpetegem.accentor.data.albums.Album
-import me.vanpetegem.accentor.media.MediaSessionConnection
+import me.vanpetegem.accentor.ui.player.PlayerViewModel
 
 @Composable
-public fun AlbumCard(album: Album, navController: NavController, hideArtist: Int? = null, mediaSessionConnection: MediaSessionConnection = hiltViewModel()) {
+public fun AlbumCard(album: Album, navController: NavController, hideArtist: Int? = null, playerViewModel: PlayerViewModel = hiltViewModel()) {
     val scope = rememberCoroutineScope()
     Card(modifier = Modifier.padding(8.dp).clickable { navController.navigate("albums/${album.id}") }) {
         Column {
@@ -90,7 +90,7 @@ public fun AlbumCard(album: Album, navController: NavController, hideArtist: Int
                         DropdownMenuItem(
                             onClick = {
                                 expanded = false
-                                scope.launch(IO) { mediaSessionConnection.play(album) }
+                                scope.launch(IO) { playerViewModel.play(album) }
                             }
                         ) {
                             Text(stringResource(R.string.play_now))
@@ -98,7 +98,7 @@ public fun AlbumCard(album: Album, navController: NavController, hideArtist: Int
                         DropdownMenuItem(
                             onClick = {
                                 expanded = false
-                                scope.launch(IO) { mediaSessionConnection.addTracksToQueue(album, maxOf(0, mediaSessionConnection.queuePosition.value ?: 0)) }
+                                scope.launch(IO) { playerViewModel.addTracksToQueue(album, maxOf(0, playerViewModel.queuePosition.value ?: 0)) }
                             }
                         ) {
                             Text(stringResource(R.string.play_next))
@@ -106,7 +106,7 @@ public fun AlbumCard(album: Album, navController: NavController, hideArtist: Int
                         DropdownMenuItem(
                             onClick = {
                                 expanded = false
-                                scope.launch(IO) { mediaSessionConnection.addTracksToQueue(album) }
+                                scope.launch(IO) { playerViewModel.addTracksToQueue(album) }
                             }
                         ) {
                             Text(stringResource(R.string.play_last))

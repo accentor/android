@@ -37,7 +37,7 @@ import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
 import me.vanpetegem.accentor.R
 import me.vanpetegem.accentor.data.tracks.Track
-import me.vanpetegem.accentor.media.MediaSessionConnection
+import me.vanpetegem.accentor.ui.player.PlayerViewModel
 
 @Composable
 fun TrackRow(
@@ -45,12 +45,12 @@ fun TrackRow(
     navController: NavController,
     hideAlbum: Boolean = false,
     hideArtist: Int? = null,
-    mediaSessionConnection: MediaSessionConnection = hiltViewModel()
+    playerViewModel: PlayerViewModel = hiltViewModel()
 ) {
     val scope = rememberCoroutineScope()
     Row(
         modifier = Modifier.fillMaxWidth().padding(8.dp).clickable {
-            scope.launch(IO) { mediaSessionConnection.play(track) }
+            scope.launch(IO) { playerViewModel.play(track) }
         }
     ) {
         Column(modifier = Modifier.weight(1f)) {
@@ -77,7 +77,7 @@ fun TrackRow(
                 DropdownMenuItem(
                     onClick = {
                         expanded = false
-                        scope.launch(IO) { mediaSessionConnection.addTrackToQueue(track, maxOf(0, mediaSessionConnection.queuePosition.value ?: 0)) }
+                        scope.launch(IO) { playerViewModel.addTrackToQueue(track, maxOf(0, playerViewModel.queuePosition.value ?: 0)) }
                     }
                 ) {
                     Text(stringResource(R.string.play_next))
@@ -85,7 +85,7 @@ fun TrackRow(
                 DropdownMenuItem(
                     onClick = {
                         expanded = false
-                        scope.launch(IO) { mediaSessionConnection.addTrackToQueue(track) }
+                        scope.launch(IO) { playerViewModel.addTrackToQueue(track) }
                     }
                 ) {
                     Text(stringResource(R.string.play_last))

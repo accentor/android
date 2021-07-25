@@ -34,7 +34,7 @@ import java.time.format.DateTimeFormatter
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
 import me.vanpetegem.accentor.R
-import me.vanpetegem.accentor.media.MediaSessionConnection
+import me.vanpetegem.accentor.ui.player.PlayerViewModel
 import me.vanpetegem.accentor.ui.tracks.TrackRow
 
 @Composable
@@ -42,7 +42,7 @@ fun AlbumView(
     id: Int,
     navController: NavController,
     albumViewModel: AlbumViewModel = hiltViewModel(),
-    mediaSessionConnection: MediaSessionConnection = hiltViewModel()
+    playerViewModel: PlayerViewModel = hiltViewModel()
 ) {
     val scope = rememberCoroutineScope()
     val albumState by albumViewModel.getAlbum(id).observeAsState()
@@ -88,10 +88,10 @@ fun AlbumView(
                             overflow = TextOverflow.Ellipsis,
                         )
                         Row(modifier = Modifier.padding(8.dp)) {
-                            IconButton(onClick = { scope.launch(IO) { mediaSessionConnection.play(album) } }) {
+                            IconButton(onClick = { scope.launch(IO) { playerViewModel.play(album) } }) {
                                 Icon(painterResource(R.drawable.ic_play), contentDescription = stringResource(R.string.play_now))
                             }
-                            IconButton(onClick = { scope.launch(IO) { mediaSessionConnection.addTracksToQueue(album) } }) {
+                            IconButton(onClick = { scope.launch(IO) { playerViewModel.addTracksToQueue(album) } }) {
                                 Icon(painterResource(R.drawable.ic_queue_add), contentDescription = stringResource(R.string.play_last))
                             }
                         }
