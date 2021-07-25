@@ -42,7 +42,6 @@ import kotlinx.coroutines.launch
 @Composable
 fun ScrollBar(
     state: LazyListState,
-    scrollableSize: IntSize,
     width: Dp = 8.dp,
     minimumHeight: Dp = 48.dp,
     getSectionName: ((Int) -> String)
@@ -55,14 +54,20 @@ fun ScrollBar(
         animationSpec = tween(duration),
     )
     val color = MaterialTheme.colors.secondary
-    val firstVisibleElementIndex = state.layoutInfo.visibleItemsInfo.firstOrNull()?.index
-    val totalItemsCount = state.layoutInfo.totalItemsCount
     val coroutineScope = rememberCoroutineScope()
     var scrollbarOffset by remember { mutableStateOf(0.dp) }
+    val firstVisibleElementIndex = state.layoutInfo.visibleItemsInfo.firstOrNull()?.index
 
     if (alpha > 0.0f && firstVisibleElementIndex != null) {
         val sectionName = getSectionName(firstVisibleElementIndex)
+
+        val totalItemsCount = state.layoutInfo.totalItemsCount
+        val itemHeight = state.layoutInfo.visibleItemsInfo[0].size
+        val totalHeight = itemHeight * totalItemsCount
+        val boxHeight = state.layoutInfo.viewportEndOffset
+        val currentPosition = firstVisibleElementIndex * itemHeight + state.firstVisibleItemScrollOffset
         val topDistance = maxOf(0.dp, scrollbarOffset - (minimumHeight / 2))
+
         if (dragging) {
             Surface(
                 modifier = Modifier.height(minimumHeight).width(minimumHeight).offset(-width * 2, topDistance),
@@ -79,19 +84,19 @@ fun ScrollBar(
             modifier = Modifier.fillMaxHeight().width(width * 2).draggable(
                 orientation = Orientation.Vertical,
                 state = rememberDraggableState { delta ->
-                    val percentage = delta / scrollableSize.height
-                    coroutineScope.launch {
-                        state.scrollToItem(maxOf(0, firstVisibleElementIndex + (percentage * totalItemsCount).toInt()), 0)
-                    }
+                    val percentage = delta / boxHeight
+                    val newPosition = maxOf(0f, currentPosition + percentage * totalHeight)
+                    val newIndex = (newPosition / itemHeight).toInt()
+                    val newOffset = (newPosition - (newIndex * itemHeight)).toInt()
+                    coroutineScope.launch { state.scrollToItem(newIndex, newOffset) }
                 },
                 onDragStarted = { _ -> dragging = true },
                 onDragStopped = { _ -> dragging = false },
             )
         ) {
-            val baseElementHeight = scrollableSize.height.toFloat() / state.layoutInfo.totalItemsCount
-            val scrollbarHeight = maxOf(state.layoutInfo.visibleItemsInfo.size * baseElementHeight, minimumHeight.toPx())
-            val elementHeight = (scrollableSize.height.toFloat() - scrollbarHeight) / state.layoutInfo.totalItemsCount
-            val scrollbarOffsetY = firstVisibleElementIndex * elementHeight
+            val scrollbarHeight = maxOf(boxHeight * (boxHeight.toFloat() / totalHeight), minimumHeight.toPx())
+            val scrollbarDiff = maxOf(0f, scrollbarHeight - boxHeight * (boxHeight.toFloat() / totalHeight))
+            val scrollbarOffsetY = (currentPosition.toFloat() / totalHeight * boxHeight) - (scrollbarDiff * (currentPosition.toFloat() / totalHeight))
             scrollbarOffset = (scrollbarOffsetY / 1.dp.toPx()).dp
 
             drawRoundRect(
@@ -118,6 +123,8 @@ fun <T> FastScrollableGrid(gridItems: List<T>, getSectionName: (T) -> String, it
         ) {
             items(gridItems.size) { i -> itemView(gridItems[i]) }
         }
-        ScrollBar(listState, boxSize, getSectionName = { getSectionName(gridItems[it * cardsPerRow]) })
+        if (gridItems.size / maxOf(cardsPerRow, 2) > 8) {
+            ScrollBar(listState, getSectionName = { getSectionName(gridItems[it * cardsPerRow]) })
+        }
     }
 }
