@@ -115,6 +115,8 @@ class MusicService : MediaSessionService() {
                 override fun onPlaybackStateChanged(state: Int) {
                     if (trackId != null && state == Player.STATE_ENDED) {
                         reportPlay()
+                        exoPlayer.stop()
+                        exoPlayer.seekTo(0, 0)
                     }
                 }
 
