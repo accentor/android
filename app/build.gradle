@@ -13,8 +13,8 @@ android {
         applicationId "me.vanpetegem.accentor"
         minSdkVersion 26
         targetSdkVersion 30
-        versionCode 22
-        versionName "0.5.0"
+        versionCode 23
+        versionName "0.6.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         kapt {
