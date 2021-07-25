@@ -1,5 +1,6 @@
 package me.vanpetegem.accentor.ui.player
 
+import android.app.Activity
 import android.content.res.Configuration
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
@@ -28,6 +29,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -54,7 +56,8 @@ fun PlayerOverlay(
     val showQueue by playerViewModel.showQueue.observeAsState()
     val queueLength by mediaSessionConnection.queueLength.observeAsState()
     val showPlayer = (queueLength ?: 0) > 0
-    val isLandscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
+    val isLandscape = (LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE)
+    val isMultiWindow = (LocalContext.current as Activity).isInMultiWindowMode()
     LaunchedEffect(queueLength) {
         if (queueLength == 0) {
             scope.launch { swipeableState.snapTo(false) }
@@ -94,13 +97,13 @@ fun PlayerOverlay(
                         }
                 ) {
                     if (swipeableState.currentValue) {
-                        ToolBar(!isLandscape, closePlayer = closePlayer)
+                        ToolBar(!(isLandscape && !isMultiWindow), closePlayer = closePlayer)
                     } else {
                         ControlBar()
                     }
                 }
                 Surface(Modifier.fillMaxSize()) {
-                    if (isLandscape) {
+                    if (isLandscape && !isMultiWindow) {
                         Row(modifier = Modifier.fillMaxSize()) {
                             Column(modifier = Modifier.fillMaxHeight().weight(0.4f)) {
                                 Box(modifier = Modifier.weight(1f)) {
