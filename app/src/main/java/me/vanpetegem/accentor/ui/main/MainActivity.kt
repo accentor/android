@@ -238,7 +238,7 @@ fun BaseToolbar(
                     }
                 }
             }
-        }
+        },
     )
 }
 
@@ -263,8 +263,10 @@ fun SearchToolbar(value: String, update: (String) -> Unit, exit: () -> Unit) {
                 )
             },
             colors = TextFieldDefaults.textFieldColors(
-                backgroundColor = MaterialTheme.colors.primarySurface,
-                cursorColor = LocalContentColor.current.copy(LocalContentAlpha.current)
+                backgroundColor = Color.Transparent,
+                cursorColor = LocalContentColor.current.copy(LocalContentAlpha.current),
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
             ),
             modifier = Modifier.weight(1f).fillMaxHeight().focusRequester(focusRequester),
         )
