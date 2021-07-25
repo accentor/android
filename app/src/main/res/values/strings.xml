@@ -62,4 +62,6 @@
     <string name="tracks">Tracks</string>
     <string name="go_to_album">Go to album</string>
     <string name="go_to">Go to %s</string>
+    <string name="search">Search</string>
+    <string name="stop_searching">Stop searching</string>
 </resources>

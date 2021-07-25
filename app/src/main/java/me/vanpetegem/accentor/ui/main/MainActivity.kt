@@ -4,28 +4,40 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.material.ContentAlpha
 import androidx.compose.material.Divider
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.ListItem
+import androidx.compose.material.LocalContentAlpha
+import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
+import androidx.compose.material.ScaffoldState
 import androidx.compose.material.Text
+import androidx.compose.material.TextField
+import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.TopAppBar
+import androidx.compose.material.contentColorFor
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.primarySurface
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -38,6 +50,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -60,9 +74,11 @@ import kotlinx.coroutines.launch
 import me.vanpetegem.accentor.R
 import me.vanpetegem.accentor.ui.AccentorTheme
 import me.vanpetegem.accentor.ui.albums.AlbumGrid
+import me.vanpetegem.accentor.ui.albums.AlbumToolbar
 import me.vanpetegem.accentor.ui.albums.AlbumView
 import me.vanpetegem.accentor.ui.albums.AlbumViewDropdown
 import me.vanpetegem.accentor.ui.artists.ArtistGrid
+import me.vanpetegem.accentor.ui.artists.ArtistToolbar
 import me.vanpetegem.accentor.ui.artists.ArtistView
 import me.vanpetegem.accentor.ui.home.Home
 import me.vanpetegem.accentor.ui.login.LoginActivity
@@ -106,13 +122,24 @@ fun Content(mainViewModel: MainViewModel = viewModel()) {
     PlayerOverlay(navController) {
         NavHost(navController = navController, startDestination = "home") {
             composable("home") { Base(navController, mainViewModel) { Home(navController) } }
-            composable("artists") { Base(navController, mainViewModel) { ArtistGrid(navController) } }
+            composable("artists") { Base(navController, mainViewModel, toolbar = { ArtistToolbar(it) }) { ArtistGrid(navController) } }
             composable("artists/{artistId}", arguments = listOf(navArgument("artistId") { type = NavType.IntType })) { entry ->
                 Base(navController, mainViewModel) { ArtistView(entry.arguments!!.getInt("artistId"), navController) }
             }
-            composable("albums") { Base(navController, mainViewModel) { AlbumGrid(navController) } }
+            composable("albums") { Base(navController, mainViewModel, toolbar = { AlbumToolbar(it) }) { AlbumGrid(navController) } }
             composable("albums/{albumId}", arguments = listOf(navArgument("albumId") { type = NavType.IntType })) { entry ->
-                Base(navController, mainViewModel, extraDropdownItems = { AlbumViewDropdown(entry.arguments!!.getInt("albumId"), navController, it) }) {
+                Base(
+                    navController,
+                    mainViewModel,
+                    toolbar = { scaffoldState ->
+                        BaseToolbar(
+                            scaffoldState,
+                            extraDropdownItems = {
+                                AlbumViewDropdown(entry.arguments!!.getInt("albumId"), navController, it)
+                            },
+                        )
+                    },
+                ) {
                     AlbumView(entry.arguments!!.getInt("albumId"), navController)
                 }
             }
@@ -123,10 +150,10 @@ fun Content(mainViewModel: MainViewModel = viewModel()) {
 @Composable
 fun Base(
     navController: NavController,
-    mainViewModel: MainViewModel = viewModel(),
+    mainViewModel: MainViewModel = hiltViewModel(),
     playerViewModel: PlayerViewModel = hiltViewModel(),
-    extraDropdownItems: @Composable ((() -> Unit) -> Unit)? = null,
-    mainContent: @Composable (() -> Unit)
+    toolbar: @Composable ((ScaffoldState) -> Unit) = { scaffoldState -> BaseToolbar(scaffoldState) },
+    mainContent: @Composable (() -> Unit),
 ) {
     val scaffoldState = rememberScaffoldState()
     val scope = rememberCoroutineScope()
@@ -155,45 +182,7 @@ fun Base(
             }
         },
         drawerGesturesEnabled = !(isPlayerOpen ?: false),
-        topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.app_name)) },
-                navigationIcon = {
-                    IconButton(onClick = { scope.launch { scaffoldState.drawerState.open() } }) {
-                        Icon(Icons.Filled.Menu, contentDescription = stringResource(R.string.open_drawer))
-                    }
-                },
-                actions = {
-                    var expanded by remember { mutableStateOf(false) }
-                    Box(modifier = Modifier.height(40.dp).aspectRatio(1f).wrapContentSize(Alignment.TopStart)) {
-                        IconButton(onClick = { expanded = true }) {
-                            Icon(Icons.Default.MoreVert, contentDescription = stringResource(R.string.open_menu))
-                        }
-                        DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-                            if (extraDropdownItems != null) {
-                                extraDropdownItems { expanded = false }
-                            }
-                            DropdownMenuItem(
-                                onClick = {
-                                    mainViewModel.refresh()
-                                    expanded = false
-                                }
-                            ) {
-                                Text(stringResource(R.string.action_refresh))
-                            }
-                            DropdownMenuItem(
-                                onClick = {
-                                    mainViewModel.logout()
-                                    expanded = false
-                                }
-                            ) {
-                                Text(stringResource(R.string.action_sign_out))
-                            }
-                        }
-                    }
-                }
-            )
-        },
+        topBar = { toolbar(scaffoldState) },
     ) { _ ->
         val isRefreshing by mainViewModel.isRefreshing.observeAsState()
         SwipeRefresh(
@@ -203,6 +192,87 @@ fun Base(
             content = mainContent,
         )
     }
+}
+
+@Composable
+fun BaseToolbar(
+    scaffoldState: ScaffoldState,
+    mainViewModel: MainViewModel = hiltViewModel(),
+    extraActions: @Composable (() -> Unit)? = null,
+    extraDropdownItems: @Composable ((() -> Unit) -> Unit)? = null,
+) {
+    val scope = rememberCoroutineScope()
+    TopAppBar(
+        title = { Text(stringResource(R.string.app_name)) },
+        navigationIcon = {
+            IconButton(onClick = { scope.launch { scaffoldState.drawerState.open() } }) {
+                Icon(Icons.Filled.Menu, contentDescription = stringResource(R.string.open_drawer))
+            }
+        },
+        actions = {
+            extraActions?.invoke()
+            var expanded by remember { mutableStateOf(false) }
+            Box(modifier = Modifier.height(40.dp).aspectRatio(1f).wrapContentSize(Alignment.TopStart)) {
+                IconButton(onClick = { expanded = true }) {
+                    Icon(Icons.Default.MoreVert, contentDescription = stringResource(R.string.open_menu))
+                }
+                DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+                    if (extraDropdownItems != null) {
+                        extraDropdownItems { expanded = false }
+                    }
+                    DropdownMenuItem(
+                        onClick = {
+                            mainViewModel.refresh()
+                            expanded = false
+                        }
+                    ) {
+                        Text(stringResource(R.string.action_refresh))
+                    }
+                    DropdownMenuItem(
+                        onClick = {
+                            mainViewModel.logout()
+                            expanded = false
+                        }
+                    ) {
+                        Text(stringResource(R.string.action_sign_out))
+                    }
+                }
+            }
+        }
+    )
+}
+
+@Composable
+fun SearchToolbar(value: String, update: (String) -> Unit, exit: () -> Unit) {
+    val focusRequester = remember { FocusRequester() }
+    TopAppBar(contentPadding = PaddingValues(0.dp)) {
+        IconButton(
+            onClick = { exit() },
+            modifier = Modifier.padding(start = 8.dp),
+        ) {
+            Icon(Icons.Filled.ArrowBack, contentDescription = stringResource(R.string.stop_searching))
+        }
+        TextField(
+            value,
+            update,
+            singleLine = true,
+            placeholder = {
+                Text(
+                    stringResource(R.string.search),
+                    color = MaterialTheme.colors.contentColorFor(MaterialTheme.colors.primarySurface).copy(ContentAlpha.medium)
+                )
+            },
+            colors = TextFieldDefaults.textFieldColors(
+                backgroundColor = MaterialTheme.colors.primarySurface,
+                cursorColor = LocalContentColor.current.copy(LocalContentAlpha.current)
+            ),
+            modifier = Modifier.weight(1f).fillMaxHeight().focusRequester(focusRequester),
+        )
+    }
+    LaunchedEffect(focusRequester) {
+        focusRequester.requestFocus()
+    }
+    BackHandler { exit() }
 }
 
 @Composable
