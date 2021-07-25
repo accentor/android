@@ -45,24 +45,23 @@ import kotlinx.coroutines.launch
 import me.vanpetegem.accentor.R
 import me.vanpetegem.accentor.data.albums.Album
 import me.vanpetegem.accentor.data.tracks.Track
-import me.vanpetegem.accentor.media.MediaSessionConnection
 import me.vanpetegem.accentor.util.formatTrackLength
 
 @Composable
-fun Queue(navController: NavController, closePlayer: (() -> Unit), mediaSessionConnection: MediaSessionConnection = viewModel()) {
-    val queue by mediaSessionConnection.queue.observeAsState()
-    val queuePosition by mediaSessionConnection.queuePosition.observeAsState()
+fun Queue(navController: NavController, closePlayer: (() -> Unit), playerViewModel: PlayerViewModel = viewModel()) {
+    val queue by playerViewModel.queue.observeAsState()
+    val queuePosition by playerViewModel.queuePosition.observeAsState()
     val state = rememberLazyListState((queuePosition ?: 1) - 1)
     LazyColumn(state = state) {
         items(queue?.size ?: 0, key = { Pair(it, queue!![it].second?.id) }) { i ->
-            QueueItem(mediaSessionConnection, navController, i, queue!![i], closePlayer)
+            QueueItem(playerViewModel, navController, i, queue!![i], closePlayer)
         }
     }
 }
 
 @Composable
 fun QueueItem(
-    mediaSessionConnection: MediaSessionConnection,
+    playerViewModel: PlayerViewModel,
     navController: NavController,
     index: Int,
     item: Triple<Boolean, Track?, Album?>,
@@ -74,7 +73,7 @@ fun QueueItem(
     val scope = rememberCoroutineScope()
     val dismissState = rememberDismissState {
         if (it == DismissValue.DismissedToEnd || it == DismissValue.DismissedToStart) {
-            scope.launch(IO) { mediaSessionConnection.removeFromQueue(index) }
+            scope.launch(IO) { playerViewModel.removeFromQueue(index) }
             true
         } else {
             false
@@ -88,7 +87,12 @@ fun QueueItem(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
                     .padding(8.dp)
-                    .clickable { scope.launch(IO) { mediaSessionConnection.skipTo(index) } }
+                    .clickable {
+                        scope.launch(IO) {
+                            playerViewModel.skipTo(index)
+                            playerViewModel.play()
+                        }
+                    }
             ) {
                 val track = item.second
                 if (item.first) {

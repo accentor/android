@@ -30,21 +30,20 @@ import androidx.media2.common.SessionPlayer
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
 import me.vanpetegem.accentor.R
-import me.vanpetegem.accentor.media.MediaSessionConnection
 import me.vanpetegem.accentor.ui.util.Timer
 import me.vanpetegem.accentor.util.formatTrackLength
 
 @Composable
-fun Controls(mediaSessionConnection: MediaSessionConnection = viewModel()) {
+fun Controls(playerViewModel: PlayerViewModel = viewModel()) {
     val scope = rememberCoroutineScope()
-    val isPlaying by mediaSessionConnection.playing.observeAsState()
-    val shuffleMode by mediaSessionConnection.shuffleMode.observeAsState()
-    val repeatMode by mediaSessionConnection.repeatMode.observeAsState()
+    val isPlaying by playerViewModel.playing.observeAsState()
+    val shuffleMode by playerViewModel.shuffleMode.observeAsState()
+    val repeatMode by playerViewModel.repeatMode.observeAsState()
     Column {
         Row(modifier = Modifier.padding(start = 24.dp, end = 24.dp, top = 12.dp)) {
             when (repeatMode) {
                 SessionPlayer.REPEAT_MODE_ALL -> {
-                    IconButton(onClick = { scope.launch(IO) { mediaSessionConnection.setRepeatMode(SessionPlayer.REPEAT_MODE_ONE) } }) {
+                    IconButton(onClick = { scope.launch(IO) { playerViewModel.setRepeatMode(SessionPlayer.REPEAT_MODE_ONE) } }) {
                         Icon(
                             painterResource(R.drawable.ic_repeat_all),
                             contentDescription = stringResource(R.string.repeat_all),
@@ -54,7 +53,7 @@ fun Controls(mediaSessionConnection: MediaSessionConnection = viewModel()) {
                     }
                 }
                 SessionPlayer.REPEAT_MODE_ONE -> {
-                    IconButton(onClick = { scope.launch(IO) { mediaSessionConnection.setRepeatMode(SessionPlayer.REPEAT_MODE_NONE) } }) {
+                    IconButton(onClick = { scope.launch(IO) { playerViewModel.setRepeatMode(SessionPlayer.REPEAT_MODE_NONE) } }) {
                         Icon(
                             painterResource(R.drawable.ic_repeat_one),
                             contentDescription = stringResource(R.string.repeat_one),
@@ -64,7 +63,7 @@ fun Controls(mediaSessionConnection: MediaSessionConnection = viewModel()) {
                     }
                 }
                 else -> {
-                    IconButton(onClick = { scope.launch(IO) { mediaSessionConnection.setRepeatMode(SessionPlayer.REPEAT_MODE_ALL) } }) {
+                    IconButton(onClick = { scope.launch(IO) { playerViewModel.setRepeatMode(SessionPlayer.REPEAT_MODE_ALL) } }) {
                         Icon(
                             painterResource(R.drawable.ic_repeat_off),
                             contentDescription = stringResource(R.string.repeat_off),
@@ -76,7 +75,7 @@ fun Controls(mediaSessionConnection: MediaSessionConnection = viewModel()) {
             Spacer(Modifier.weight(1f))
             IconButton(
                 onClick = {
-                    scope.launch(IO) { mediaSessionConnection.previous() }
+                    scope.launch(IO) { playerViewModel.previous() }
                 },
             ) {
                 Icon(
@@ -88,7 +87,7 @@ fun Controls(mediaSessionConnection: MediaSessionConnection = viewModel()) {
             if (isPlaying ?: false) {
                 IconButton(
                     onClick = {
-                        scope.launch(IO) { mediaSessionConnection.pause() }
+                        scope.launch(IO) { playerViewModel.pause() }
                     },
                 ) {
                     Icon(
@@ -100,7 +99,7 @@ fun Controls(mediaSessionConnection: MediaSessionConnection = viewModel()) {
             } else {
                 IconButton(
                     onClick = {
-                        scope.launch(IO) { mediaSessionConnection.play() }
+                        scope.launch(IO) { playerViewModel.play() }
                     },
                 ) {
                     Icon(
@@ -112,7 +111,7 @@ fun Controls(mediaSessionConnection: MediaSessionConnection = viewModel()) {
             }
             IconButton(
                 onClick = {
-                    scope.launch(IO) { mediaSessionConnection.next() }
+                    scope.launch(IO) { playerViewModel.next() }
                 },
             ) {
                 Icon(
@@ -124,7 +123,7 @@ fun Controls(mediaSessionConnection: MediaSessionConnection = viewModel()) {
             Spacer(Modifier.weight(1f))
             when (shuffleMode) {
                 SessionPlayer.SHUFFLE_MODE_ALL -> {
-                    IconButton(onClick = { scope.launch(IO) { mediaSessionConnection.setShuffleMode(SessionPlayer.SHUFFLE_MODE_NONE) } }) {
+                    IconButton(onClick = { scope.launch(IO) { playerViewModel.setShuffleMode(SessionPlayer.SHUFFLE_MODE_NONE) } }) {
                         Icon(
                             painterResource(R.drawable.ic_shuffle_all),
                             contentDescription = stringResource(R.string.shuffle_all),
@@ -134,7 +133,7 @@ fun Controls(mediaSessionConnection: MediaSessionConnection = viewModel()) {
                     }
                 }
                 else -> {
-                    IconButton(onClick = { scope.launch(IO) { mediaSessionConnection.setShuffleMode(SessionPlayer.SHUFFLE_MODE_ALL) } }) {
+                    IconButton(onClick = { scope.launch(IO) { playerViewModel.setShuffleMode(SessionPlayer.SHUFFLE_MODE_ALL) } }) {
                         Icon(
                             painterResource(R.drawable.ic_shuffle_none),
                             contentDescription = stringResource(R.string.shuffle_none),
@@ -145,19 +144,19 @@ fun Controls(mediaSessionConnection: MediaSessionConnection = viewModel()) {
             }
         }
         Row(modifier = Modifier.padding(start = 12.dp, end = 12.dp, bottom = 12.dp), verticalAlignment = Alignment.CenterVertically) {
-            val buffering by mediaSessionConnection.buffering.observeAsState(false)
-            val currentPosition by mediaSessionConnection.currentPosition.observeAsState()
+            val buffering by playerViewModel.buffering.observeAsState(false)
+            val currentPosition by playerViewModel.currentPosition.observeAsState()
             var seekPosition by remember { mutableStateOf<Int?>(null) }
-            val currentTrack by mediaSessionConnection.currentTrack.observeAsState()
+            val currentTrack by playerViewModel.currentTrack.observeAsState()
             val trackLength = currentTrack?.length ?: 1
-            Timer { mediaSessionConnection.updateCurrentPosition() }
+            Timer { playerViewModel.updateCurrentPosition() }
             Text(if (seekPosition != null) seekPosition.formatTrackLength() else currentPosition.formatTrackLength())
             Slider(
                 seekPosition?.toFloat() ?: (currentPosition?.toFloat() ?: 0f),
                 onValueChange = { seekPosition = it.toInt() },
                 onValueChangeFinished = {
                     val positionCopy = seekPosition!!
-                    scope.launch(IO) { mediaSessionConnection.seekTo(positionCopy) }
+                    scope.launch(IO) { playerViewModel.seekTo(positionCopy) }
                     seekPosition = null
                 },
                 enabled = !buffering,

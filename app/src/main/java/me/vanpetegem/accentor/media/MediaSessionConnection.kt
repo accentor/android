@@ -3,7 +3,6 @@ package me.vanpetegem.accentor.media
 import android.app.Application
 import android.content.ComponentName
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations.map
@@ -15,20 +14,20 @@ import androidx.media2.session.MediaController
 import androidx.media2.session.SessionCommand
 import androidx.media2.session.SessionCommandGroup
 import androidx.media2.session.SessionToken
-import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import javax.inject.Singleton
 import kotlinx.coroutines.guava.await
 import me.vanpetegem.accentor.data.albums.Album
 import me.vanpetegem.accentor.data.albums.AlbumRepository
 import me.vanpetegem.accentor.data.tracks.Track
 import me.vanpetegem.accentor.data.tracks.TrackRepository
 
-@HiltViewModel
+@Singleton
 class MediaSessionConnection @Inject constructor(
     application: Application,
     private val albumRepository: AlbumRepository,
     private val trackRepository: TrackRepository,
-) : AndroidViewModel(application) {
+) {
     private val mediaController: MediaController = MediaController.Builder(application)
         .setSessionToken(SessionToken(application, ComponentName(application, MusicService::class.java)))
         .setControllerCallback(
@@ -216,9 +215,6 @@ class MediaSessionConnection @Inject constructor(
     }
 
     suspend fun skipTo(position: Int) = mediaController.skipToPlaylistItem(position).await()
-
-    suspend fun move(oldPosition: Int, newPosition: Int) =
-        mediaController.movePlaylistItem(oldPosition, newPosition).await()
 
     suspend fun removeFromQueue(position: Int) = mediaController.removePlaylistItem(position).await()
 }

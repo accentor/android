@@ -27,14 +27,13 @@ import coil.compose.rememberImagePainter
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
 import me.vanpetegem.accentor.R
-import me.vanpetegem.accentor.media.MediaSessionConnection
 
 @Composable
-fun ControlBar(mediaSessionConnection: MediaSessionConnection = viewModel()) {
+fun ControlBar(playerViewModel: PlayerViewModel = viewModel()) {
     val scope = rememberCoroutineScope()
-    val currentTrack by mediaSessionConnection.currentTrack.observeAsState()
-    val currentAlbum by mediaSessionConnection.currentAlbum.observeAsState()
-    val isPlaying by mediaSessionConnection.playing.observeAsState()
+    val currentTrack by playerViewModel.currentTrack.observeAsState()
+    val currentAlbum by playerViewModel.currentAlbum.observeAsState()
+    val isPlaying by playerViewModel.playing.observeAsState()
     BottomAppBar(contentPadding = PaddingValues(end = 8.dp)) {
         Image(
             painter = if (currentAlbum?.image500 != null) {
@@ -64,7 +63,7 @@ fun ControlBar(mediaSessionConnection: MediaSessionConnection = viewModel()) {
         }
         IconButton(
             onClick = {
-                scope.launch(IO) { mediaSessionConnection.previous() }
+                scope.launch(IO) { playerViewModel.previous() }
             },
         ) {
             Icon(painterResource(R.drawable.ic_previous), contentDescription = stringResource(R.string.previous))
@@ -72,7 +71,7 @@ fun ControlBar(mediaSessionConnection: MediaSessionConnection = viewModel()) {
         if (isPlaying ?: false) {
             IconButton(
                 onClick = {
-                    scope.launch(IO) { mediaSessionConnection.pause() }
+                    scope.launch(IO) { playerViewModel.pause() }
                 },
             ) {
                 Icon(painterResource(R.drawable.ic_pause), contentDescription = stringResource(R.string.pause))
@@ -80,7 +79,7 @@ fun ControlBar(mediaSessionConnection: MediaSessionConnection = viewModel()) {
         } else {
             IconButton(
                 onClick = {
-                    scope.launch(IO) { mediaSessionConnection.play() }
+                    scope.launch(IO) { playerViewModel.play() }
                 },
             ) {
                 Icon(painterResource(R.drawable.ic_play), contentDescription = stringResource(R.string.play))
@@ -88,7 +87,7 @@ fun ControlBar(mediaSessionConnection: MediaSessionConnection = viewModel()) {
         }
         IconButton(
             onClick = {
-                scope.launch(IO) { mediaSessionConnection.next() }
+                scope.launch(IO) { playerViewModel.next() }
             },
         ) {
             Icon(painterResource(R.drawable.ic_next), contentDescription = stringResource(R.string.next))

@@ -23,12 +23,11 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberImagePainter
 import me.vanpetegem.accentor.R
-import me.vanpetegem.accentor.media.MediaSessionConnection
 
 @Composable
-fun CurrentTrackInfo(mediaSessionConnection: MediaSessionConnection = viewModel()) {
-    val currentTrack by mediaSessionConnection.currentTrack.observeAsState()
-    val currentAlbum by mediaSessionConnection.currentAlbum.observeAsState()
+fun CurrentTrackInfo(playerViewModel: PlayerViewModel = viewModel()) {
+    val currentTrack by playerViewModel.currentTrack.observeAsState()
+    val currentAlbum by playerViewModel.currentAlbum.observeAsState()
     Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
         Image(
             painter = if (currentAlbum?.image500 != null) {

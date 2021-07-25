@@ -32,17 +32,15 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
 import me.vanpetegem.accentor.R
-import me.vanpetegem.accentor.media.MediaSessionConnection
 
 @Composable
 fun ToolBar(
     showQueueButton: Boolean,
     playerViewModel: PlayerViewModel = viewModel(),
-    mediaSessionConnection: MediaSessionConnection = viewModel(),
     closePlayer: (() -> Unit)
 ) {
     val scope = rememberCoroutineScope()
-    val queuePosStr by mediaSessionConnection.queuePosStr.observeAsState()
+    val queuePosStr by playerViewModel.queuePosStr.observeAsState()
     TopAppBar(
         title = {
             Column {
@@ -80,7 +78,7 @@ fun ToolBar(
                     DropdownMenuItem(
                         onClick = {
                             expanded = false
-                            scope.launch(IO) { mediaSessionConnection.clearQueue() }
+                            scope.launch(IO) { playerViewModel.clearQueue() }
                         }
                     ) {
                         Text(stringResource(R.string.clear_queue))
