@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.Divider
 import androidx.compose.material.DropdownMenu
@@ -54,6 +55,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -244,6 +246,7 @@ fun BaseToolbar(
 
 @Composable
 fun SearchToolbar(value: String, update: (String) -> Unit, exit: () -> Unit) {
+    val keyboardController = LocalSoftwareKeyboardController.current
     val focusRequester = remember { FocusRequester() }
     TopAppBar(contentPadding = PaddingValues(0.dp)) {
         IconButton(
@@ -269,6 +272,12 @@ fun SearchToolbar(value: String, update: (String) -> Unit, exit: () -> Unit) {
                 unfocusedIndicatorColor = Color.Transparent,
             ),
             modifier = Modifier.weight(1f).fillMaxHeight().focusRequester(focusRequester),
+            keyboardActions = KeyboardActions(
+                onDone = {
+                    keyboardController?.hide()
+                    focusRequester.freeFocus()
+                },
+            ),
         )
     }
     LaunchedEffect(focusRequester) {
