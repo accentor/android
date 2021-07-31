@@ -78,7 +78,7 @@ class NotificationBuilder(private val context: Context) {
             .setShowActionsInCompactView(0, 1, 2)
 
         val openIntent = Intent(context, MainActivity::class.java)
-        val pendingIntent = PendingIntent.getActivity(context, 0, openIntent, 0)
+        val pendingIntent = PendingIntent.getActivity(context, 0, openIntent, PendingIntent.FLAG_IMMUTABLE)
 
         val bitmap = metadata?.getString(MediaMetadata.METADATA_KEY_ALBUM_ART_URI)?.let {
             context.imageLoader.execute(ImageRequest.Builder(context).data(it).build()).drawable?.toBitmap()
@@ -105,7 +105,7 @@ class NotificationBuilder(private val context: Context) {
         if (action != PlaybackStateCompat.ACTION_PAUSE) {
             return PendingIntent.getForegroundService(context, keyCode, intent, 0)
         } else {
-            return PendingIntent.getService(context, keyCode, intent, 0)
+            return PendingIntent.getService(context, keyCode, intent, PendingIntent.FLAG_IMMUTABLE)
         }
     }
 

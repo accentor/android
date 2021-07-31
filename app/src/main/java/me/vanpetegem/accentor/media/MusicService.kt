@@ -73,22 +73,26 @@ class MusicService : MediaSessionService() {
         .setUsage(C.USAGE_MEDIA)
         .build()
 
+    private val baseDataSourceFactory by lazy {
+        DefaultDataSourceFactory(this@MusicService.application, DefaultHttpDataSource.Factory().setUserAgent(userAgent))
+    }
+    private val cache: SimpleCache by lazy {
+        SimpleCache(
+            File(this@MusicService.application.cacheDir, "audio"),
+            LeastRecentlyUsedCacheEvictor(preferencesDataSource.musicCacheSize.value!!),
+            ExoDatabaseProvider(this@MusicService.application)
+        )
+    }
+
     private val exoPlayer: ExoPlayer by lazy {
         SimpleExoPlayer.Builder(this).apply {
             setMediaSourceFactory(
                 ProgressiveMediaSource.Factory(
                     object : DataSource.Factory {
-                        val base = DefaultDataSourceFactory(this@MusicService.application, DefaultHttpDataSource.Factory().setUserAgent(userAgent))
-                        val cache = SimpleCache(
-                            File(this@MusicService.application.cacheDir, "audio"),
-                            LeastRecentlyUsedCacheEvictor(preferencesDataSource.musicCacheSize.value!!),
-                            ExoDatabaseProvider(this@MusicService.application)
-                        )
-
                         override fun createDataSource(): DataSource {
                             return CacheDataSource(
                                 cache,
-                                base.createDataSource(),
+                                baseDataSourceFactory.createDataSource(),
                                 (CacheDataSource.FLAG_BLOCK_ON_CACHE or CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR)
                             )
                         }
