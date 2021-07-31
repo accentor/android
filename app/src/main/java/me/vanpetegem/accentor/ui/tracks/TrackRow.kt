@@ -100,8 +100,10 @@ fun TrackRow(
                         Text(stringResource(R.string.go_to_album))
                     }
                 }
+                val used = HashSet<Pair<Int, String>>()
                 for (ta in track.trackArtists.sortedBy { ta -> ta.order }) {
-                    if (ta.artistId != hideArtist) {
+                    if (ta.artistId != hideArtist && !used.contains(Pair(ta.artistId, ta.name))) {
+                        used.add(Pair(ta.artistId, ta.name))
                         DropdownMenuItem(
                             onClick = {
                                 expanded = false
