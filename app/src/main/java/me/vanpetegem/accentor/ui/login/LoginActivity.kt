@@ -35,7 +35,6 @@ import androidx.compose.ui.autofill.Autofill
 import androidx.compose.ui.autofill.AutofillNode
 import androidx.compose.ui.autofill.AutofillTree
 import androidx.compose.ui.autofill.AutofillType
-import androidx.compose.ui.composed
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
@@ -200,11 +199,11 @@ fun Modifier.autofill(
     autofillTree: AutofillTree,
     autofillTypes: List<AutofillType>,
     onFill: ((String) -> Unit),
-) = composed {
+): Modifier {
     val node = AutofillNode(onFill = onFill, autofillTypes = autofillTypes)
     autofillTree += node
 
-    onGloballyPositioned {
+    return onGloballyPositioned {
         node.boundingBox = it.boundsInWindow()
     }.onFocusChanged { state ->
         autofill?.run {

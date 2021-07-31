@@ -23,6 +23,7 @@
         android:windowSoftInputMode="adjustResize">
         <activity android:name=".ui.login.LoginActivity" />
         <activity
+            android:exported="true"
             android:name=".ui.main.MainActivity"
             android:launchMode="singleInstance">
             <intent-filter>
