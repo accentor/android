@@ -40,7 +40,11 @@ fun compareAlbumEditions(a1: Album, a2: Album): Int {
     if (a1.edition == null) { return -1 }
     if (a2.edition == null) { return 1 }
     val order = a1.edition.compareTo(a2.edition)
-    return if (order == 0) a1.editionDescription!!.compareTo(a2.editionDescription!!) else order
+    if (order != 0) { return order }
+    if (a1.editionDescription == null && a2.editionDescription == null) { return 0 }
+    if (a1.editionDescription == null) { return -1 }
+    if (a2.editionDescription == null) { return 1 }
+    return a1.editionDescription.compareTo(a2.editionDescription)
 }
 
 data class AlbumArtist(
