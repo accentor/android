@@ -72,7 +72,7 @@ fun AlbumView(
                             overflow = TextOverflow.Ellipsis,
                         )
                         Text(
-                            album.stringifyAlbumArtists(),
+                            album.stringifyAlbumArtists().let { if (it.isEmpty()) stringResource(R.string.various_artists) else it },
                             style = MaterialTheme.typography.subtitle1,
                             color = LocalContentColor.current.copy(alpha = ContentAlpha.medium),
                             modifier = Modifier.padding(start = 8.dp),
