@@ -26,8 +26,8 @@ fun Home(navController: NavController, homeViewModel: HomeViewModel = hiltViewMo
     LazyColumn(modifier = Modifier.fillMaxSize()) {
         item {
             val albums by homeViewModel.recentlyReleasedAlbums.observeAsState()
-            if (albums != null) {
-                Text(stringResource(R.string.recently_released), style = MaterialTheme.typography.h5, modifier = Modifier.padding(8.dp))
+            Text(stringResource(R.string.recently_released), style = MaterialTheme.typography.h5, modifier = Modifier.padding(8.dp))
+            if (albums != null && albums!!.size > 0) {
                 LazyRow {
                     items(albums!!.size) { i ->
                         Box(modifier = Modifier.width(192.dp)) {
@@ -35,12 +35,14 @@ fun Home(navController: NavController, homeViewModel: HomeViewModel = hiltViewMo
                         }
                     }
                 }
+            } else {
+                Text(stringResource(R.string.no_albums), modifier = Modifier.padding(horizontal = 8.dp))
             }
         }
         item {
             val albums by homeViewModel.recentlyAddedAlbums.observeAsState()
-            if (albums != null) {
-                Text(stringResource(R.string.recently_added_albums), style = MaterialTheme.typography.h5, modifier = Modifier.padding(8.dp))
+            Text(stringResource(R.string.recently_added_albums), style = MaterialTheme.typography.h5, modifier = Modifier.padding(8.dp))
+            if (albums != null && albums!!.size > 0) {
                 LazyRow {
                     items(albums!!.size) { i ->
                         Box(modifier = Modifier.width(192.dp)) {
@@ -48,6 +50,8 @@ fun Home(navController: NavController, homeViewModel: HomeViewModel = hiltViewMo
                         }
                     }
                 }
+            } else {
+                Text(stringResource(R.string.no_albums), modifier = Modifier.padding(horizontal = 8.dp))
             }
         }
         item {
@@ -56,8 +60,8 @@ fun Home(navController: NavController, homeViewModel: HomeViewModel = hiltViewMo
             }
             val currentDay by homeViewModel.currentDay.observeAsState()
             val albums by homeViewModel.albumsForDay(currentDay!!).observeAsState()
-            if (albums != null) {
-                Text(stringResource(R.string.on_this_day), style = MaterialTheme.typography.h5, modifier = Modifier.padding(8.dp))
+            Text(stringResource(R.string.on_this_day), style = MaterialTheme.typography.h5, modifier = Modifier.padding(8.dp))
+            if (albums != null && albums!!.size > 0) {
                 LazyRow {
                     items(albums!!.size) { i ->
                         Box(modifier = Modifier.width(192.dp)) {
@@ -65,12 +69,14 @@ fun Home(navController: NavController, homeViewModel: HomeViewModel = hiltViewMo
                         }
                     }
                 }
+            } else {
+                Text(stringResource(R.string.no_on_this_day), modifier = Modifier.padding(horizontal = 8.dp))
             }
         }
         item {
             val artists by homeViewModel.recentlyAddedArtists.observeAsState()
-            if (artists != null) {
-                Text(stringResource(R.string.recently_added_artists), style = MaterialTheme.typography.h5, modifier = Modifier.padding(8.dp))
+            Text(stringResource(R.string.recently_added_artists), style = MaterialTheme.typography.h5, modifier = Modifier.padding(8.dp))
+            if (artists != null && artists!!.size > 0) {
                 LazyRow {
                     items(artists!!.size) { i ->
                         Box(modifier = Modifier.width(192.dp)) {
@@ -78,12 +84,14 @@ fun Home(navController: NavController, homeViewModel: HomeViewModel = hiltViewMo
                         }
                     }
                 }
+            } else {
+                Text(stringResource(R.string.no_artists), modifier = Modifier.padding(horizontal = 8.dp))
             }
         }
         item {
             val albums by homeViewModel.randomAlbums.observeAsState()
-            if (albums != null) {
-                Text(stringResource(R.string.random_albums), style = MaterialTheme.typography.h5, modifier = Modifier.padding(8.dp))
+            Text(stringResource(R.string.random_albums), style = MaterialTheme.typography.h5, modifier = Modifier.padding(8.dp))
+            if (albums != null && albums!!.size > 0) {
                 LazyRow {
                     items(albums!!.size) { i ->
                         Box(modifier = Modifier.width(192.dp)) {
@@ -91,12 +99,14 @@ fun Home(navController: NavController, homeViewModel: HomeViewModel = hiltViewMo
                         }
                     }
                 }
+            } else {
+                Text(stringResource(R.string.no_albums), modifier = Modifier.padding(horizontal = 8.dp))
             }
         }
         item {
             val artists by homeViewModel.randomArtists.observeAsState()
-            if (artists != null) {
-                Text(stringResource(R.string.random_artists), style = MaterialTheme.typography.h5, modifier = Modifier.padding(8.dp))
+            Text(stringResource(R.string.random_artists), style = MaterialTheme.typography.h5, modifier = Modifier.padding(8.dp))
+            if (artists != null && artists!!.size > 0) {
                 LazyRow {
                     items(artists!!.size) { i ->
                         Box(modifier = Modifier.width(192.dp)) {
@@ -104,6 +114,8 @@ fun Home(navController: NavController, homeViewModel: HomeViewModel = hiltViewMo
                         }
                     }
                 }
+            } else {
+                Text(stringResource(R.string.no_artists), modifier = Modifier.padding(horizontal = 8.dp))
             }
         }
     }
