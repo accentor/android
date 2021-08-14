@@ -64,4 +64,7 @@
     <string name="go_to">Go to %s</string>
     <string name="search">Search</string>
     <string name="stop_searching">Stop searching</string>
+    <string name="no_albums">No albums could be found</string>
+    <string name="no_on_this_day">No albums were released on this day</string>
+    <string name="no_artists">No artists could be found</string>
 </resources>
