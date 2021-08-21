@@ -37,6 +37,7 @@ class MainViewModel @Inject constructor(
     val loginState: LiveData<Boolean> = authenticationRepository.isLoggedIn
 
     fun refresh() {
+        if ((refreshing.value ?: 0) > 0) return
         refreshing.value?.let { refreshing.value = it + 3 }
         viewModelScope.launch(IO) {
             codecConversionRepository.refresh {
