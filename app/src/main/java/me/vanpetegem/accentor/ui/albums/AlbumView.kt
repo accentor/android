@@ -41,8 +41,8 @@ import me.vanpetegem.accentor.ui.tracks.TrackRow
 fun AlbumView(
     id: Int,
     navController: NavController,
+    playerViewModel: PlayerViewModel,
     albumViewModel: AlbumViewModel = hiltViewModel(),
-    playerViewModel: PlayerViewModel = hiltViewModel()
 ) {
     val scope = rememberCoroutineScope()
     val albumState by albumViewModel.getAlbum(id).observeAsState()
@@ -99,7 +99,7 @@ fun AlbumView(
                 }
             }
             if (tracks != null && tracks!!.size > 0) {
-                items(tracks!!.size) { i -> TrackRow(tracks!![i], navController, hideAlbum = true) }
+                items(tracks!!.size) { i -> TrackRow(tracks!![i], navController, playerViewModel, hideAlbum = true) }
             }
         }
     }

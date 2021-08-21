@@ -31,7 +31,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
@@ -43,9 +42,9 @@ import me.vanpetegem.accentor.ui.player.PlayerViewModel
 fun TrackRow(
     track: Track,
     navController: NavController,
+    playerViewModel: PlayerViewModel,
     hideAlbum: Boolean = false,
     hideArtist: Int? = null,
-    playerViewModel: PlayerViewModel = hiltViewModel()
 ) {
     val scope = rememberCoroutineScope()
     Row(

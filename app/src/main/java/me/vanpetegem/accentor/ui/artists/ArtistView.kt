@@ -26,10 +26,11 @@ import coil.compose.rememberImagePainter
 import coil.transform.CircleCropTransformation
 import me.vanpetegem.accentor.R
 import me.vanpetegem.accentor.ui.albums.AlbumCard
+import me.vanpetegem.accentor.ui.player.PlayerViewModel
 import me.vanpetegem.accentor.ui.tracks.TrackRow
 
 @Composable
-fun ArtistView(id: Int, navController: NavController, artistViewModel: ArtistViewModel = hiltViewModel()) {
+fun ArtistView(id: Int, navController: NavController, playerViewModel: PlayerViewModel, artistViewModel: ArtistViewModel = hiltViewModel()) {
     val artistState by artistViewModel.getArtist(id).observeAsState()
     if (artistState != null) {
         val artist = artistState!!
@@ -59,7 +60,7 @@ fun ArtistView(id: Int, navController: NavController, artistViewModel: ArtistVie
                     LazyRow {
                         items(albums!!.size) { i ->
                             Box(modifier = Modifier.width(192.dp)) {
-                                AlbumCard(albums!![i], navController, hideArtist = id)
+                                AlbumCard(albums!![i], navController, playerViewModel, hideArtist = id)
                             }
                         }
                     }
@@ -69,7 +70,7 @@ fun ArtistView(id: Int, navController: NavController, artistViewModel: ArtistVie
                 item {
                     Text(stringResource(R.string.tracks), style = MaterialTheme.typography.h5, modifier = Modifier.padding(8.dp))
                 }
-                items(tracks!!.size) { i -> TrackRow(tracks!![i], navController, hideArtist = id) }
+                items(tracks!!.size) { i -> TrackRow(tracks!![i], navController, playerViewModel, hideArtist = id) }
             }
         }
     }
