@@ -19,10 +19,11 @@ import androidx.navigation.NavController
 import me.vanpetegem.accentor.R
 import me.vanpetegem.accentor.ui.albums.AlbumCard
 import me.vanpetegem.accentor.ui.artists.ArtistCard
+import me.vanpetegem.accentor.ui.player.PlayerViewModel
 import me.vanpetegem.accentor.ui.util.Timer
 
 @Composable
-fun Home(navController: NavController, homeViewModel: HomeViewModel = hiltViewModel()) {
+fun Home(navController: NavController, playerViewModel: PlayerViewModel, homeViewModel: HomeViewModel = hiltViewModel()) {
     LazyColumn(modifier = Modifier.fillMaxSize()) {
         item {
             val albums by homeViewModel.recentlyReleasedAlbums.observeAsState()
@@ -31,7 +32,7 @@ fun Home(navController: NavController, homeViewModel: HomeViewModel = hiltViewMo
                 LazyRow {
                     items(albums!!.size) { i ->
                         Box(modifier = Modifier.width(192.dp)) {
-                            AlbumCard(albums!![i], navController)
+                            AlbumCard(albums!![i], navController, playerViewModel)
                         }
                     }
                 }
@@ -46,7 +47,7 @@ fun Home(navController: NavController, homeViewModel: HomeViewModel = hiltViewMo
                 LazyRow {
                     items(albums!!.size) { i ->
                         Box(modifier = Modifier.width(192.dp)) {
-                            AlbumCard(albums!![i], navController)
+                            AlbumCard(albums!![i], navController, playerViewModel)
                         }
                     }
                 }
@@ -65,7 +66,7 @@ fun Home(navController: NavController, homeViewModel: HomeViewModel = hiltViewMo
                 LazyRow {
                     items(albums!!.size) { i ->
                         Box(modifier = Modifier.width(192.dp)) {
-                            AlbumCard(albums!![i], navController)
+                            AlbumCard(albums!![i], navController, playerViewModel)
                         }
                     }
                 }
@@ -95,7 +96,7 @@ fun Home(navController: NavController, homeViewModel: HomeViewModel = hiltViewMo
                 LazyRow {
                     items(albums!!.size) { i ->
                         Box(modifier = Modifier.width(192.dp)) {
-                            AlbumCard(albums!![i], navController)
+                            AlbumCard(albums!![i], navController, playerViewModel)
                         }
                     }
                 }

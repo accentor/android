@@ -59,7 +59,6 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavType
@@ -101,7 +100,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Content(mainViewModel: MainViewModel = viewModel()) {
+fun Content(mainViewModel: MainViewModel = viewModel(), playerViewModel: PlayerViewModel = viewModel()) {
     val navController = rememberNavController()
 
     val loginState by mainViewModel.loginState.observeAsState()
@@ -123,26 +122,36 @@ fun Content(mainViewModel: MainViewModel = viewModel()) {
 
     PlayerOverlay(navController) {
         NavHost(navController = navController, startDestination = "home") {
-            composable("home") { Base(navController, mainViewModel) { Home(navController) } }
-            composable("artists") { Base(navController, mainViewModel, toolbar = { ArtistToolbar(it) }) { ArtistGrid(navController) } }
-            composable("artists/{artistId}", arguments = listOf(navArgument("artistId") { type = NavType.IntType })) { entry ->
-                Base(navController, mainViewModel) { ArtistView(entry.arguments!!.getInt("artistId"), navController) }
+            composable("home") { Base(navController, mainViewModel, playerViewModel) { Home(navController, playerViewModel) } }
+            composable("artists") {
+                Base(
+                    navController, mainViewModel, playerViewModel, toolbar = { ArtistToolbar(it, mainViewModel) }
+                ) { ArtistGrid(navController) }
             }
-            composable("albums") { Base(navController, mainViewModel, toolbar = { AlbumToolbar(it) }) { AlbumGrid(navController) } }
+            composable("artists/{artistId}", arguments = listOf(navArgument("artistId") { type = NavType.IntType })) { entry ->
+                Base(navController, mainViewModel, playerViewModel) { ArtistView(entry.arguments!!.getInt("artistId"), navController, playerViewModel) }
+            }
+            composable("albums") {
+                Base(
+                    navController, mainViewModel, playerViewModel, toolbar = { AlbumToolbar(it, mainViewModel) }
+                ) { AlbumGrid(navController, playerViewModel) }
+            }
             composable("albums/{albumId}", arguments = listOf(navArgument("albumId") { type = NavType.IntType })) { entry ->
                 Base(
                     navController,
                     mainViewModel,
+                    playerViewModel,
                     toolbar = { scaffoldState ->
                         BaseToolbar(
                             scaffoldState,
+                            mainViewModel,
                             extraDropdownItems = {
                                 AlbumViewDropdown(entry.arguments!!.getInt("albumId"), navController, it)
                             },
                         )
                     },
                 ) {
-                    AlbumView(entry.arguments!!.getInt("albumId"), navController)
+                    AlbumView(entry.arguments!!.getInt("albumId"), navController, playerViewModel)
                 }
             }
         }
@@ -152,9 +161,9 @@ fun Content(mainViewModel: MainViewModel = viewModel()) {
 @Composable
 fun Base(
     navController: NavController,
-    mainViewModel: MainViewModel = hiltViewModel(),
-    playerViewModel: PlayerViewModel = hiltViewModel(),
-    toolbar: @Composable ((ScaffoldState) -> Unit) = { scaffoldState -> BaseToolbar(scaffoldState) },
+    mainViewModel: MainViewModel = viewModel(),
+    playerViewModel: PlayerViewModel = viewModel(),
+    toolbar: @Composable ((ScaffoldState) -> Unit) = { scaffoldState -> BaseToolbar(scaffoldState, mainViewModel) },
     mainContent: @Composable (() -> Unit),
 ) {
     val scaffoldState = rememberScaffoldState()
@@ -199,7 +208,7 @@ fun Base(
 @Composable
 fun BaseToolbar(
     scaffoldState: ScaffoldState,
-    mainViewModel: MainViewModel = hiltViewModel(),
+    mainViewModel: MainViewModel = viewModel(),
     extraActions: @Composable (() -> Unit)? = null,
     extraDropdownItems: @Composable ((() -> Unit) -> Unit)? = null,
 ) {

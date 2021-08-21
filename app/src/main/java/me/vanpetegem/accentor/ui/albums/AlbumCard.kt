@@ -35,7 +35,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
 import kotlinx.coroutines.Dispatchers.IO
@@ -45,7 +44,7 @@ import me.vanpetegem.accentor.data.albums.Album
 import me.vanpetegem.accentor.ui.player.PlayerViewModel
 
 @Composable
-public fun AlbumCard(album: Album, navController: NavController, hideArtist: Int? = null, playerViewModel: PlayerViewModel = hiltViewModel()) {
+public fun AlbumCard(album: Album, navController: NavController, playerViewModel: PlayerViewModel, hideArtist: Int? = null) {
     val scope = rememberCoroutineScope()
     Card(modifier = Modifier.padding(8.dp).clickable { navController.navigate("albums/${album.id}") }) {
         Column {

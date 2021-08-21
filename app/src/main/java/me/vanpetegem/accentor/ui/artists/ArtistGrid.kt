@@ -13,6 +13,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import me.vanpetegem.accentor.R
 import me.vanpetegem.accentor.ui.main.BaseToolbar
+import me.vanpetegem.accentor.ui.main.MainViewModel
 import me.vanpetegem.accentor.ui.main.SearchToolbar
 import me.vanpetegem.accentor.ui.util.FastScrollableGrid
 
@@ -25,7 +26,7 @@ fun ArtistGrid(navController: NavController, artistsViewModel: ArtistsViewModel 
 }
 
 @Composable
-fun ArtistToolbar(scaffoldState: ScaffoldState, artistsViewModel: ArtistsViewModel = hiltViewModel()) {
+fun ArtistToolbar(scaffoldState: ScaffoldState, mainViewModel: MainViewModel, artistsViewModel: ArtistsViewModel = hiltViewModel()) {
     val searching by artistsViewModel.searching.observeAsState()
     if (searching ?: false) {
         val query by artistsViewModel.query.observeAsState()
@@ -36,6 +37,7 @@ fun ArtistToolbar(scaffoldState: ScaffoldState, artistsViewModel: ArtistsViewMod
     } else {
         BaseToolbar(
             scaffoldState,
+            mainViewModel,
             extraActions = {
                 IconButton(onClick = { artistsViewModel.setSearching(true) }) {
                     Icon(Icons.Filled.Search, contentDescription = stringResource(R.string.search))
