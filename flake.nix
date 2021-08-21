@@ -2,19 +2,19 @@
   description = "Accentor android app";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
+    nixpkgs.url = "github:chvp/nixpkgs/bump-androidenv";
     flake-utils.url = "github:numtide/flake-utils/master";
   };
   outputs = { self, nixpkgs, flake-utils }:
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = import nixpkgs { inherit system; config.android_sdk.accept_license = true; };
-        buildToolsVersion = "30.0.3";
+        buildToolsVersion = "31.0.0";
         composed = pkgs.androidenv.composeAndroidPackages {
           toolsVersion = "26.1.1";
-          platformToolsVersion = "31.0.2";
+          platformToolsVersion = "31.0.3";
           buildToolsVersions = [ buildToolsVersion ];
-          platformVersions = [ "30" ];
+          platformVersions = [ "31" ];
         };
         fhsEnv = pkgs.buildFHSUserEnv {
           name = "android-sdk-env";
