@@ -33,6 +33,14 @@ data class Track(
         return this.number - other.number
     }
 
+    fun compareAlphabetically(other: Track, albums: SparseArray<Album>): Int {
+        var order = normalizedTitle.compareTo(other.normalizedTitle)
+        if (order != 0) { return order }
+        order = this.number - other.number
+        if (order != 0) { return order }
+        return compareTo(other, albums)
+    }
+
     companion object {
         const val ALBUMARTIST = "me.vanpetegem.accentor.data.tracks.Track.ALBUMARTIST"
         const val ARTIST = "me.vanpetegem.accentor.data.tracks.Track.ARTIST"

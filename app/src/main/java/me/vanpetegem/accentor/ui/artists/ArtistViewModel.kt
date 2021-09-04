@@ -34,7 +34,7 @@ class ArtistViewModel @Inject constructor(
     fun tracksForArtist(artist: Artist): LiveData<List<Track>> = switchMap(trackRepository.findByArtist(artist)) { tracks ->
         map(albumRepository.allAlbumsById) { albums ->
             val copy = tracks.toMutableList()
-            copy.sortWith({ t1, t2 -> t1.compareTo(t2, albums) })
+            copy.sortWith({ t1, t2 -> t1.compareAlphabetically(t2, albums) })
             copy
         }
     }
