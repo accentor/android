@@ -157,7 +157,10 @@ class MediaSessionConnection @Inject constructor(
 
     suspend fun play(tracks: List<Pair<Track, Album>>) {
         stop()
-        mediaController.setPlaylist(tracks.map { it.first.id.toString() }, null).await()
+        mediaController.setPlaylist(
+            tracks.map { it.first.id.toString() },
+            null
+        ).await()
         play()
     }
 
