@@ -3,7 +3,7 @@
 buildscript {
     ext {
         coil_version = '1.4.0'
-        compose_version = '1.0.3'
+        compose_version = '1.0.4'
         exoplayer_version = '2.15.1'
         fuel_version = '2.3.1'
         glide_version = '4.12.0'
