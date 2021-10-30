@@ -10,7 +10,7 @@ buildscript {
         hilt_version = '2.39.1'
         kotlin_version = '1.5.31'
         kotlinx_version = '1.5.2'
-        lifecycle_version = '2.3.1'
+        lifecycle_version = '2.4.0'
         room_version = '2.3.0'
     }
     repositories {
