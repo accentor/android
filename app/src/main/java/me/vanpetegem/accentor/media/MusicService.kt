@@ -15,15 +15,14 @@ import androidx.media2.session.SessionResult
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.Player
-import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.audio.AudioAttributes
-import com.google.android.exoplayer2.database.ExoDatabaseProvider
+import com.google.android.exoplayer2.database.StandaloneDatabaseProvider
 import com.google.android.exoplayer2.ext.media2.SessionCallbackBuilder
 import com.google.android.exoplayer2.ext.media2.SessionPlayerConnector
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.upstream.DataSource
-import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
+import com.google.android.exoplayer2.upstream.DefaultDataSource
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSource
 import com.google.android.exoplayer2.upstream.cache.CacheDataSource
 import com.google.android.exoplayer2.upstream.cache.LeastRecentlyUsedCacheEvictor
@@ -74,18 +73,18 @@ class MusicService : MediaSessionService() {
         .build()
 
     private val baseDataSourceFactory by lazy {
-        DefaultDataSourceFactory(this@MusicService.application, DefaultHttpDataSource.Factory().setUserAgent(userAgent))
+        DefaultDataSource.Factory(this@MusicService.application, DefaultHttpDataSource.Factory().setUserAgent(userAgent))
     }
     private val cache: SimpleCache by lazy {
         SimpleCache(
             File(this@MusicService.application.cacheDir, "audio"),
             LeastRecentlyUsedCacheEvictor(preferencesDataSource.musicCacheSize.value!!),
-            ExoDatabaseProvider(this@MusicService.application)
+            StandaloneDatabaseProvider(this@MusicService.application)
         )
     }
 
     private val exoPlayer: ExoPlayer by lazy {
-        SimpleExoPlayer.Builder(this).apply {
+        ExoPlayer.Builder(this).apply {
             setMediaSourceFactory(
                 ProgressiveMediaSource.Factory(
                     object : DataSource.Factory {
