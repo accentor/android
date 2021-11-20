@@ -20,6 +20,8 @@ import me.vanpetegem.accentor.data.artists.ArtistDao
 import me.vanpetegem.accentor.data.artists.DbArtist
 import me.vanpetegem.accentor.data.codecconversions.CodecConversionDao
 import me.vanpetegem.accentor.data.codecconversions.DbCodecConversion
+import me.vanpetegem.accentor.data.plays.DbPlay
+import me.vanpetegem.accentor.data.plays.PlayDao
 import me.vanpetegem.accentor.data.plays.UnreportedPlay
 import me.vanpetegem.accentor.data.plays.UnreportedPlayDao
 import me.vanpetegem.accentor.data.tracks.DbTrack
@@ -39,17 +41,19 @@ import me.vanpetegem.accentor.util.RoomTypeConverters
         DbAlbumLabel::class,
         DbArtist::class,
         DbCodecConversion::class,
+        DbPlay::class,
         DbTrack::class,
         DbTrackArtist::class,
         DbTrackGenre::class,
         UnreportedPlay::class,
     ],
-    version = 8
+    version = 9
 )
 abstract class AccentorDatabase : RoomDatabase() {
     abstract fun albumDao(): AlbumDao
     abstract fun artistDao(): ArtistDao
     abstract fun codecConversionDao(): CodecConversionDao
+    abstract fun playDao(): PlayDao
     abstract fun trackDao(): TrackDao
     abstract fun userDao(): UserDao
     abstract fun unreportedPlayDao(): UnreportedPlayDao
@@ -203,6 +207,27 @@ internal object DatabaseModule {
                     }
                 }
             })
+            .addMigrations(object : Migration(8, 9) {
+                override fun migrate(database: SupportSQLiteDatabase) {
+                    database.beginTransaction()
+                    try {
+                        database.execSQL(
+                            """
+                            CREATE TABLE IF NOT EXISTS `plays` (
+                                `id` INTEGER NOT NULL,
+                                `played_at` TEXT NOT NULL,
+                                `track_id` INTEGER NOT NULL,
+                                `user_id` INTEGER NOT NULL,
+                                PRIMARY KEY(`id`)
+                            )
+                            """
+                        )
+                        database.setTransactionSuccessful()
+                    } finally {
+                        database.endTransaction()
+                    }
+                }
+            })
             .build()
     }
 
@@ -212,6 +237,8 @@ internal object DatabaseModule {
     fun provideArtistDao(database: AccentorDatabase): ArtistDao = database.artistDao()
     @Provides
     fun provideCodecConversionDao(database: AccentorDatabase): CodecConversionDao = database.codecConversionDao()
+    @Provides
+    fun providePlayDao(database: AccentorDatabase): PlayDao = database.playDao()
     @Provides
     fun provideTrackDao(database: AccentorDatabase): TrackDao = database.trackDao()
     @Provides

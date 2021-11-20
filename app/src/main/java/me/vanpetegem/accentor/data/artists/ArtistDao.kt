@@ -54,7 +54,7 @@ abstract class ArtistDao {
     protected abstract fun getAllDbArtists(): LiveData<List<DbArtist>>
 
     @Insert
-    protected abstract fun insert(album: DbArtist)
+    protected abstract fun insert(artist: DbArtist)
 
     @Query("DELETE FROM artists")
     abstract fun deleteAll()
