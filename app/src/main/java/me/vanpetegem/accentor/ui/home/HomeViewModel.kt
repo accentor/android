@@ -23,6 +23,7 @@ class HomeViewModel @Inject constructor(
     val recentlyPlayedAlbums = albumRepository.albumsByPlayed
     val randomAlbums = albumRepository.randomAlbums
     val recentlyAddedArtists = artistRepository.artistsByAdded
+    val recentlyPlayedArtists = artistRepository.artistsByPlayed
     val randomArtists = artistRepository.randomArtists
     val currentDay: LiveData<LocalDate> = _currentDay
 

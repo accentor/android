@@ -1,6 +1,5 @@
 package me.vanpetegem.accentor.data.plays
 
-import androidx.lifecycle.LiveData
 import java.time.Instant
 import javax.inject.Inject
 import me.vanpetegem.accentor.api.plays.create
@@ -13,8 +12,6 @@ class PlayRepository @Inject constructor(
     private val unreportedPlayDao: UnreportedPlayDao,
     private val authenticationRepository: AuthenticationRepository,
 ) {
-    val allPlays: LiveData<List<Play>> = playDao.getAll()
-
     suspend fun refresh(handler: suspend (Result<Unit>) -> Unit) {
         when (val result = index(authenticationRepository.server.value!!, authenticationRepository.authData.value!!)) {
             is Result.Success -> {

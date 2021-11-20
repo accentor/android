@@ -56,6 +56,7 @@
     <string name="recently_added_albums">Recently added albums</string>
     <string name="recently_played_albums">Recently played albums</string>
     <string name="recently_added_artists">Recently added artists</string>
+    <string name="recently_played_artists">Recently played artists</string>
     <string name="random_albums">Random albums</string>
     <string name="random_artists">Random artists</string>
     <string name="artists">Artists</string>

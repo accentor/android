@@ -105,6 +105,21 @@ fun Home(navController: NavController, playerViewModel: PlayerViewModel, homeVie
             }
         }
         item {
+            val artists by homeViewModel.recentlyPlayedArtists.observeAsState()
+            Text(stringResource(R.string.recently_played_artists), style = MaterialTheme.typography.h5, modifier = Modifier.padding(8.dp))
+            if (artists != null && artists!!.size > 0) {
+                LazyRow {
+                    items(artists!!.size) { i ->
+                        Box(modifier = Modifier.width(192.dp)) {
+                            ArtistCard(navController, artists!![i])
+                        }
+                    }
+                }
+            } else {
+                Text(stringResource(R.string.no_artists), modifier = Modifier.padding(horizontal = 8.dp))
+            }
+        }
+        item {
             val albums by homeViewModel.randomAlbums.observeAsState()
             Text(stringResource(R.string.random_albums), style = MaterialTheme.typography.h5, modifier = Modifier.padding(8.dp))
             if (albums != null && albums!!.size > 0) {
