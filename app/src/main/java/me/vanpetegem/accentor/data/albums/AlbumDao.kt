@@ -7,6 +7,7 @@ import androidx.lifecycle.Transformations.switchMap
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.RewriteQueriesToDropUnusedColumns
 import androidx.room.Transaction
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -17,26 +18,15 @@ abstract class AlbumDao {
     open fun getAll(): LiveData<List<Album>> = switchMap(getAllDbAlbums()) { albums ->
         switchMap(albumArtistsByAlbumId()) { albumArtists ->
             map(albumLabelsByAlbumId()) { albumLabels ->
-                albums.map { a ->
-                    Album(
-                        a.id,
-                        a.title,
-                        a.normalizedTitle,
-                        a.release,
-                        a.reviewComment,
-                        a.edition,
-                        a.editionDescription,
-                        a.createdAt,
-                        a.updatedAt,
-                        a.image,
-                        a.image500,
-                        a.image250,
-                        a.image100,
-                        a.imageType,
-                        albumLabels.get(a.id, ArrayList()),
-                        albumArtists.get(a.id, ArrayList())
-                    )
-                }
+                albums.map { a -> Album.fromDbAlbum(a, albumLabels.get(a.id, ArrayList()), albumArtists.get(a.id, ArrayList())) }
+            }
+        }
+    }
+
+    open fun getAllByPlayed(): LiveData<List<Album>> = switchMap(getAllDbAlbumsByPlayed()) { albums ->
+        switchMap(albumArtistsByAlbumId()) { albumArtists ->
+            map(albumLabelsByAlbumId()) { albumLabels ->
+                albums.map { a -> Album.fromDbAlbum(a, albumLabels.get(a.id, ArrayList()), albumArtists.get(a.id, ArrayList())) }
             }
         }
     }
@@ -44,26 +34,7 @@ abstract class AlbumDao {
     open fun findByIds(ids: List<Int>): LiveData<List<Album>> = switchMap(findDbAlbumsByIds(ids)) { albums ->
         switchMap(albumArtistsByAlbumIdWhereAlbumIds(ids)) { albumArtists ->
             map(albumLabelsByAlbumIdWhereAlbumIds(ids)) { albumLabels ->
-                albums.map { a ->
-                    Album(
-                        a.id,
-                        a.title,
-                        a.normalizedTitle,
-                        a.release,
-                        a.reviewComment,
-                        a.edition,
-                        a.editionDescription,
-                        a.createdAt,
-                        a.updatedAt,
-                        a.image,
-                        a.image500,
-                        a.image250,
-                        a.image100,
-                        a.imageType,
-                        albumLabels.get(a.id, ArrayList()),
-                        albumArtists.get(a.id, ArrayList())
-                    )
-                }
+                albums.map { a -> Album.fromDbAlbum(a, albumLabels.get(a.id, ArrayList()), albumArtists.get(a.id, ArrayList())) }
             }
         }
     }
@@ -72,23 +43,10 @@ abstract class AlbumDao {
         switchMap(findDbAlbumArtistsById(id)) { albumArtists ->
             map(findDbAlbumLabelsById(id)) { albumLabels ->
                 if (dbAlbum != null) {
-                    Album(
-                        dbAlbum.id,
-                        dbAlbum.title,
-                        dbAlbum.normalizedTitle,
-                        dbAlbum.release,
-                        dbAlbum.reviewComment,
-                        dbAlbum.edition,
-                        dbAlbum.editionDescription,
-                        dbAlbum.createdAt,
-                        dbAlbum.updatedAt,
-                        dbAlbum.image,
-                        dbAlbum.image500,
-                        dbAlbum.image250,
-                        dbAlbum.image100,
-                        dbAlbum.imageType,
+                    Album.fromDbAlbum(
+                        dbAlbum,
                         albumLabels.map { AlbumLabel(it.labelId, it.catalogueNumber) },
-                        albumArtists.map { AlbumArtist(it.artistId, it.name, it.normalizedName, it.order, it.separator) }
+                        albumArtists.map { AlbumArtist(it.artistId, it.name, it.normalizedName, it.order, it.separator) },
                     )
                 } else {
                     null
@@ -101,26 +59,7 @@ abstract class AlbumDao {
         switchMap(findDbAlbumsByDay(day.format(DateTimeFormatter.ISO_LOCAL_DATE).substring(4))) { albums ->
             switchMap(albumArtistsByAlbumId()) { albumArtists ->
                 map(albumLabelsByAlbumId()) { albumLabels ->
-                    albums.map { a ->
-                        Album(
-                            a.id,
-                            a.title,
-                            a.normalizedTitle,
-                            a.release,
-                            a.reviewComment,
-                            a.edition,
-                            a.editionDescription,
-                            a.createdAt,
-                            a.updatedAt,
-                            a.image,
-                            a.image500,
-                            a.image250,
-                            a.image100,
-                            a.imageType,
-                            albumLabels.get(a.id, ArrayList()),
-                            albumArtists.get(a.id, ArrayList())
-                        )
-                    }
+                    albums.map { a -> Album.fromDbAlbum(a, albumLabels.get(a.id, ArrayList()), albumArtists.get(a.id, ArrayList())) }
                 }
             }
         }
@@ -132,23 +71,10 @@ abstract class AlbumDao {
         val albumArtists = getDbAlbumArtistsById(id)
         val albumLabels = getDbAlbumLabelsById(id)
 
-        return Album(
-            dbAlbum.id,
-            dbAlbum.title,
-            dbAlbum.normalizedTitle,
-            dbAlbum.release,
-            dbAlbum.reviewComment,
-            dbAlbum.edition,
-            dbAlbum.editionDescription,
-            dbAlbum.createdAt,
-            dbAlbum.updatedAt,
-            dbAlbum.image,
-            dbAlbum.image500,
-            dbAlbum.image250,
-            dbAlbum.image100,
-            dbAlbum.imageType,
+        return Album.fromDbAlbum(
+            dbAlbum,
             albumLabels.map { AlbumLabel(it.labelId, it.catalogueNumber) },
-            albumArtists.map { AlbumArtist(it.artistId, it.name, it.normalizedName, it.order, it.separator) }
+            albumArtists.map { AlbumArtist(it.artistId, it.name, it.normalizedName, it.order, it.separator) },
         )
     }
 
@@ -169,7 +95,7 @@ abstract class AlbumDao {
                       edition ASC,
                       edition_description ASC,
                       id ASC
-           """
+        """
     )
     protected abstract fun findDbAlbumsByDay(day: String): LiveData<List<DbAlbum>>
 
@@ -264,6 +190,17 @@ abstract class AlbumDao {
 
     @Query("SELECT * FROM albums ORDER BY normalized_title ASC, release ASC, edition ASC, edition_description ASC, id ASC")
     protected abstract fun getAllDbAlbums(): LiveData<List<DbAlbum>>
+
+    @RewriteQueriesToDropUnusedColumns
+    @Query(
+        """
+           SELECT * FROM albums INNER JOIN (
+               SELECT tracks.album_id as album_id, MAX(plays.played_at) AS played_at FROM
+                   tracks INNER JOIN plays ON tracks.id = plays.track_id GROUP BY tracks.album_id
+           ) p ON p.album_id = albums.id ORDER BY p.played_at DESC
+        """
+    )
+    protected abstract fun getAllDbAlbumsByPlayed(): LiveData<List<DbAlbum>>
 
     @Query("SELECT * FROM album_artists")
     protected abstract fun getAllAlbumArtists(): LiveData<List<DbAlbumArtist>>

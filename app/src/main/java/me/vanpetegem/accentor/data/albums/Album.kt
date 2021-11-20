@@ -33,6 +33,28 @@ data class Album(
         order = if (order == 0) this.id - other.id else order
         return order
     }
+
+    companion object {
+        fun fromDbAlbum(a: DbAlbum, labels: List<AlbumLabel>, artists: List<AlbumArtist>): Album =
+            Album(
+                a.id,
+                a.title,
+                a.normalizedTitle,
+                a.release,
+                a.reviewComment,
+                a.edition,
+                a.editionDescription,
+                a.createdAt,
+                a.updatedAt,
+                a.image,
+                a.image500,
+                a.image250,
+                a.image100,
+                a.imageType,
+                labels,
+                artists,
+            )
+    }
 }
 
 fun compareAlbumEditions(a1: Album, a2: Album): Int {

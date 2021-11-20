@@ -16,4 +16,20 @@ data class Artist(
     val imageType: String?
 ) {
     fun firstCharacter() = String(intArrayOf(name.codePointAt(0)), 0, 1)
+
+    companion object {
+        fun fromDbArtist(a: DbArtist): Artist = Artist(
+            a.id,
+            a.name,
+            a.normalizedName,
+            a.reviewComment,
+            a.createdAt,
+            a.updatedAt,
+            a.image,
+            a.image500,
+            a.image250,
+            a.image100,
+            a.imageType,
+        )
+    }
 }

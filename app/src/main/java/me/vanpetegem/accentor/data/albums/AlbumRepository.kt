@@ -13,7 +13,7 @@ import me.vanpetegem.accentor.util.Result
 @Reusable
 class AlbumRepository @Inject constructor(
     private val albumDao: AlbumDao,
-    private val authenticationRepository: AuthenticationRepository
+    private val authenticationRepository: AuthenticationRepository,
 ) {
     val allAlbums: LiveData<List<Album>> = albumDao.getAll()
     val allAlbumsById: LiveData<SparseArray<Album>> = map(allAlbums) {
@@ -31,6 +31,7 @@ class AlbumRepository @Inject constructor(
         copy.sortWith({ a1, a2 -> a2.createdAt.compareTo(a1.createdAt) })
         copy
     }
+    val albumsByPlayed: LiveData<List<Album>> = albumDao.getAllByPlayed()
     val randomAlbums: LiveData<List<Album>> = map(allAlbums) {
         val copy = it.toMutableList()
         copy.shuffle()

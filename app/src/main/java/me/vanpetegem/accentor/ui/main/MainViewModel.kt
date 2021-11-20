@@ -16,6 +16,7 @@ import me.vanpetegem.accentor.data.albums.AlbumRepository
 import me.vanpetegem.accentor.data.artists.ArtistRepository
 import me.vanpetegem.accentor.data.authentication.AuthenticationRepository
 import me.vanpetegem.accentor.data.codecconversions.CodecConversionRepository
+import me.vanpetegem.accentor.data.plays.PlayRepository
 import me.vanpetegem.accentor.data.tracks.TrackRepository
 import me.vanpetegem.accentor.data.users.User
 import me.vanpetegem.accentor.data.users.UserRepository
@@ -29,6 +30,7 @@ class MainViewModel @Inject constructor(
     private val artistRepository: ArtistRepository,
     private val trackRepository: TrackRepository,
     private val codecConversionRepository: CodecConversionRepository,
+    private val playRepository: PlayRepository,
 ) : AndroidViewModel(application) {
     private val refreshing = MutableLiveData<Int>(0)
     val isRefreshing: LiveData<Boolean> = map(refreshing) { if (it != null) it > 0 else false }
@@ -51,12 +53,15 @@ class MainViewModel @Inject constructor(
             }
         }
 
-        refreshing.value?.let { refreshing.value = it + 2 }
+        refreshing.value?.let { refreshing.value = it + 3 }
         viewModelScope.launch(IO) {
             artistRepository.refresh {
                 withContext(Main) { refreshing.value?.let { refreshing.value = it - 1 } }
             }
             albumRepository.refresh {
+                withContext(Main) { refreshing.value?.let { refreshing.value = it - 1 } }
+            }
+            playRepository.refresh {
                 withContext(Main) { refreshing.value?.let { refreshing.value = it - 1 } }
             }
         }
@@ -67,6 +72,7 @@ class MainViewModel @Inject constructor(
         viewModelScope.launch(IO) { albumRepository.clear() }
         viewModelScope.launch(IO) { artistRepository.clear() }
         viewModelScope.launch(IO) { trackRepository.clear() }
+        viewModelScope.launch(IO) { playRepository.clear() }
         viewModelScope.launch(IO) { codecConversionRepository.clear() }
         viewModelScope.launch(IO) { authenticationRepository.logout() }
     }

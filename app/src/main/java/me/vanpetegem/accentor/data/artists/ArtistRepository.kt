@@ -25,6 +25,7 @@ class ArtistRepository @Inject constructor(
         copy.sortWith({ a1, a2 -> a2.createdAt.compareTo(a1.createdAt) })
         copy
     }
+    val artistsByPlayed: LiveData<List<Artist>> = artistDao.getAllByPlayed()
     val randomArtists: LiveData<List<Artist>> = map(allArtists) {
         val copy = it.toMutableList()
         copy.shuffle()

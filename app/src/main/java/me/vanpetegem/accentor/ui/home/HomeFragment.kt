@@ -75,8 +75,38 @@ fun Home(navController: NavController, playerViewModel: PlayerViewModel, homeVie
             }
         }
         item {
+            val albums by homeViewModel.recentlyPlayedAlbums.observeAsState()
+            Text(stringResource(R.string.recently_played_albums), style = MaterialTheme.typography.h5, modifier = Modifier.padding(8.dp))
+            if (albums != null && albums!!.size > 0) {
+                LazyRow {
+                    items(albums!!.size) { i ->
+                        Box(modifier = Modifier.width(192.dp)) {
+                            AlbumCard(albums!![i], navController, playerViewModel)
+                        }
+                    }
+                }
+            } else {
+                Text(stringResource(R.string.no_albums), modifier = Modifier.padding(horizontal = 8.dp))
+            }
+        }
+        item {
             val artists by homeViewModel.recentlyAddedArtists.observeAsState()
             Text(stringResource(R.string.recently_added_artists), style = MaterialTheme.typography.h5, modifier = Modifier.padding(8.dp))
+            if (artists != null && artists!!.size > 0) {
+                LazyRow {
+                    items(artists!!.size) { i ->
+                        Box(modifier = Modifier.width(192.dp)) {
+                            ArtistCard(navController, artists!![i])
+                        }
+                    }
+                }
+            } else {
+                Text(stringResource(R.string.no_artists), modifier = Modifier.padding(horizontal = 8.dp))
+            }
+        }
+        item {
+            val artists by homeViewModel.recentlyPlayedArtists.observeAsState()
+            Text(stringResource(R.string.recently_played_artists), style = MaterialTheme.typography.h5, modifier = Modifier.padding(8.dp))
             if (artists != null && artists!!.size > 0) {
                 LazyRow {
                     items(artists!!.size) { i ->

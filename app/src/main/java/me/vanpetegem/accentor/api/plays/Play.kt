@@ -1,5 +1,6 @@
 package me.vanpetegem.accentor.api.plays
 
+import com.github.kittinunf.fuel.httpGet
 import com.github.kittinunf.fuel.httpPost
 import java.time.Instant
 import me.vanpetegem.accentor.data.authentication.AuthenticationData
@@ -22,4 +23,31 @@ fun create(server: String, authenticationData: AuthenticationData, trackId: Int,
             { play: Play -> Result.Success(play) },
             { e: Throwable -> Result.Error(Exception("Error creating play", e)) },
         )
+}
+
+fun index(server: String, authenticationData: AuthenticationData): Result<List<Play>> {
+    var page = 1
+    val results = ArrayList<Play>()
+
+    fun doFetch(): Result<List<Play>> {
+        return "$server/api/plays".httpGet(listOf(Pair("page", page)))
+            .set("Accept", "application/json")
+            .set("X-Secret", authenticationData.secret)
+            .set("X-Device-Id", authenticationData.deviceId)
+            .responseObject<List<Play>>().third
+            .fold(
+                { a: List<Play> ->
+                    if (a.isEmpty()) {
+                        Result.Success(results)
+                    } else {
+                        results.addAll(a)
+                        page++
+                        doFetch()
+                    }
+                },
+                { e: Throwable -> Result.Error(Exception("Error getting plays", e)) }
+            )
+    }
+
+    return doFetch()
 }
