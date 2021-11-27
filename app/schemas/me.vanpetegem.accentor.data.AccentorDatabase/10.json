@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 10,
-    "identityHash": "981b2326de20e076d19b7c7c17c4ed0e",
+    "identityHash": "8b37d08e7b035f0f6e0b0824b571f0c7",
     "entities": [
       {
         "tableName": "users",
@@ -307,7 +307,7 @@
       },
       {
         "tableName": "codec_conversions",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `name` TEXT NOT NULL, `ffmpeg_params` TEXT NOT NULL, `resulting_codec_id` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `name` TEXT NOT NULL, `ffmpeg_params` TEXT NOT NULL, `resulting_codec_id` INTEGER NOT NULL, `fetched_at` TEXT NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -331,6 +331,12 @@
             "fieldPath": "resultingCodecId",
             "columnName": "resulting_codec_id",
             "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fetchedAt",
+            "columnName": "fetched_at",
+            "affinity": "TEXT",
             "notNull": true
           }
         ],
@@ -589,7 +595,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '981b2326de20e076d19b7c7c17c4ed0e')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '8b37d08e7b035f0f6e0b0824b571f0c7')"
     ]
   }
 }
