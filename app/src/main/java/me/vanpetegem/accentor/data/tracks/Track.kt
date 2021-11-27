@@ -47,7 +47,7 @@ data class Track(
         const val ARTIST = "me.vanpetegem.accentor.data.tracks.Track.ARTIST"
         const val YEAR = "me.vanpetegem.accentor.data.tracks.Track.YEAR"
 
-        fun fromDb(t: DbTrack, trackArtists: SparseArray<MutableList<TrackArtist>>, trackGenres: SparseArray<MutableList<Int>>) =
+        fun fromDb(t: DbTrack, trackArtists: List<TrackArtist>, trackGenres: List<Int>) =
             Track(
                 t.id,
                 t.title,
@@ -57,8 +57,8 @@ data class Track(
                 t.reviewComment,
                 t.createdAt,
                 t.updatedAt,
-                trackGenres.get(t.id, ArrayList()),
-                trackArtists.get(t.id, ArrayList()),
+                trackGenres,
+                trackArtists,
                 t.codecId,
                 t.length,
                 t.bitrate,
