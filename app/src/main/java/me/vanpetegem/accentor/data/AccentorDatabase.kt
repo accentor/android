@@ -234,10 +234,11 @@ internal object DatabaseModule {
                     database.beginTransaction()
                     try {
                         val now = Instant.now()
+                        database.execSQL("ALTER TABLE `albums` ADD COLUMN `fetched_at` TEXT NOT NULL DEFAULT '$now'")
+                        database.execSQL("ALTER TABLE `artists` ADD COLUMN `fetched_at` TEXT NOT NULL DEFAULT '$now'")
+                        database.execSQL("ALTER TABLE `codec_conversions` ADD COLUMN `fetched_at` TEXT NOT NULL DEFAULT '$now'")
                         database.execSQL("ALTER TABLE `tracks` ADD COLUMN `fetched_at` TEXT NOT NULL DEFAULT '$now'")
                         database.execSQL("ALTER TABLE `users` ADD COLUMN `fetched_at` TEXT NOT NULL DEFAULT '$now'")
-                        database.execSQL("ALTER TABLE `codec_conversions` ADD COLUMN `fetched_at` TEXT NOT NULL DEFAULT '$now'")
-                        database.execSQL("ALTER TABLE `artists` ADD COLUMN `fetched_at` TEXT NOT NULL DEFAULT '$now'")
                         database.setTransactionSuccessful()
                     } finally {
                         database.endTransaction()

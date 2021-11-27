@@ -12,17 +12,9 @@ data class ApiTrack(
     val createdAt: Instant,
     val updatedAt: Instant,
     val genreIds: List<Int>,
-    val trackArtists: List<ApiTrackArtist>,
+    val trackArtists: List<TrackArtist>,
     val codecId: Int?,
     val length: Int?,
     val bitrate: Int?,
     val locationId: Int?,
-)
-
-data class ApiTrackArtist(
-    val artistId: Int,
-    val name: String,
-    val normalizedName: String,
-    val role: Role,
-    val order: Int,
 )

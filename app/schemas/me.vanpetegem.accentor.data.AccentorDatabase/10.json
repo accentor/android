@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 10,
-    "identityHash": "db2492c742ec8157e10d00b7033e0395",
+    "identityHash": "38bf96bb9dbb575937a66f2e79dc0582",
     "entities": [
       {
         "tableName": "users",
@@ -44,7 +44,7 @@
       },
       {
         "tableName": "albums",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `title` TEXT NOT NULL, `normalized_title` TEXT NOT NULL, `release` TEXT NOT NULL, `review_comment` TEXT, `edition` TEXT, `edition_description` TEXT, `created_at` TEXT NOT NULL, `updated_at` TEXT NOT NULL, `image` TEXT, `image_500` TEXT, `image_250` TEXT, `image_100` TEXT, `image_type` TEXT, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `title` TEXT NOT NULL, `normalized_title` TEXT NOT NULL, `release` TEXT NOT NULL, `review_comment` TEXT, `edition` TEXT, `edition_description` TEXT, `created_at` TEXT NOT NULL, `updated_at` TEXT NOT NULL, `image` TEXT, `image_500` TEXT, `image_250` TEXT, `image_100` TEXT, `image_type` TEXT, `fetched_at` TEXT NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -129,6 +129,12 @@
             "columnName": "image_type",
             "affinity": "TEXT",
             "notNull": false
+          },
+          {
+            "fieldPath": "fetchedAt",
+            "columnName": "fetched_at",
+            "affinity": "TEXT",
+            "notNull": true
           }
         ],
         "primaryKey": {
@@ -601,7 +607,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'db2492c742ec8157e10d00b7033e0395')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '38bf96bb9dbb575937a66f2e79dc0582')"
     ]
   }
 }

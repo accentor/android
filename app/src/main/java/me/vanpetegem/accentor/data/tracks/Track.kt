@@ -77,7 +77,7 @@ data class Track(
                 t.createdAt,
                 t.updatedAt,
                 t.genreIds,
-                t.trackArtists.map { TrackArtist.fromApi(it) },
+                t.trackArtists,
                 t.codecId,
                 t.length,
                 t.bitrate,
@@ -93,18 +93,7 @@ data class TrackArtist(
     val normalizedName: String,
     val role: Role,
     val order: Int,
-) {
-    companion object {
-        fun fromApi(t: ApiTrackArtist) =
-            TrackArtist(
-                t.artistId,
-                t.name,
-                t.normalizedName,
-                t.role,
-                t.order,
-            )
-    }
-}
+)
 
 enum class Role {
     MAIN,
