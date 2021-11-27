@@ -4,27 +4,30 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations.map
 import androidx.room.Dao
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
+import java.time.Instant
 
 @Dao
 abstract class UserDao {
-
     open fun getAll(): LiveData<List<User>> = map(getAllDbUsers()) { us ->
-        us.map { User(it.id, it.name, it.permission) }
+        us.map { User.fromDb(it) }
     }
 
     @Transaction
-    open fun replaceAll(users: List<User>) {
-        deleteAll()
-        users.forEach { insert(DbUser(it.id, it.name, it.permission)) }
+    open fun upsertAll(users: List<User>) {
+        users.forEach { upsert(DbUser(it.id, it.name, it.permission, it.fetchedAt)) }
     }
 
     @Query("SELECT * FROM users ORDER BY name COLLATE NOCASE ASC")
     protected abstract fun getAllDbUsers(): LiveData<List<DbUser>>
 
-    @Insert
-    protected abstract fun insert(user: DbUser)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    protected abstract fun upsert(user: DbUser)
+
+    @Query("DELETE FROM users WHERE fetched_at < :time")
+    abstract fun deleteFetchedBefore(time: Instant)
 
     @Query("DELETE FROM users")
     abstract fun deleteAll()

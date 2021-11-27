@@ -2,33 +2,31 @@ package me.vanpetegem.accentor.api.user
 
 import com.github.kittinunf.fuel.httpGet
 import me.vanpetegem.accentor.data.authentication.AuthenticationData
-import me.vanpetegem.accentor.data.users.User
+import me.vanpetegem.accentor.data.users.ApiUser
 import me.vanpetegem.accentor.util.Result
 import me.vanpetegem.accentor.util.responseObject
 
-fun index(server: String, authenticationData: AuthenticationData): Result<List<User>> {
+fun index(server: String, authenticationData: AuthenticationData): Sequence<Result<List<ApiUser>>> {
     var page = 1
-    val results = ArrayList<User>()
 
-    fun doFetch(): Result<List<User>> {
+    fun doFetch(): Result<List<ApiUser>>? {
         return "$server/api/users".httpGet(listOf(Pair("page", page)))
             .set("Accept", "application/json")
             .set("X-Secret", authenticationData.secret)
             .set("X-Device-Id", authenticationData.deviceId)
-            .responseObject<List<User>>().third
+            .responseObject<List<ApiUser>>().third
             .fold(
-                { u: List<User> ->
+                { u: List<ApiUser> ->
                     if (u.isEmpty()) {
-                        Result.Success(results)
+                        null
                     } else {
-                        results.addAll(u)
                         page++
-                        doFetch()
+                        Result.Success(u)
                     }
                 },
                 { e: Throwable -> Result.Error(Exception("Error getting users", e)) }
             )
     }
 
-    return doFetch()
+    return generateSequence { doFetch() }
 }

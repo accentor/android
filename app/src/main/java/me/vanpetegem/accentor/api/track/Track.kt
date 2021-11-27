@@ -17,11 +17,11 @@ fun index(server: String, authenticationData: AuthenticationData): Sequence<Resu
             .responseObject<List<ApiTrack>>().third
             .fold(
                 { a: List<ApiTrack> ->
-                    if (a.size > 0) {
+                    if (a.isEmpty()) {
+                        null
+                    } else {
                         page++
                         Result.Success(a)
-                    } else {
-                        null
                     }
                 },
                 { e: Throwable -> Result.Error(Exception("Error getting tracks", e)) },

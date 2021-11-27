@@ -235,6 +235,7 @@ internal object DatabaseModule {
                     try {
                         val now = Instant.now()
                         database.execSQL("ALTER TABLE `tracks` ADD COLUMN `fetched_at` TEXT NOT NULL DEFAULT '$now'")
+                        database.execSQL("ALTER TABLE `users` ADD COLUMN `fetched_at` TEXT NOT NULL DEFAULT '$now'")
                         database.setTransactionSuccessful()
                     } finally {
                         database.endTransaction()
