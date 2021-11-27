@@ -4,26 +4,27 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations.map
 import androidx.room.Dao
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.RewriteQueriesToDropUnusedColumns
 import androidx.room.Transaction
+import java.time.Instant
 
 @Dao
 abstract class ArtistDao {
 
     open fun getAll(): LiveData<List<Artist>> = map(getAllDbArtists()) { list ->
-        list.map { Artist.fromDbArtist(it) }
+        list.map { Artist.fromDb(it) }
     }
 
     open fun getAllByPlayed(): LiveData<List<Artist>> = map(getAllDbArtistsByPlayed()) { list ->
-        list.map { Artist.fromDbArtist(it) }
+        list.map { Artist.fromDb(it) }
     }
 
     @Transaction
-    open fun replaceAll(artists: List<Artist>) {
-        deleteAll()
+    open fun upsertAll(artists: List<Artist>) {
         artists.forEach { artist ->
-            insert(
+            upsert(
                 DbArtist(
                     artist.id,
                     artist.name,
@@ -35,7 +36,8 @@ abstract class ArtistDao {
                     artist.image500,
                     artist.image250,
                     artist.image100,
-                    artist.imageType
+                    artist.imageType,
+                    artist.fetchedAt,
                 )
             )
         }
@@ -56,8 +58,11 @@ abstract class ArtistDao {
     )
     protected abstract fun getAllDbArtistsByPlayed(): LiveData<List<DbArtist>>
 
-    @Insert
-    protected abstract fun insert(artist: DbArtist)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    protected abstract fun upsert(artist: DbArtist)
+
+    @Query("DELETE FROM artists WHERE fetched_at < :time")
+    abstract fun deleteFetchedBefore(time: Instant)
 
     @Query("DELETE FROM artists")
     abstract fun deleteAll()

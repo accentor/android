@@ -1,34 +1,32 @@
 package me.vanpetegem.accentor.api.artist
 
 import com.github.kittinunf.fuel.httpGet
-import me.vanpetegem.accentor.data.artists.Artist
+import me.vanpetegem.accentor.data.artists.ApiArtist
 import me.vanpetegem.accentor.data.authentication.AuthenticationData
 import me.vanpetegem.accentor.util.Result
 import me.vanpetegem.accentor.util.responseObject
 
-fun index(server: String, authenticationData: AuthenticationData): Result<List<Artist>> {
+fun index(server: String, authenticationData: AuthenticationData): Sequence<Result<List<ApiArtist>>> {
     var page = 1
-    val results = ArrayList<Artist>()
 
-    fun doFetch(): Result<List<Artist>> {
+    fun doFetch(): Result<List<ApiArtist>>? {
         return "$server/api/artists".httpGet(listOf(Pair("page", page)))
             .set("Accept", "application/json")
             .set("X-Secret", authenticationData.secret)
             .set("X-Device-Id", authenticationData.deviceId)
-            .responseObject<List<Artist>>().third
+            .responseObject<List<ApiArtist>>().third
             .fold(
-                { a: List<Artist> ->
+                { a: List<ApiArtist> ->
                     if (a.isEmpty()) {
-                        Result.Success(results)
+                        null
                     } else {
-                        results.addAll(a)
                         page++
-                        doFetch()
+                        Result.Success(a)
                     }
                 },
                 { e: Throwable -> Result.Error(Exception("Error getting artists", e)) }
             )
     }
 
-    return doFetch()
+    return generateSequence { doFetch() }
 }

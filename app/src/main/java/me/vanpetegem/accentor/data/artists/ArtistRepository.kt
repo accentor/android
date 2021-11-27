@@ -4,6 +4,7 @@ import android.util.SparseArray
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations.map
 import dagger.Reusable
+import java.time.Instant
 import javax.inject.Inject
 import me.vanpetegem.accentor.api.artist.index
 import me.vanpetegem.accentor.data.authentication.AuthenticationRepository
@@ -33,13 +34,22 @@ class ArtistRepository @Inject constructor(
     }
 
     suspend fun refresh(handler: suspend (Result<Unit>) -> Unit) {
-        when (val result = index(authenticationRepository.server.value!!, authenticationRepository.authData.value!!)) {
-            is Result.Success -> {
-                artistDao.replaceAll(result.data)
-                handler(Result.Success(Unit))
+        val fetchStart = Instant.now()
+
+        for (result in index(authenticationRepository.server.value!!, authenticationRepository.authData.value!!)) {
+            when (result) {
+                is Result.Success -> {
+                    val fetchTime = Instant.now()
+                    artistDao.upsertAll(result.data.map { Artist.fromApi(it, fetchTime) })
+                }
+                is Result.Error -> {
+                    handler(Result.Error(result.exception))
+                    return
+                }
             }
-            is Result.Error -> handler(Result.Error(result.exception))
         }
+        artistDao.deleteFetchedBefore(fetchStart)
+        handler(Result.Success(Unit))
     }
 
     suspend fun clear() {
