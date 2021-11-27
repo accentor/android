@@ -1,6 +1,5 @@
 package me.vanpetegem.accentor.util
 
-import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.ResponseDeserializable
 import com.github.kittinunf.fuel.core.extensions.jsonBody
@@ -29,8 +28,7 @@ inline fun <reified T : Any> gsonDeserializer() = object : ResponseDeserializabl
 
 inline fun <reified T : Any> Request.jsonBody(src: T) =
     this.jsonBody(
-        gsonObject().toJson(src, object : TypeToken<T>() {}.type)
-            .also { Fuel.trace { "serialized $it" } } as String
+        gsonObject().toJson(src, object : TypeToken<T>() {}.type) as String
     )
 
 fun gsonObject(): Gson {

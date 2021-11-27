@@ -31,7 +31,9 @@ data class DbTrack(
     @ColumnInfo(name = "bitrate")
     val bitrate: Int?,
     @ColumnInfo(name = "location_id")
-    val locationId: Int?
+    val locationId: Int?,
+    @ColumnInfo(name = "fetched_at")
+    val fetchedAt: Instant,
 )
 
 @Entity(tableName = "track_artists", primaryKeys = ["track_id", "artist_id", "name", "role"])
@@ -47,7 +49,7 @@ data class DbTrackArtist(
     @ColumnInfo(name = "role")
     val role: Role,
     @ColumnInfo(name = "order")
-    val order: Int
+    val order: Int,
 )
 
 @Entity(tableName = "track_genres", primaryKeys = ["track_id", "genre_id"])
@@ -55,5 +57,5 @@ data class DbTrackGenre(
     @ColumnInfo(name = "track_id")
     val trackId: Int,
     @ColumnInfo(name = "genre_id")
-    val genreId: Int
+    val genreId: Int,
 )

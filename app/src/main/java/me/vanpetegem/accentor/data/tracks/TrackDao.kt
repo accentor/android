@@ -6,8 +6,10 @@ import androidx.lifecycle.Transformations.map
 import androidx.lifecycle.Transformations.switchMap
 import androidx.room.Dao
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
+import java.time.Instant
 import me.vanpetegem.accentor.data.albums.Album
 import me.vanpetegem.accentor.data.artists.Artist
 
@@ -20,13 +22,13 @@ abstract class TrackDao {
         val ids = tracks.map { it.id }
         val trackGenres = getTrackGenresByTrackIdWhereTrackIds(ids)
         val trackArtists = getTrackArtistsByTrackIdWhereTrackIds(ids)
-        return tracks.map { t -> Track.fromDbTrack(t, trackArtists, trackGenres) }
+        return tracks.map { t -> Track.fromDb(t, trackArtists, trackGenres) }
     }
 
     open fun findByIds(ids: List<Int>): LiveData<List<Track>> = switchMap(findDbTracksByIds(ids)) { tracks ->
         switchMap(findTrackArtistsByTrackIdWhereTrackIds(ids)) { trackArtists ->
             map(findTrackGenresByTrackIdWhereTrackIds(ids)) { trackGenres ->
-                tracks.map { t -> Track.fromDbTrack(t, trackArtists, trackGenres) }
+                tracks.map { t -> Track.fromDb(t, trackArtists, trackGenres) }
             }
         }
     }
@@ -49,7 +51,8 @@ abstract class TrackDao {
                         it.codecId,
                         it.length,
                         it.bitrate,
-                        it.locationId
+                        it.locationId,
+                        it.fetchedAt,
                     )
                 }
             }
@@ -60,7 +63,7 @@ abstract class TrackDao {
         val ids = tracks.map { it.id }
         switchMap(findTrackArtistsByTrackIdWhereTrackIds(ids)) { trackArtists ->
             map(findTrackGenresByTrackIdWhereTrackIds(ids)) { trackGenres ->
-                tracks.map { Track.fromDbTrack(it, trackArtists, trackGenres) }
+                tracks.map { Track.fromDb(it, trackArtists, trackGenres) }
             }
         }
     }
@@ -69,7 +72,7 @@ abstract class TrackDao {
         val ids = tracks.map { it.id }
         switchMap(findTrackArtistsByTrackIdWhereTrackIds(ids)) { trackArtists ->
             map(findTrackGenresByTrackIdWhereTrackIds(ids)) { trackGenres ->
-                tracks.map { Track.fromDbTrack(it, trackArtists, trackGenres) }
+                tracks.map { Track.fromDb(it, trackArtists, trackGenres) }
             }
         }
     }
@@ -95,7 +98,8 @@ abstract class TrackDao {
             dbTrack.codecId,
             dbTrack.length,
             dbTrack.bitrate,
-            dbTrack.locationId
+            dbTrack.locationId,
+            dbTrack.fetchedAt,
         )
     }
 
@@ -188,12 +192,9 @@ abstract class TrackDao {
     }
 
     @Transaction
-    open fun replaceAll(tracks: List<Track>) {
-        deleteAllTracks()
-        deleteAllTrackArtists()
-        deleteAllTrackGenres()
+    open fun upsertAll(tracks: List<Track>) {
         tracks.forEach { track: Track ->
-            insert(
+            upsert(
                 DbTrack(
                     track.id,
                     track.title,
@@ -206,9 +207,11 @@ abstract class TrackDao {
                     track.codecId,
                     track.length,
                     track.bitrate,
-                    track.locationId
+                    track.locationId,
+                    track.fetchedAt,
                 )
             )
+            deleteTrackArtistsById(track.id)
             for (ta in track.trackArtists) {
                 insert(
                     DbTrackArtist(
@@ -217,10 +220,11 @@ abstract class TrackDao {
                         ta.name,
                         ta.normalizedName,
                         ta.role,
-                        ta.order
+                        ta.order,
                     )
                 )
             }
+            deleteTrackGenresById(track.id)
             for (gId in track.genreIds) {
                 insert(DbTrackGenre(track.id, gId))
             }
@@ -239,6 +243,9 @@ abstract class TrackDao {
     @Query("SELECT * FROM track_genres WHERE track_id IN (:ids)")
     protected abstract fun getAllTrackGenresWhereTrackIds(ids: List<Int>): List<DbTrackGenre>
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    protected abstract fun upsert(track: DbTrack)
+
     @Insert
     protected abstract fun insert(track: DbTrack)
 
@@ -247,6 +254,15 @@ abstract class TrackDao {
 
     @Insert
     protected abstract fun insert(trackGenre: DbTrackGenre)
+
+    @Query("DELETE FROM tracks WHERE fetched_at < :time")
+    abstract fun deleteFetchedBefore(time: Instant)
+
+    @Query("DELETE FROM track_artists WHERE track_id = :id")
+    protected abstract fun deleteTrackArtistsById(id: Int)
+
+    @Query("DELETE FROM track_genres WHERE track_id = :id")
+    protected abstract fun deleteTrackGenresById(id: Int)
 
     @Query("DELETE FROM tracks")
     protected abstract fun deleteAllTracks()

@@ -12,6 +12,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import java.time.Instant
 import me.vanpetegem.accentor.data.albums.AlbumDao
 import me.vanpetegem.accentor.data.albums.DbAlbum
 import me.vanpetegem.accentor.data.albums.DbAlbumArtist
@@ -47,7 +48,7 @@ import me.vanpetegem.accentor.util.RoomTypeConverters
         DbTrackGenre::class,
         UnreportedPlay::class,
     ],
-    version = 9
+    version = 10
 )
 abstract class AccentorDatabase : RoomDatabase() {
     abstract fun albumDao(): AlbumDao
@@ -222,6 +223,18 @@ internal object DatabaseModule {
                             )
                             """
                         )
+                        database.setTransactionSuccessful()
+                    } finally {
+                        database.endTransaction()
+                    }
+                }
+            })
+            .addMigrations(object : Migration(9, 10) {
+                override fun migrate(database: SupportSQLiteDatabase) {
+                    database.beginTransaction()
+                    try {
+                        val now = Instant.now()
+                        database.execSQL("ALTER TABLE `tracks` ADD COLUMN `fetched_at` TEXT NOT NULL DEFAULT '$now'")
                         database.setTransactionSuccessful()
                     } finally {
                         database.endTransaction()

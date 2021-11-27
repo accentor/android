@@ -40,27 +40,44 @@ class MainViewModel @Inject constructor(
 
     fun refresh() {
         if ((refreshing.value ?: 0) > 0) return
-        refreshing.value?.let { refreshing.value = it + 3 }
+
+        refreshing.value?.let { refreshing.value = it + 1 }
         viewModelScope.launch(IO) {
             codecConversionRepository.refresh {
                 withContext(Main) { refreshing.value?.let { refreshing.value = it - 1 } }
             }
+        }
+
+        refreshing.value?.let { refreshing.value = it + 1 }
+        viewModelScope.launch(IO) {
             userRepository.refresh {
                 withContext(Main) { refreshing.value?.let { refreshing.value = it - 1 } }
             }
+        }
+
+        refreshing.value?.let { refreshing.value = it + 1 }
+        viewModelScope.launch(IO) {
             trackRepository.refresh {
                 withContext(Main) { refreshing.value?.let { refreshing.value = it - 1 } }
             }
         }
 
-        refreshing.value?.let { refreshing.value = it + 3 }
+        refreshing.value?.let { refreshing.value = it + 1 }
         viewModelScope.launch(IO) {
             artistRepository.refresh {
                 withContext(Main) { refreshing.value?.let { refreshing.value = it - 1 } }
             }
+        }
+
+        refreshing.value?.let { refreshing.value = it + 1 }
+        viewModelScope.launch(IO) {
             albumRepository.refresh {
                 withContext(Main) { refreshing.value?.let { refreshing.value = it - 1 } }
             }
+        }
+
+        refreshing.value?.let { refreshing.value = it + 1 }
+        viewModelScope.launch(IO) {
             playRepository.refresh {
                 withContext(Main) { refreshing.value?.let { refreshing.value = it - 1 } }
             }

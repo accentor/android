@@ -2,6 +2,7 @@ package me.vanpetegem.accentor.data.tracks
 
 import androidx.lifecycle.LiveData
 import dagger.Reusable
+import java.time.Instant
 import javax.inject.Inject
 import me.vanpetegem.accentor.api.track.index
 import me.vanpetegem.accentor.data.albums.Album
@@ -22,13 +23,21 @@ class TrackRepository @Inject constructor(
     fun getByAlbum(album: Album): List<Track> = trackDao.getByAlbum(album)
 
     suspend fun refresh(handler: suspend (Result<Unit>) -> Unit) {
-        when (val result = index(authenticationRepository.server.value!!, authenticationRepository.authData.value!!)) {
-            is Result.Success -> {
-                trackDao.replaceAll(result.data)
-                handler(Result.Success(Unit))
+        val fetchStart = Instant.now()
+        for (result in index(authenticationRepository.server.value!!, authenticationRepository.authData.value!!)) {
+            when (result) {
+                is Result.Success -> {
+                    val fetchTime = Instant.now()
+                    trackDao.upsertAll(result.data.map { Track.fromApi(it, fetchTime) })
+                }
+                is Result.Error -> {
+                    handler(Result.Error(result.exception))
+                    return
+                }
             }
-            is Result.Error -> handler(Result.Error(result.exception))
         }
+        trackDao.deleteFetchedBefore(fetchStart)
+        handler(Result.Success(Unit))
     }
 
     suspend fun clear() {
