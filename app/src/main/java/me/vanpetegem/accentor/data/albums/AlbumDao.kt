@@ -224,9 +224,21 @@ abstract class AlbumDao {
     @Insert
     protected abstract fun insert(albumLabel: DbAlbumLabel)
 
-    // TODO(chvp): Also clear old album labels and album artists
+    @Transaction
+    open fun deleteFetchedBefore(time: Instant) {
+        deleteAlbumsFetchedBefore(time)
+        deleteUnusedAlbumLabels()
+        deleteUnusedAlbumArtists()
+    }
+
     @Query("DELETE FROM albums WHERE fetched_at < :time")
-    abstract fun deleteFetchedBefore(time: Instant)
+    protected abstract fun deleteAlbumsFetchedBefore(time: Instant)
+
+    @Query("DELETE FROM album_artists WHERE album_id NOT IN (SELECT id FROM albums)")
+    protected abstract fun deleteUnusedAlbumArtists()
+
+    @Query("DELETE FROM album_labels WHERE album_id NOT IN (SELECT id FROM albums)")
+    protected abstract fun deleteUnusedAlbumLabels()
 
     @Query("DELETE FROM albums")
     protected abstract fun deleteAllAlbums()

@@ -16,4 +16,6 @@ data class DbPlay(
     val trackId: Int,
     @ColumnInfo(name = "user_id")
     val userId: Int,
+    @ColumnInfo(name = "fetched_at")
+    val fetchedAt: Instant,
 )

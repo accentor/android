@@ -255,9 +255,21 @@ abstract class TrackDao {
     @Insert
     protected abstract fun insert(trackGenre: DbTrackGenre)
 
-    // TODO(chvp): Also clear old track genres and track artists
+    @Transaction
+    open fun deleteFetchedBefore(time: Instant) {
+        deleteTracksFetchedBefore(time)
+        deleteUnusedTrackArtists()
+        deleteUnusedTrackGenres()
+    }
+
     @Query("DELETE FROM tracks WHERE fetched_at < :time")
-    abstract fun deleteFetchedBefore(time: Instant)
+    protected abstract fun deleteTracksFetchedBefore(time: Instant)
+
+    @Query("DELETE FROM track_artists WHERE track_id NOT IN (SELECT id FROM tracks)")
+    protected abstract fun deleteUnusedTrackArtists()
+
+    @Query("DELETE FROM track_genres WHERE track_id NOT IN (SELECT id FROM tracks)")
+    protected abstract fun deleteUnusedTrackGenres()
 
     @Query("DELETE FROM track_artists WHERE track_id = :id")
     protected abstract fun deleteTrackArtistsById(id: Int)

@@ -4,7 +4,7 @@ import com.github.kittinunf.fuel.httpGet
 import com.github.kittinunf.fuel.httpPost
 import java.time.Instant
 import me.vanpetegem.accentor.data.authentication.AuthenticationData
-import me.vanpetegem.accentor.data.plays.Play
+import me.vanpetegem.accentor.data.plays.ApiPlay
 import me.vanpetegem.accentor.util.Result
 import me.vanpetegem.accentor.util.jsonBody
 import me.vanpetegem.accentor.util.responseObject
@@ -12,42 +12,40 @@ import me.vanpetegem.accentor.util.responseObject
 data class Arguments(val play: PlayArguments)
 data class PlayArguments(val trackId: Int, val playedAt: Instant)
 
-fun create(server: String, authenticationData: AuthenticationData, trackId: Int, playedAt: Instant): Result<Play> {
+fun create(server: String, authenticationData: AuthenticationData, trackId: Int, playedAt: Instant): Result<ApiPlay> {
     return "$server/api/plays".httpPost()
         .set("Accept", "application/json")
         .set("X-Secret", authenticationData.secret)
         .set("X-Device-Id", authenticationData.deviceId)
         .jsonBody(Arguments(PlayArguments(trackId, playedAt)))
-        .responseObject<Play>().third
+        .responseObject<ApiPlay>().third
         .fold(
-            { play: Play -> Result.Success(play) },
+            { play: ApiPlay -> Result.Success(play) },
             { e: Throwable -> Result.Error(Exception("Error creating play", e)) },
         )
 }
 
-fun index(server: String, authenticationData: AuthenticationData): Result<List<Play>> {
+fun index(server: String, authenticationData: AuthenticationData): Sequence<Result<List<ApiPlay>>> {
     var page = 1
-    val results = ArrayList<Play>()
 
-    fun doFetch(): Result<List<Play>> {
+    fun doFetch(): Result<List<ApiPlay>>? {
         return "$server/api/plays".httpGet(listOf(Pair("page", page)))
             .set("Accept", "application/json")
             .set("X-Secret", authenticationData.secret)
             .set("X-Device-Id", authenticationData.deviceId)
-            .responseObject<List<Play>>().third
+            .responseObject<List<ApiPlay>>().third
             .fold(
-                { a: List<Play> ->
-                    if (a.isEmpty()) {
-                        Result.Success(results)
+                { p: List<ApiPlay> ->
+                    if (p.isEmpty()) {
+                        null
                     } else {
-                        results.addAll(a)
                         page++
-                        doFetch()
+                        Result.Success(p)
                     }
                 },
                 { e: Throwable -> Result.Error(Exception("Error getting plays", e)) }
             )
     }
 
-    return doFetch()
+    return generateSequence { doFetch() }
 }

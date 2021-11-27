@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 10,
-    "identityHash": "38bf96bb9dbb575937a66f2e79dc0582",
+    "identityHash": "5430ffd7639b64c98d0edfe1924b02f2",
     "entities": [
       {
         "tableName": "users",
@@ -363,7 +363,7 @@
       },
       {
         "tableName": "plays",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `played_at` TEXT NOT NULL, `track_id` INTEGER NOT NULL, `user_id` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `played_at` TEXT NOT NULL, `track_id` INTEGER NOT NULL, `user_id` INTEGER NOT NULL, `fetched_at` TEXT NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -387,6 +387,12 @@
             "fieldPath": "userId",
             "columnName": "user_id",
             "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fetchedAt",
+            "columnName": "fetched_at",
+            "affinity": "TEXT",
             "notNull": true
           }
         ],
@@ -607,7 +613,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '38bf96bb9dbb575937a66f2e79dc0582')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '5430ffd7639b64c98d0edfe1924b02f2')"
     ]
   }
 }
