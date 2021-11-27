@@ -2,33 +2,31 @@ package me.vanpetegem.accentor.api.codecconversion
 
 import com.github.kittinunf.fuel.httpGet
 import me.vanpetegem.accentor.data.authentication.AuthenticationData
-import me.vanpetegem.accentor.data.codecconversions.CodecConversion
+import me.vanpetegem.accentor.data.codecconversions.ApiCodecConversion
 import me.vanpetegem.accentor.util.Result
 import me.vanpetegem.accentor.util.responseObject
 
-fun index(server: String, authenticationData: AuthenticationData): Result<List<CodecConversion>> {
+fun index(server: String, authenticationData: AuthenticationData): Sequence<Result<List<ApiCodecConversion>>> {
     var page = 1
-    val results = ArrayList<CodecConversion>()
 
-    fun doFetch(): Result<List<CodecConversion>> {
+    fun doFetch(): Result<List<ApiCodecConversion>>? {
         return "$server/api/codec_conversions".httpGet(listOf(Pair("page", page)))
             .set("Accept", "application/json")
             .set("X-Secret", authenticationData.secret)
             .set("X-Device-Id", authenticationData.deviceId)
-            .responseObject<List<CodecConversion>>().third
+            .responseObject<List<ApiCodecConversion>>().third
             .fold(
-                { u: List<CodecConversion> ->
-                    if (u.isEmpty()) {
-                        Result.Success(results)
+                { c: List<ApiCodecConversion> ->
+                    if (c.isEmpty()) {
+                        null
                     } else {
-                        results.addAll(u)
                         page++
-                        doFetch()
+                        Result.Success(c)
                     }
                 },
                 { e: Throwable -> Result.Error(Exception("Error getting codec conversions", e)) }
             )
     }
 
-    return doFetch()
+    return generateSequence { doFetch() }
 }

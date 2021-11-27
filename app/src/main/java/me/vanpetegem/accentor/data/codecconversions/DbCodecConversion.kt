@@ -3,6 +3,7 @@ package me.vanpetegem.accentor.data.codecconversions
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import java.time.Instant
 
 @Entity(tableName = "codec_conversions")
 data class DbCodecConversion(
@@ -15,4 +16,6 @@ data class DbCodecConversion(
     val ffmpegParams: String,
     @ColumnInfo(name = "resulting_codec_id")
     val resultingCodecId: Int,
+    @ColumnInfo(name = "fetched_at")
+    val fetchedAt: Instant,
 )

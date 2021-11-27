@@ -18,7 +18,8 @@ data class Track(
     val codecId: Int?,
     val length: Int?,
     val bitrate: Int?,
-    val locationId: Int?
+    val locationId: Int?,
+    val fetchedAt: Instant,
 ) {
     fun stringifyTrackArtists() = trackArtists.sortedBy { ta -> ta.order }.joinToString(" / ") { ta -> ta.name }
 
@@ -46,7 +47,7 @@ data class Track(
         const val ARTIST = "me.vanpetegem.accentor.data.tracks.Track.ARTIST"
         const val YEAR = "me.vanpetegem.accentor.data.tracks.Track.YEAR"
 
-        fun fromDbTrack(t: DbTrack, trackArtists: SparseArray<MutableList<TrackArtist>>, trackGenres: SparseArray<MutableList<Int>>) =
+        fun fromDb(t: DbTrack, trackArtists: SparseArray<MutableList<TrackArtist>>, trackGenres: SparseArray<MutableList<Int>>) =
             Track(
                 t.id,
                 t.title,
@@ -61,7 +62,27 @@ data class Track(
                 t.codecId,
                 t.length,
                 t.bitrate,
-                t.locationId
+                t.locationId,
+                t.fetchedAt,
+            )
+
+        fun fromApi(t: ApiTrack, fetchTime: Instant) =
+            Track(
+                t.id,
+                t.title,
+                t.normalizedTitle,
+                t.number,
+                t.albumId,
+                t.reviewComment,
+                t.createdAt,
+                t.updatedAt,
+                t.genreIds,
+                t.trackArtists,
+                t.codecId,
+                t.length,
+                t.bitrate,
+                t.locationId,
+                fetchTime,
             )
     }
 }
@@ -71,7 +92,7 @@ data class TrackArtist(
     val name: String,
     val normalizedName: String,
     val role: Role,
-    val order: Int
+    val order: Int,
 )
 
 enum class Role {

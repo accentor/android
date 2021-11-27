@@ -6,19 +6,20 @@ import androidx.lifecycle.Transformations.map
 import androidx.lifecycle.Transformations.switchMap
 import androidx.room.Dao
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.RewriteQueriesToDropUnusedColumns
 import androidx.room.Transaction
+import java.time.Instant
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 @Dao
 abstract class AlbumDao {
-
     open fun getAll(): LiveData<List<Album>> = switchMap(getAllDbAlbums()) { albums ->
         switchMap(albumArtistsByAlbumId()) { albumArtists ->
             map(albumLabelsByAlbumId()) { albumLabels ->
-                albums.map { a -> Album.fromDbAlbum(a, albumLabels.get(a.id, ArrayList()), albumArtists.get(a.id, ArrayList())) }
+                albums.map { a -> Album.fromDb(a, albumLabels.get(a.id, ArrayList()), albumArtists.get(a.id, ArrayList())) }
             }
         }
     }
@@ -26,7 +27,7 @@ abstract class AlbumDao {
     open fun getAllByPlayed(): LiveData<List<Album>> = switchMap(getAllDbAlbumsByPlayed()) { albums ->
         switchMap(albumArtistsByAlbumId()) { albumArtists ->
             map(albumLabelsByAlbumId()) { albumLabels ->
-                albums.map { a -> Album.fromDbAlbum(a, albumLabels.get(a.id, ArrayList()), albumArtists.get(a.id, ArrayList())) }
+                albums.map { a -> Album.fromDb(a, albumLabels.get(a.id, ArrayList()), albumArtists.get(a.id, ArrayList())) }
             }
         }
     }
@@ -34,7 +35,7 @@ abstract class AlbumDao {
     open fun findByIds(ids: List<Int>): LiveData<List<Album>> = switchMap(findDbAlbumsByIds(ids)) { albums ->
         switchMap(albumArtistsByAlbumIdWhereAlbumIds(ids)) { albumArtists ->
             map(albumLabelsByAlbumIdWhereAlbumIds(ids)) { albumLabels ->
-                albums.map { a -> Album.fromDbAlbum(a, albumLabels.get(a.id, ArrayList()), albumArtists.get(a.id, ArrayList())) }
+                albums.map { a -> Album.fromDb(a, albumLabels.get(a.id, ArrayList()), albumArtists.get(a.id, ArrayList())) }
             }
         }
     }
@@ -43,7 +44,7 @@ abstract class AlbumDao {
         switchMap(findDbAlbumArtistsById(id)) { albumArtists ->
             map(findDbAlbumLabelsById(id)) { albumLabels ->
                 if (dbAlbum != null) {
-                    Album.fromDbAlbum(
+                    Album.fromDb(
                         dbAlbum,
                         albumLabels.map { AlbumLabel(it.labelId, it.catalogueNumber) },
                         albumArtists.map { AlbumArtist(it.artistId, it.name, it.normalizedName, it.order, it.separator) },
@@ -59,7 +60,7 @@ abstract class AlbumDao {
         switchMap(findDbAlbumsByDay(day.format(DateTimeFormatter.ISO_LOCAL_DATE).substring(4))) { albums ->
             switchMap(albumArtistsByAlbumId()) { albumArtists ->
                 map(albumLabelsByAlbumId()) { albumLabels ->
-                    albums.map { a -> Album.fromDbAlbum(a, albumLabels.get(a.id, ArrayList()), albumArtists.get(a.id, ArrayList())) }
+                    albums.map { a -> Album.fromDb(a, albumLabels.get(a.id, ArrayList()), albumArtists.get(a.id, ArrayList())) }
                 }
             }
         }
@@ -71,7 +72,7 @@ abstract class AlbumDao {
         val albumArtists = getDbAlbumArtistsById(id)
         val albumLabels = getDbAlbumLabelsById(id)
 
-        return Album.fromDbAlbum(
+        return Album.fromDb(
             dbAlbum,
             albumLabels.map { AlbumLabel(it.labelId, it.catalogueNumber) },
             albumArtists.map { AlbumArtist(it.artistId, it.name, it.normalizedName, it.order, it.separator) },
@@ -156,12 +157,9 @@ abstract class AlbumDao {
         }
 
     @Transaction
-    open fun replaceAll(albums: List<Album>) {
-        deleteAllAlbums()
-        deleteAllAlbumArtists()
-        deleteAllAlbumLabels()
+    open fun upsertAll(albums: List<Album>) {
         albums.forEach { album: Album ->
-            insert(
+            upsert(
                 DbAlbum(
                     album.id,
                     album.title,
@@ -176,12 +174,15 @@ abstract class AlbumDao {
                     album.image500,
                     album.image250,
                     album.image100,
-                    album.imageType
+                    album.imageType,
+                    album.fetchedAt,
                 )
             )
+            deleteAlbumLabelsById(album.id)
             for (al: AlbumLabel in album.albumLabels) {
                 insert(DbAlbumLabel(album.id, al.labelId, al.catalogueNumber))
             }
+            deleteAlbumArtistsById(album.id)
             for (al: AlbumArtist in album.albumArtists) {
                 insert(DbAlbumArtist(album.id, al.artistId, al.name, al.normalizedName, al.order, al.separator))
             }
@@ -214,8 +215,8 @@ abstract class AlbumDao {
     @Query("SELECT * FROM album_labels WHERE album_id IN (:ids)")
     protected abstract fun getAllAlbumLabelsWhereAlbumIds(ids: List<Int>): LiveData<List<DbAlbumLabel>>
 
-    @Insert
-    protected abstract fun insert(album: DbAlbum)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    protected abstract fun upsert(album: DbAlbum)
 
     @Insert
     protected abstract fun insert(albumArtist: DbAlbumArtist)
@@ -223,11 +224,33 @@ abstract class AlbumDao {
     @Insert
     protected abstract fun insert(albumLabel: DbAlbumLabel)
 
+    @Transaction
+    open fun deleteFetchedBefore(time: Instant) {
+        deleteAlbumsFetchedBefore(time)
+        deleteUnusedAlbumLabels()
+        deleteUnusedAlbumArtists()
+    }
+
+    @Query("DELETE FROM albums WHERE fetched_at < :time")
+    protected abstract fun deleteAlbumsFetchedBefore(time: Instant)
+
+    @Query("DELETE FROM album_artists WHERE album_id NOT IN (SELECT id FROM albums)")
+    protected abstract fun deleteUnusedAlbumArtists()
+
+    @Query("DELETE FROM album_labels WHERE album_id NOT IN (SELECT id FROM albums)")
+    protected abstract fun deleteUnusedAlbumLabels()
+
     @Query("DELETE FROM albums")
     protected abstract fun deleteAllAlbums()
 
+    @Query("DELETE FROM album_artists WHERE album_id = :id")
+    protected abstract fun deleteAlbumArtistsById(id: Int)
+
     @Query("DELETE FROM album_artists")
     protected abstract fun deleteAllAlbumArtists()
+
+    @Query("DELETE FROM album_labels WHERE album_id = :id")
+    protected abstract fun deleteAlbumLabelsById(id: Int)
 
     @Query("DELETE FROM album_labels")
     protected abstract fun deleteAllAlbumLabels()

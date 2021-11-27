@@ -36,7 +36,9 @@ data class DbAlbum(
     @ColumnInfo(name = "image_100")
     val image100: String?,
     @ColumnInfo(name = "image_type")
-    val imageType: String?
+    val imageType: String?,
+    @ColumnInfo(name = "fetched_at")
+    val fetchedAt: Instant,
 )
 
 @Entity(

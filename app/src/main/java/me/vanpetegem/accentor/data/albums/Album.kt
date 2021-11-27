@@ -19,7 +19,8 @@ data class Album(
     val image100: String?,
     val imageType: String?,
     val albumLabels: List<AlbumLabel>,
-    val albumArtists: List<AlbumArtist>
+    val albumArtists: List<AlbumArtist>,
+    val fetchedAt: Instant,
 ) {
     fun stringifyAlbumArtists() =
         albumArtists.sortedBy { aa -> aa.order }.fold("") { acc, aa -> acc + aa.name + (aa.separator ?: "") }
@@ -35,7 +36,7 @@ data class Album(
     }
 
     companion object {
-        fun fromDbAlbum(a: DbAlbum, labels: List<AlbumLabel>, artists: List<AlbumArtist>): Album =
+        fun fromDb(a: DbAlbum, labels: List<AlbumLabel>, artists: List<AlbumArtist>): Album =
             Album(
                 a.id,
                 a.title,
@@ -53,6 +54,28 @@ data class Album(
                 a.imageType,
                 labels,
                 artists,
+                a.fetchedAt,
+            )
+
+        fun fromApi(a: ApiAlbum, fetchTime: Instant) =
+            Album(
+                a.id,
+                a.title,
+                a.normalizedTitle,
+                a.release,
+                a.reviewComment,
+                a.edition,
+                a.editionDescription,
+                a.createdAt,
+                a.updatedAt,
+                a.image,
+                a.image500,
+                a.image250,
+                a.image100,
+                a.imageType,
+                a.albumLabels,
+                a.albumArtists,
+                fetchTime,
             )
     }
 }
