@@ -39,7 +39,7 @@ abstract class TrackDao {
                 dbTrack?.let {
                     Track.fromDb(
                         it,
-                        trackArtists.map { TrackArtist(it.artistId, it.name, it.normalizedName, it.role, it.order) },
+                        trackArtists.map { TrackArtist(it.artistId, it.name, it.normalizedName, it.role, it.order, it.hidden) },
                         trackGenres.map { it.genreId },
                     )
                 }
@@ -74,7 +74,7 @@ abstract class TrackDao {
 
         return Track.fromDb(
             dbTrack,
-            trackArtists.map { TrackArtist(it.artistId, it.name, it.normalizedName, it.role, it.order) },
+            trackArtists.map { TrackArtist(it.artistId, it.name, it.normalizedName, it.role, it.order, it.hidden) },
             trackGenres.map { it.genreId },
         )
     }
@@ -120,7 +120,8 @@ abstract class TrackDao {
                         ta.name,
                         ta.normalizedName,
                         ta.role,
-                        ta.order
+                        ta.order,
+                        ta.hidden,
                     )
                 )
                 map.put(ta.trackId, l)
@@ -138,7 +139,8 @@ abstract class TrackDao {
                     ta.name,
                     ta.normalizedName,
                     ta.role,
-                    ta.order
+                    ta.order,
+                    ta.hidden,
                 )
             )
             map.put(ta.trackId, l)
@@ -197,6 +199,7 @@ abstract class TrackDao {
                         ta.normalizedName,
                         ta.role,
                         ta.order,
+                        ta.hidden,
                     )
                 )
             }

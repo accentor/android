@@ -52,7 +52,7 @@ abstract class ArtistDao {
            SELECT * FROM artists INNER JOIN (
                SELECT track_artists.artist_id as artist_id, MAX(plays.played_at) as played_at FROM
                    track_artists INNER JOIN tracks ON track_artists.track_id = tracks.id INNER JOIN plays ON tracks.id = plays.track_id
-                   GROUP BY track_artists.artist_id
+                   WHERE track_artists.hidden = 0 GROUP BY track_artists.artist_id
            ) p ON p.artist_id = artists.id ORDER BY p.played_at DESC, normalized_name ASC, id ASC
         """
     )
