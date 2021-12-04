@@ -21,7 +21,7 @@ data class Track(
     val locationId: Int?,
     val fetchedAt: Instant,
 ) {
-    fun stringifyTrackArtists() = trackArtists.sortedBy { ta -> ta.order }.joinToString(" / ") { ta -> ta.name }
+    fun stringifyTrackArtists() = trackArtists.filter { ta -> !ta.hidden }.sortedBy { ta -> ta.order }.joinToString(" / ") { ta -> ta.name }
 
     fun compareTo(other: Track, albums: SparseArray<Album>): Int {
         val a1 = albums[this.albumId]
@@ -93,6 +93,7 @@ data class TrackArtist(
     val normalizedName: String,
     val role: Role,
     val order: Int,
+    val hidden: Boolean,
 )
 
 enum class Role {

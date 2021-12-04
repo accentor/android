@@ -50,6 +50,8 @@ data class DbTrackArtist(
     val role: Role,
     @ColumnInfo(name = "order")
     val order: Int,
+    @ColumnInfo(name = "hidden")
+    val hidden: Boolean,
 )
 
 @Entity(tableName = "track_genres", primaryKeys = ["track_id", "genre_id"])

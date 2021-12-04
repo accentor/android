@@ -48,7 +48,7 @@ import me.vanpetegem.accentor.util.RoomTypeConverters
         DbTrackGenre::class,
         UnreportedPlay::class,
     ],
-    version = 10
+    version = 11
 )
 abstract class AccentorDatabase : RoomDatabase() {
     abstract fun albumDao(): AlbumDao
@@ -240,6 +240,17 @@ internal object DatabaseModule {
                         database.execSQL("ALTER TABLE `plays` ADD COLUMN `fetched_at` TEXT NOT NULL DEFAULT '$now'")
                         database.execSQL("ALTER TABLE `tracks` ADD COLUMN `fetched_at` TEXT NOT NULL DEFAULT '$now'")
                         database.execSQL("ALTER TABLE `users` ADD COLUMN `fetched_at` TEXT NOT NULL DEFAULT '$now'")
+                        database.setTransactionSuccessful()
+                    } finally {
+                        database.endTransaction()
+                    }
+                }
+            })
+            .addMigrations(object : Migration(10, 11) {
+                override fun migrate(database: SupportSQLiteDatabase) {
+                    database.beginTransaction()
+                    try {
+                        database.execSQL("ALTER TABLE `track_artists` ADD COLUMN `hidden` INTEGER NOT NULL DEFAULT 0")
                         database.setTransactionSuccessful()
                     } finally {
                         database.endTransaction()
