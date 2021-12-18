@@ -86,7 +86,7 @@ dependencies {
     // AndroidX Room
     implementation "androidx.room:room-runtime:$room_version"
     implementation "androidx.room:room-ktx:$room_version"
-    kapt "androidx.room:room-compiler:2.3.0"
+    kapt "androidx.room:room-compiler:2.4.0"
 
     // AndroidX Lifecycle
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle_version"
