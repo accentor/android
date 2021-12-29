@@ -181,7 +181,7 @@ fun Content(mainViewModel: MainViewModel = viewModel(), playerViewModel: PlayerV
                     AlbumView(entry.arguments!!.getInt("albumId"), navController, playerViewModel)
                 }
             }
-            composable("devices") { Base(navController, mainViewModel) { Devices() } }
+            composable("devices") { Base(navController, mainViewModel, playerViewModel) { Devices() } }
         }
     }
 }

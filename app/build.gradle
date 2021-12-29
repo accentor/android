@@ -60,6 +60,9 @@ android {
         textOutput "stdout"
         explainIssues !project.hasProperty("isCI")
     }
+    packagingOptions {
+        exclude "META-INF/beans.xml"
+    }
 }
 
 tasks.lint.dependsOn(ktlintCheck)
@@ -133,6 +136,7 @@ dependencies {
 
     // Cling (UPnP/DLNA)
     implementation "org.fourthline.cling:cling-core:2.1.2"
+    implementation "org.fourthline.cling:cling-support:2.1.2"
     implementation "org.eclipse.jetty:jetty-servlet:8.2.0.v20160908"
     implementation "org.eclipse.jetty:jetty-client:8.2.0.v20160908"
     implementation "org.slf4j:slf4j-android:1.7.32"

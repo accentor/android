@@ -25,11 +25,11 @@ import me.vanpetegem.accentor.devices.Device
 @Composable
 fun Devices(devicesViewModel: DevicesViewModel = hiltViewModel()) {
     val devices: List<Device>? by devicesViewModel.devices().observeAsState()
-    DeviceList(devices ?: emptyList())
+    DeviceList(devices ?: emptyList(), selectFn = { devicesViewModel.selectDevice(it) })
 }
 
 @Composable
-fun DeviceList(devices: List<Device>) {
+fun DeviceList(devices: List<Device>, selectFn: (d: Device) -> Unit = {}) {
     Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState())) {
         DeviceCard(
             name = stringResource(R.string.local_device),
@@ -45,7 +45,8 @@ fun DeviceList(devices: List<Device>) {
         devices.forEach { device ->
             DeviceCard(
                 name = device.friendlyName,
-                icon = R.drawable.ic_menu_devices
+                icon = R.drawable.ic_menu_devices,
+                onClick = { selectFn(device) }
             )
         }
     }

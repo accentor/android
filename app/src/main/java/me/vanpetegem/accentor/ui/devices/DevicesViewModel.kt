@@ -15,14 +15,11 @@ class DevicesViewModel @Inject constructor(
     private val deviceManager: DeviceManager,
 ) : AndroidViewModel(application) {
 
-    fun devices(): LiveData<List<Device>> = map(deviceManager.devices) { devices ->
-        devices.values.sortedWith(compareBy(
-            { when(it) {
-                is Device.Ready -> 1
-                is Device.Failed -> 2
-                is Device.Discovered -> 3
-            }},
-            { it.friendlyName })
-        )
+    fun devices(): LiveData<List<Device>> = map(deviceManager.playerDevices) { devices ->
+        devices.values.sortedWith(compareBy { it.friendlyName })
+    }
+
+    fun selectDevice(device: Device) {
+        deviceManager.select(device = device)
     }
 }
