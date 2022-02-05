@@ -31,22 +31,22 @@ class NotificationBuilder(private val context: Context) {
         context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
     private val skipToPreviousAction = NotificationCompat.Action(
-        R.drawable.exo_controls_previous,
+        R.drawable.ic_previous,
         context.getString(R.string.previous),
         createPendingIntent(PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS)
     )
     private val playAction = NotificationCompat.Action(
-        R.drawable.exo_controls_play,
+        R.drawable.ic_play,
         context.getString(R.string.play),
         createPendingIntent(PlaybackStateCompat.ACTION_PLAY)
     )
     private val pauseAction = NotificationCompat.Action(
-        R.drawable.exo_controls_pause,
+        R.drawable.ic_pause,
         context.getString(R.string.pause),
         createPendingIntent(PlaybackStateCompat.ACTION_PAUSE)
     )
     private val skipToNextAction = NotificationCompat.Action(
-        R.drawable.exo_controls_next,
+        R.drawable.ic_next,
         context.getString(R.string.play_next),
         createPendingIntent(PlaybackStateCompat.ACTION_SKIP_TO_NEXT)
     )
