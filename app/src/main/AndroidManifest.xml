@@ -31,7 +31,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.preferences.PreferencesActivity" />
+        <activity
+            android:exported="false"
+            android:name=".ui.preferences.PreferencesActivity" />
 
         <service
             android:name=".media.MusicService"
