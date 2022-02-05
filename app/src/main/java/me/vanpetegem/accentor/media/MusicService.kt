@@ -167,7 +167,8 @@ class MusicService : MediaSessionService() {
                             }
                             return SessionResult(SessionResult.RESULT_SUCCESS, null)
                         }
-                        else -> { return SessionResult(SessionResult.RESULT_ERROR_UNKNOWN, null) }
+                        // We don't know the command. Shouldn't happen, but SUCCESS is the only value we're allowed to return.
+                        else -> { return SessionResult(SessionResult.RESULT_SUCCESS, null) }
                     }
                 }
 
