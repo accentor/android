@@ -39,6 +39,9 @@ class PlayRepository @Inject constructor(
                     val fetchTime = Instant.now()
                     playDao.insert(Play.fromApi(result.data, fetchTime))
                 }
+                is Result.Error -> {
+                    // Ignore, creation will be retried at a later time
+                }
             }
         }
     }
