@@ -13,6 +13,7 @@ import androidx.media2.common.SessionPlayer
 import androidx.media2.session.MediaController
 import androidx.media2.session.SessionCommand
 import androidx.media2.session.SessionCommandGroup
+import androidx.media2.session.SessionResult
 import androidx.media2.session.SessionToken
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -153,7 +154,7 @@ class MediaSessionConnection @Inject constructor(
         }
     }
 
-    suspend fun stop() = mediaController.sendCustomCommand(SessionCommand("STOP", null), null).await()
+    suspend fun stop(): SessionResult = mediaController.sendCustomCommand(SessionCommand("STOP", null), null).await()
 
     suspend fun play(tracks: List<Pair<Track, Album>>) {
         stop()
@@ -174,8 +175,8 @@ class MediaSessionConnection @Inject constructor(
         album?.let { play(listOf(Pair(track, it))) }
     }
 
-    suspend fun addTrackToQueue(track: Track) = addTrackToQueue(track, _queue.value?.size ?: 0)
-    suspend fun addTracksToQueue(album: Album) = addTracksToQueue(album, _queue.value?.size ?: 0)
+    suspend fun addTrackToQueue(track: Track): Unit = addTrackToQueue(track, _queue.value?.size ?: 0)
+    suspend fun addTracksToQueue(album: Album): Unit = addTracksToQueue(album, _queue.value?.size ?: 0)
 
     suspend fun addTrackToQueue(track: Track, index: Int) {
         val album = albumRepository.getById(track.albumId)
@@ -186,28 +187,26 @@ class MediaSessionConnection @Inject constructor(
         addTracksToQueue(tracks, index)
     }
 
-    suspend fun clearQueue() {
-        mediaController.sendCustomCommand(SessionCommand("CLEAR", null), null).await()
-    }
+    suspend fun clearQueue(): SessionResult = mediaController.sendCustomCommand(SessionCommand("CLEAR", null), null).await()
 
     suspend fun addTracksToQueue(tracks: List<Pair<Track, Album>>, index: Int) {
         var base = index
         tracks.forEach { mediaController.addPlaylistItem(base++, it.first.id.toString()).await() }
     }
 
-    suspend fun previous() = mediaController.skipToPreviousPlaylistItem().await()
+    suspend fun previous(): SessionResult = mediaController.skipToPreviousPlaylistItem().await()
 
-    suspend fun pause() = mediaController.pause().await()
+    suspend fun pause(): SessionResult = mediaController.pause().await()
 
-    suspend fun play() = mediaController.play().await()
+    suspend fun play(): SessionResult = mediaController.play().await()
 
-    suspend fun next() = mediaController.skipToNextPlaylistItem().await()
+    suspend fun next(): SessionResult = mediaController.skipToNextPlaylistItem().await()
 
-    suspend fun seekTo(time: Int) = mediaController.seekTo(time.toLong() * 1000).await()
+    suspend fun seekTo(time: Int): SessionResult = mediaController.seekTo(time.toLong() * 1000).await()
 
-    suspend fun setRepeatMode(repeatMode: Int) = mediaController.setRepeatMode(repeatMode).await()
+    suspend fun setRepeatMode(repeatMode: Int): SessionResult = mediaController.setRepeatMode(repeatMode).await()
 
-    suspend fun setShuffleMode(shuffleMode: Int) = mediaController.setShuffleMode(shuffleMode).await()
+    suspend fun setShuffleMode(shuffleMode: Int): SessionResult = mediaController.setShuffleMode(shuffleMode).await()
 
     fun updateCurrentPosition() {
         if (mediaController.currentPosition == SessionPlayer.UNKNOWN_TIME) {
@@ -217,7 +216,7 @@ class MediaSessionConnection @Inject constructor(
         }
     }
 
-    suspend fun skipTo(position: Int) = mediaController.skipToPlaylistItem(position).await()
+    suspend fun skipTo(position: Int): SessionResult = mediaController.skipToPlaylistItem(position).await()
 
-    suspend fun removeFromQueue(position: Int) = mediaController.removePlaylistItem(position).await()
+    suspend fun removeFromQueue(position: Int): SessionResult = mediaController.removePlaylistItem(position).await()
 }
