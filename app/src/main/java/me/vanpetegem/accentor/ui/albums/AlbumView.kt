@@ -1,6 +1,5 @@
 package me.vanpetegem.accentor.ui.albums
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
@@ -28,7 +27,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import coil.compose.rememberImagePainter
+import coil.compose.AsyncImage
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import kotlinx.coroutines.Dispatchers.IO
@@ -52,15 +51,11 @@ fun AlbumView(
         LazyColumn(modifier = Modifier.fillMaxSize()) {
             item {
                 Row(verticalAlignment = Alignment.Top, modifier = Modifier.padding(bottom = 8.dp)) {
-                    Image(
-                        painter = if (album.image500 != null) {
-                            rememberImagePainter(album.image500) {
-                                placeholder(R.drawable.ic_album)
-                            }
-                        } else {
-                            painterResource(R.drawable.ic_album)
-                        },
-                        contentDescription = stringResource(R.string.artist_image),
+                    AsyncImage(
+                        model = album.image500,
+                        fallback = painterResource(R.drawable.ic_album),
+                        placeholder = painterResource(R.drawable.ic_album),
+                        contentDescription = stringResource(R.string.album_image),
                         modifier = Modifier.width(128.dp).aspectRatio(1f),
                     )
                     Column {

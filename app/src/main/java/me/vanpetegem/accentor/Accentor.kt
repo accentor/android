@@ -6,13 +6,12 @@ import coil.ImageLoader
 import coil.ImageLoaderFactory
 import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
+import coil.disk.DiskCache
 import com.github.kittinunf.fuel.core.FuelManager
 import dagger.hilt.android.HiltAndroidApp
 import java.io.File
 import javax.inject.Inject
 import me.vanpetegem.accentor.data.preferences.PreferencesDataSource
-import okhttp3.Cache
-import okhttp3.OkHttpClient
 
 @HiltAndroidApp
 class Accentor : Application(), ImageLoaderFactory {
@@ -25,27 +24,19 @@ class Accentor : Application(), ImageLoaderFactory {
         FuelManager.instance.baseHeaders = mapOf("User-Agent" to userAgent)
     }
 
-    override fun newImageLoader(): ImageLoader {
-        return ImageLoader.Builder(applicationContext)
-            .okHttpClient {
-                OkHttpClient.Builder()
-                    .cache(
-                        Cache(
-                            directory = File(cacheDir, "okhttp_image_cache"),
-                            maxSize = preferences.imageCacheSize.value!!
-                        )
-                    )
-                    .build()
+    override fun newImageLoader(): ImageLoader =
+        ImageLoader.Builder(applicationContext)
+            .diskCache {
+                DiskCache.Builder().directory(File(cacheDir, "coil_image_cache")).build()
             }
-            .componentRegistry {
+            .components {
                 if (Build.VERSION.SDK_INT >= 28) {
-                    add(ImageDecoderDecoder(applicationContext))
+                    add(ImageDecoderDecoder.Factory())
                 } else {
-                    add(GifDecoder())
+                    add(GifDecoder.Factory())
                 }
             }
             .build()
-    }
 }
 
 lateinit var version: String

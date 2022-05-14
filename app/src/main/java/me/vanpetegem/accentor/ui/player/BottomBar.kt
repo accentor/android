@@ -1,6 +1,5 @@
 package me.vanpetegem.accentor.ui.player
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -23,7 +22,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import coil.compose.rememberImagePainter
+import coil.compose.AsyncImage
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
 import me.vanpetegem.accentor.R
@@ -35,14 +34,10 @@ fun ControlBar(playerViewModel: PlayerViewModel = viewModel()) {
     val currentAlbum by playerViewModel.currentAlbum.observeAsState()
     val isPlaying by playerViewModel.playing.observeAsState()
     BottomAppBar(contentPadding = PaddingValues(end = 8.dp)) {
-        Image(
-            painter = if (currentAlbum?.image500 != null) {
-                rememberImagePainter(currentAlbum!!.image500) {
-                    placeholder(R.drawable.ic_album)
-                }
-            } else {
-                painterResource(R.drawable.ic_album)
-            },
+        AsyncImage(
+            model = currentAlbum?.image500,
+            placeholder = painterResource(R.drawable.ic_album),
+            fallback = painterResource(R.drawable.ic_album),
             contentDescription = stringResource(R.string.album_cover_of_current_track),
             modifier = Modifier.fillMaxHeight().aspectRatio(1f).background(MaterialTheme.colors.surface),
             contentScale = ContentScale.Crop,

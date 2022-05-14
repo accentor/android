@@ -1,6 +1,5 @@
 package me.vanpetegem.accentor.ui.artists
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
@@ -9,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -17,13 +17,13 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import coil.compose.rememberImagePainter
-import coil.transform.CircleCropTransformation
+import coil.compose.AsyncImage
 import me.vanpetegem.accentor.R
 import me.vanpetegem.accentor.ui.albums.AlbumCard
 import me.vanpetegem.accentor.ui.player.PlayerViewModel
@@ -39,17 +39,12 @@ fun ArtistView(id: Int, navController: NavController, playerViewModel: PlayerVie
         LazyColumn(modifier = Modifier.fillMaxSize()) {
             item {
                 Row(modifier = Modifier.padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Image(
-                        painter = if (artist.image500 != null) {
-                            rememberImagePainter(artist.image500) {
-                                placeholder(R.drawable.ic_artist)
-                                transformations(CircleCropTransformation())
-                            }
-                        } else {
-                            painterResource(R.drawable.ic_artist)
-                        },
+                    AsyncImage(
+                        model = artist.image500,
+                        placeholder = painterResource(R.drawable.ic_artist),
+                        fallback = painterResource(R.drawable.ic_artist),
                         contentDescription = stringResource(R.string.artist_image),
-                        modifier = Modifier.width(80.dp).aspectRatio(1f),
+                        modifier = Modifier.width(80.dp).aspectRatio(1f).clip(CircleShape),
                     )
                     Text(artist.name, style = MaterialTheme.typography.h4, modifier = Modifier.padding(start = 8.dp))
                 }

@@ -1,6 +1,5 @@
 package me.vanpetegem.accentor.ui.player
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,7 +20,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import coil.compose.rememberImagePainter
+import coil.compose.AsyncImage
 import me.vanpetegem.accentor.R
 
 @Composable
@@ -29,14 +28,10 @@ fun CurrentTrackInfo(playerViewModel: PlayerViewModel = viewModel()) {
     val currentTrack by playerViewModel.currentTrack.observeAsState()
     val currentAlbum by playerViewModel.currentAlbum.observeAsState()
     Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
-        Image(
-            painter = if (currentAlbum?.image500 != null) {
-                rememberImagePainter(currentAlbum!!.image500) {
-                    placeholder(R.drawable.ic_album)
-                }
-            } else {
-                painterResource(R.drawable.ic_album)
-            },
+        AsyncImage(
+            model = currentAlbum?.image500,
+            placeholder = painterResource(R.drawable.ic_album),
+            fallback = painterResource(R.drawable.ic_album),
             contentDescription = stringResource(R.string.album_cover_of_current_track),
             modifier = Modifier.weight(1f).fillMaxWidth().background(MaterialTheme.colors.surface),
             contentScale = ContentScale.Fit,

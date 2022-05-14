@@ -1,6 +1,5 @@
 package me.vanpetegem.accentor.ui.artists
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
@@ -16,7 +15,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import coil.compose.rememberImagePainter
+import coil.compose.AsyncImage
 import me.vanpetegem.accentor.R
 import me.vanpetegem.accentor.data.artists.Artist
 
@@ -26,14 +25,10 @@ public fun ArtistCard(navController: NavController, artist: Artist) {
         modifier = Modifier.padding(8.dp).clickable { navController.navigate("artists/${artist.id}") },
     ) {
         Column {
-            Image(
-                painter = if (artist.image500 != null) {
-                    rememberImagePainter(artist.image500) {
-                        placeholder(R.drawable.ic_artist)
-                    }
-                } else {
-                    painterResource(R.drawable.ic_artist)
-                },
+            AsyncImage(
+                model = artist.image500,
+                fallback = painterResource(R.drawable.ic_artist),
+                placeholder = painterResource(R.drawable.ic_artist),
                 contentDescription = stringResource(R.string.artist_image),
                 modifier = Modifier.fillMaxWidth().aspectRatio(1f),
                 contentScale = ContentScale.Crop,
