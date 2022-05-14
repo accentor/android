@@ -1,6 +1,5 @@
 package me.vanpetegem.accentor.ui.albums
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -36,7 +35,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import coil.compose.rememberImagePainter
+import coil.compose.AsyncImage
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
 import me.vanpetegem.accentor.R
@@ -48,17 +47,13 @@ public fun AlbumCard(album: Album, navController: NavController, playerViewModel
     val scope = rememberCoroutineScope()
     Card(modifier = Modifier.padding(8.dp).clickable { navController.navigate("albums/${album.id}") }) {
         Column {
-            Image(
-                painter = if (album.image500 != null) {
-                    rememberImagePainter(album.image500) {
-                        placeholder(R.drawable.ic_album)
-                    }
-                } else {
-                    painterResource(R.drawable.ic_album)
-                },
+            AsyncImage(
+                model = album.image500,
+                fallback = painterResource(R.drawable.ic_album),
+                placeholder = painterResource(R.drawable.ic_album),
                 contentDescription = stringResource(R.string.album_image),
-                modifier = Modifier.fillMaxWidth().aspectRatio(1f),
                 contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxWidth().aspectRatio(1f),
             )
             Row(horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                 Column(modifier = Modifier.weight(1f)) {
