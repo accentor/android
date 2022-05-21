@@ -1,0 +1,23 @@
+name: Cachix
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  shell:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest]
+    steps:
+      - uses: actions/checkout@v3
+      - uses: cachix/install-nix-action@v17
+      - name: Cachix
+        uses: cachix/cachix-action@v10
+        with:
+          name: accentor
+          authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
+          skipPush: true
+      - run: nix build -L --no-link .#devShells.$(nix eval --impure --expr "builtins.currentSystem").accentor-android
+      - run: nix eval --json ".#devShells.$(nix eval --impure --expr 'builtins.currentSystem').accentor-android.outPath" | sed 's/"\(.*\)"/\1/' | cachix push accentor
