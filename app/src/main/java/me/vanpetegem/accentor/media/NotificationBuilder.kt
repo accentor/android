@@ -103,7 +103,7 @@ class NotificationBuilder(private val context: Context) {
             putExtra(Intent.EXTRA_KEY_EVENT, KeyEvent(KeyEvent.ACTION_DOWN, keyCode))
         }
         if (action != PlaybackStateCompat.ACTION_PAUSE) {
-            return PendingIntent.getForegroundService(context, keyCode, intent, 0)
+            return PendingIntent.getForegroundService(context, keyCode, intent, PendingIntent.FLAG_IMMUTABLE)
         } else {
             return PendingIntent.getService(context, keyCode, intent, PendingIntent.FLAG_IMMUTABLE)
         }
