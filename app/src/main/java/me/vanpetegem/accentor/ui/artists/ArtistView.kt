@@ -16,6 +16,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
@@ -44,6 +45,7 @@ fun ArtistView(id: Int, navController: NavController, playerViewModel: PlayerVie
                         placeholder = painterResource(R.drawable.ic_artist),
                         fallback = painterResource(R.drawable.ic_artist),
                         contentDescription = stringResource(R.string.artist_image),
+                        contentScale = ContentScale.Crop,
                         modifier = Modifier.width(80.dp).aspectRatio(1f).clip(CircleShape),
                     )
                     Text(artist.name, style = MaterialTheme.typography.h4, modifier = Modifier.padding(start = 8.dp))
