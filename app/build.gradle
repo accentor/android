@@ -56,6 +56,7 @@ android {
         disable 'SyntheticAccessor'
         disable 'VectorPath'
         disable 'InvalidPackage'
+        disable 'GradleDependency'
         ignoreWarnings false
         warningsAsErrors true
         textReport true
