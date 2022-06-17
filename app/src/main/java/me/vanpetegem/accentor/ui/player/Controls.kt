@@ -26,7 +26,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.media2.common.SessionPlayer
+import androidx.media3.common.Player
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
 import me.vanpetegem.accentor.R
@@ -42,8 +42,8 @@ fun Controls(playerViewModel: PlayerViewModel = viewModel()) {
     Column {
         Row(modifier = Modifier.padding(start = 24.dp, end = 24.dp, top = 12.dp)) {
             when (repeatMode) {
-                SessionPlayer.REPEAT_MODE_ALL -> {
-                    IconButton(onClick = { scope.launch(IO) { playerViewModel.setRepeatMode(SessionPlayer.REPEAT_MODE_ONE) } }) {
+                Player.REPEAT_MODE_ALL -> {
+                    IconButton(onClick = { scope.launch(IO) { playerViewModel.setRepeatMode(Player.REPEAT_MODE_ONE) } }) {
                         Icon(
                             painterResource(R.drawable.ic_repeat_all),
                             contentDescription = stringResource(R.string.repeat_all),
@@ -52,8 +52,8 @@ fun Controls(playerViewModel: PlayerViewModel = viewModel()) {
                         )
                     }
                 }
-                SessionPlayer.REPEAT_MODE_ONE -> {
-                    IconButton(onClick = { scope.launch(IO) { playerViewModel.setRepeatMode(SessionPlayer.REPEAT_MODE_NONE) } }) {
+                Player.REPEAT_MODE_ONE -> {
+                    IconButton(onClick = { scope.launch(IO) { playerViewModel.setRepeatMode(Player.REPEAT_MODE_OFF) } }) {
                         Icon(
                             painterResource(R.drawable.ic_repeat_one),
                             contentDescription = stringResource(R.string.repeat_one),
@@ -63,7 +63,7 @@ fun Controls(playerViewModel: PlayerViewModel = viewModel()) {
                     }
                 }
                 else -> {
-                    IconButton(onClick = { scope.launch(IO) { playerViewModel.setRepeatMode(SessionPlayer.REPEAT_MODE_ALL) } }) {
+                    IconButton(onClick = { scope.launch(IO) { playerViewModel.setRepeatMode(Player.REPEAT_MODE_ALL) } }) {
                         Icon(
                             painterResource(R.drawable.ic_repeat_off),
                             contentDescription = stringResource(R.string.repeat_off),
@@ -121,25 +121,22 @@ fun Controls(playerViewModel: PlayerViewModel = viewModel()) {
                 )
             }
             Spacer(Modifier.weight(1f))
-            when (shuffleMode) {
-                SessionPlayer.SHUFFLE_MODE_ALL -> {
-                    IconButton(onClick = { scope.launch(IO) { playerViewModel.setShuffleMode(SessionPlayer.SHUFFLE_MODE_NONE) } }) {
-                        Icon(
-                            painterResource(R.drawable.ic_shuffle_all),
-                            contentDescription = stringResource(R.string.shuffle_all),
-                            modifier = Modifier.height(32.dp).aspectRatio(1f),
-                            tint = MaterialTheme.colors.secondary.copy(alpha = LocalContentAlpha.current),
-                        )
-                    }
+            if (shuffleMode ?: false) {
+                IconButton(onClick = { scope.launch(IO) { playerViewModel.setShuffleMode(false) } }) {
+                    Icon(
+                        painterResource(R.drawable.ic_shuffle_all),
+                        contentDescription = stringResource(R.string.shuffle_all),
+                        modifier = Modifier.height(32.dp).aspectRatio(1f),
+                        tint = MaterialTheme.colors.secondary.copy(alpha = LocalContentAlpha.current),
+                    )
                 }
-                else -> {
-                    IconButton(onClick = { scope.launch(IO) { playerViewModel.setShuffleMode(SessionPlayer.SHUFFLE_MODE_ALL) } }) {
-                        Icon(
-                            painterResource(R.drawable.ic_shuffle_none),
-                            contentDescription = stringResource(R.string.shuffle_none),
-                            modifier = Modifier.height(32.dp).aspectRatio(1f),
-                        )
-                    }
+            } else {
+                IconButton(onClick = { scope.launch(IO) { playerViewModel.setShuffleMode(true) } }) {
+                    Icon(
+                        painterResource(R.drawable.ic_shuffle_none),
+                        contentDescription = stringResource(R.string.shuffle_none),
+                        modifier = Modifier.height(32.dp).aspectRatio(1f),
+                    )
                 }
             }
         }

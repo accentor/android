@@ -57,6 +57,6 @@ class PlayerViewModel @Inject constructor(
     suspend fun skipTo(position: Int) = mediaSessionConnection.skipTo(position)
     suspend fun removeFromQueue(position: Int) = mediaSessionConnection.removeFromQueue(position)
     suspend fun setRepeatMode(repeatMode: Int) = mediaSessionConnection.setRepeatMode(repeatMode)
-    suspend fun setShuffleMode(shuffleMode: Int) = mediaSessionConnection.setShuffleMode(shuffleMode)
-    fun updateCurrentPosition() = mediaSessionConnection.updateCurrentPosition()
+    suspend fun setShuffleMode(shuffleMode: Boolean) = mediaSessionConnection.setShuffleMode(shuffleMode)
+    suspend fun updateCurrentPosition() = mediaSessionConnection.updateCurrentPosition()
 }

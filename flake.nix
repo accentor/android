@@ -36,7 +36,7 @@
           default = accentor-android;
           accentor-android = pkgs.devshell.mkShell {
             name = "Accentor Android";
-            packages = [ pkgs.jdk11 pkgs.nixpkgs-fmt ];
+            packages = [ pkgs.jdk11 pkgs.kotlin-language-server pkgs.nixpkgs-fmt ];
             env = [
               { name = "ANDROID_SDK_ROOT"; eval = "${composed.androidsdk}/libexec/android-sdk/"; }
               { name = "BUILD_TOOLS_PATH"; eval = "$ANDROID_SDK_ROOT/build-tools/${buildToolsVersion}"; }

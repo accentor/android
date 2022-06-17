@@ -1,50 +1,46 @@
 package me.vanpetegem.accentor.media
 
+import android.app.PendingIntent
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
-import androidx.core.app.NotificationManagerCompat
-import androidx.core.content.ContextCompat
-import androidx.media2.common.MediaItem
-import androidx.media2.common.MediaMetadata
-import androidx.media2.common.SessionPlayer
-import androidx.media2.session.MediaSession
-import androidx.media2.session.MediaSessionService
-import androidx.media2.session.SessionCommand
-import androidx.media2.session.SessionCommandGroup
-import androidx.media2.session.SessionResult
-import com.google.android.exoplayer2.C
-import com.google.android.exoplayer2.ExoPlayer
-import com.google.android.exoplayer2.Player
-import com.google.android.exoplayer2.audio.AudioAttributes
-import com.google.android.exoplayer2.database.StandaloneDatabaseProvider
-import com.google.android.exoplayer2.ext.media2.SessionCallbackBuilder
-import com.google.android.exoplayer2.ext.media2.SessionPlayerConnector
-import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory
-import com.google.android.exoplayer2.source.ProgressiveMediaSource
-import com.google.android.exoplayer2.upstream.DataSource
-import com.google.android.exoplayer2.upstream.DefaultDataSource
-import com.google.android.exoplayer2.upstream.DefaultHttpDataSource
-import com.google.android.exoplayer2.upstream.cache.CacheDataSource
-import com.google.android.exoplayer2.upstream.cache.LeastRecentlyUsedCacheEvictor
-import com.google.android.exoplayer2.upstream.cache.SimpleCache
+import androidx.media3.common.AudioAttributes
+import androidx.media3.common.C
+import androidx.media3.common.MediaItem
+import androidx.media3.common.MediaMetadata
+import androidx.media3.common.Player
+import androidx.media3.database.StandaloneDatabaseProvider
+import androidx.media3.datasource.DataSource
+import androidx.media3.datasource.DefaultDataSource
+import androidx.media3.datasource.DefaultHttpDataSource
+import androidx.media3.datasource.cache.CacheDataSource
+import androidx.media3.datasource.cache.LeastRecentlyUsedCacheEvictor
+import androidx.media3.datasource.cache.SimpleCache
+import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.exoplayer.source.ProgressiveMediaSource
+import androidx.media3.extractor.DefaultExtractorsFactory
+import androidx.media3.session.CommandButton
+import androidx.media3.session.MediaNotification
+import androidx.media3.session.MediaSession
+import androidx.media3.session.MediaSessionService
+import com.google.common.collect.ImmutableList
+import com.google.common.util.concurrent.ListenableFuture
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.File
 import java.time.Instant
-import java.util.concurrent.Executors
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers.IO
-import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.guava.future
 import kotlinx.coroutines.launch
 import me.vanpetegem.accentor.R
-import me.vanpetegem.accentor.data.albums.Album
 import me.vanpetegem.accentor.data.albums.AlbumRepository
 import me.vanpetegem.accentor.data.authentication.AuthenticationDataSource
 import me.vanpetegem.accentor.data.codecconversions.CodecConversionRepository
 import me.vanpetegem.accentor.data.plays.PlayRepository
 import me.vanpetegem.accentor.data.preferences.PreferencesDataSource
-import me.vanpetegem.accentor.data.tracks.Track
 import me.vanpetegem.accentor.data.tracks.TrackRepository
+import me.vanpetegem.accentor.ui.main.MainActivity
 import me.vanpetegem.accentor.userAgent
 
 @AndroidEntryPoint
@@ -58,17 +54,10 @@ class MusicService : MediaSessionService() {
     @Inject lateinit var albumRepository: AlbumRepository
     @Inject lateinit var playRepository: PlayRepository
 
-    private lateinit var notificationManager: NotificationManagerCompat
-    private lateinit var notificationBuilder: NotificationBuilder
-
     private lateinit var mediaSession: MediaSession
-    private lateinit var sessionCallback: MediaSession.SessionCallback
-    private lateinit var sessionPlayerConnector: SessionPlayerConnector
-
-    private var isForegroudService = false
 
     private val accentorAudioAttributes = AudioAttributes.Builder()
-        .setContentType(C.CONTENT_TYPE_MUSIC)
+        .setContentType(C.AUDIO_CONTENT_TYPE_MUSIC)
         .setUsage(C.USAGE_MEDIA)
         .build()
 
@@ -84,8 +73,8 @@ class MusicService : MediaSessionService() {
     }
 
     private val exoPlayer: ExoPlayer by lazy {
-        ExoPlayer.Builder(this).apply {
-            setMediaSourceFactory(
+        ExoPlayer.Builder(this)
+            .setMediaSourceFactory(
                 ProgressiveMediaSource.Factory(
                     object : DataSource.Factory {
                         override fun createDataSource(): DataSource {
@@ -99,193 +88,110 @@ class MusicService : MediaSessionService() {
                     DefaultExtractorsFactory().setConstantBitrateSeekingEnabled(true)
                 )
             )
-            setHandleAudioBecomingNoisy(true)
-        }.build().apply {
-            setAudioAttributes(accentorAudioAttributes, true)
-            addListener(object : Player.Listener {
-                private var trackId: Int? = null
+            .setWakeMode(C.WAKE_MODE_NETWORK)
+            .setHandleAudioBecomingNoisy(true)
+            .setAudioAttributes(accentorAudioAttributes, true)
+            .build().apply {
+                addListener(object : Player.Listener {
+                    private var trackId: Int? = null
 
-                override fun onMediaItemTransition(item: com.google.android.exoplayer2.MediaItem?, reason: Int) {
-                    trackId = item?.mediaId?.toInt()
-                }
-
-                override fun onPositionDiscontinuity(old: Player.PositionInfo, new: Player.PositionInfo, reason: Int) {
-                    if (trackId != null && reason == Player.DISCONTINUITY_REASON_AUTO_TRANSITION) {
-                        reportPlay()
+                    override fun onMediaItemTransition(item: MediaItem?, reason: Int) {
+                        trackId = item?.mediaId?.toInt()
                     }
-                }
 
-                override fun onPlaybackStateChanged(state: Int) {
-                    if (trackId != null && state == Player.STATE_ENDED) {
-                        reportPlay()
-                        exoPlayer.stop()
-                        exoPlayer.seekTo(0, 0)
+                    override fun onPositionDiscontinuity(old: Player.PositionInfo, new: Player.PositionInfo, reason: Int) {
+                        if (trackId != null && reason == Player.DISCONTINUITY_REASON_AUTO_TRANSITION) {
+                            reportPlay()
+                        }
                     }
-                }
 
-                private fun reportPlay() {
-                    val savedTrackId = trackId!!
-                    mainScope.launch(IO) { playRepository.reportPlay(savedTrackId, Instant.now()) }
-                }
-            })
-        }
+                    override fun onPlaybackStateChanged(state: Int) {
+                        if (trackId != null && state == Player.STATE_ENDED) {
+                            reportPlay()
+                            exoPlayer.stop()
+                            exoPlayer.seekTo(0, 0)
+                        }
+                    }
+
+                    private fun reportPlay() {
+                        val savedTrackId = trackId!!
+                        mainScope.launch(IO) { playRepository.reportPlay(savedTrackId, Instant.now()) }
+                    }
+                })
+            }
     }
 
     override fun onCreate() {
         super.onCreate()
 
-        sessionPlayerConnector = SessionPlayerConnector(exoPlayer)
-        sessionCallback = SessionCallbackBuilder(baseContext, sessionPlayerConnector).setMediaItemProvider(
-            object : SessionCallbackBuilder.MediaItemProvider {
-                override fun onCreateMediaItem(
-                    session: MediaSession,
-                    info: MediaSession.ControllerInfo,
-                    mediaId: String
-                ): MediaItem? {
-                    val track = trackRepository.getById(mediaId.toInt())
-                    val album = track?.let { albumRepository.getById(it.albumId) }
-                    return track?.let { t -> album?.let { a -> convertTrack(t, a) } }
-                }
-            }
-        ).setCustomCommandProvider(
-            object : SessionCallbackBuilder.CustomCommandProvider {
-                override fun onCustomCommand(
-                    session: MediaSession,
-                    info: MediaSession.ControllerInfo,
-                    command: SessionCommand,
-                    args: Bundle?
-                ): SessionResult {
-                    when (command.customAction) {
-                        "STOP" -> {
-                            mainScope.launch(Main) { exoPlayer.stop() }
-                            return SessionResult(SessionResult.RESULT_SUCCESS, null)
-                        }
-                        "CLEAR" -> {
-                            mainScope.launch(Main) {
-                                exoPlayer.stop()
-                                exoPlayer.clearMediaItems()
-                            }
-                            return SessionResult(SessionResult.RESULT_SUCCESS, null)
-                        }
-                        // We don't know the command. Shouldn't happen, but SUCCESS is the only value we're allowed to return.
-                        else -> { return SessionResult(SessionResult.RESULT_SUCCESS, null) }
-                    }
-                }
+        val openIntent = Intent(this, MainActivity::class.java)
+        val pendingIntent = PendingIntent.getActivity(this, 0, openIntent, PendingIntent.FLAG_IMMUTABLE)
 
-                override fun getCustomCommands(
+        mediaSession = MediaSession.Builder(baseContext, exoPlayer)
+            .setSessionActivity(pendingIntent)
+            .setCallback(object : MediaSession.Callback {
+                override fun onAddMediaItems(
                     session: MediaSession,
-                    info: MediaSession.ControllerInfo
-                ): SessionCommandGroup? {
-                    return SessionCommandGroup.Builder()
-                        .addCommand(SessionCommand("STOP", null))
-                        .addCommand(SessionCommand("CLEAR", null))
-                        .build()
+                    controller: MediaSession.ControllerInfo,
+                    mediaItems: List<MediaItem>
+                ): ListenableFuture<List<MediaItem>> {
+                    return mainScope.future(IO) { convertTracks(mediaItems) }
                 }
-            }
-        ).setAllowedCommandProvider(
-            object : SessionCallbackBuilder.AllowedCommandProvider by SessionCallbackBuilder.DefaultAllowedCommandProvider(this@MusicService) {
-                override fun getAllowedCommands(
-                    session: MediaSession,
-                    controllerInfo: MediaSession.ControllerInfo,
-                    base: SessionCommandGroup
-                ): SessionCommandGroup {
-                    // This is a work-around. ExoPlayer reports that previous is not possible on the first track, because it only looks at if there is a
-                    // previous track, even though previous item skips back to the start of the track after three seconds. I tried to take these three seconds
-                    // into account, but this method isn't called often enough.
-                    if (!base.hasCommand(SessionCommand(SessionCommand.COMMAND_CODE_PLAYER_SKIP_TO_PREVIOUS_PLAYLIST_ITEM))) {
-                        val builder = SessionCommandGroup.Builder()
-                        for (command in base.getCommands()) {
-                            builder.addCommand(command)
-                        }
-                        builder.addCommand(SessionCommand(SessionCommand.COMMAND_CODE_PLAYER_SKIP_TO_PREVIOUS_PLAYLIST_ITEM))
-                        return builder.build()
-                    } else {
-                        return base
-                    }
-                }
-            }
-        ).build()
-        mediaSession = MediaSession.Builder(baseContext, sessionPlayerConnector)
-            .setSessionCallback(Executors.newSingleThreadExecutor(), sessionCallback)
+            })
             .build()
 
-        notificationManager = NotificationManagerCompat.from(this)
-        notificationBuilder = NotificationBuilder(this)
+        val notificationBuilder = NotificationBuilder(this, mainScope)
+        setMediaNotificationProvider(object : MediaNotification.Provider {
+            override fun createNotification(
+                session: MediaSession,
+                customLayout: ImmutableList<CommandButton>,
+                actionFactory: MediaNotification.ActionFactory,
+                onNotificationChangedCallback: MediaNotification.Provider.Callback,
+            ): MediaNotification =
+                notificationBuilder.buildNotification(session, actionFactory, onNotificationChangedCallback)
+
+            // Ignore, there are none.
+            override fun handleCustomCommand(session: MediaSession, action: String, extras: Bundle): Boolean = false
+        })
     }
 
-    private fun convertTrack(track: Track, album: Album): MediaItem {
+    override fun onGetSession(info: MediaSession.ControllerInfo): MediaSession? = mediaSession
+
+    private suspend fun convertTracks(items: List<MediaItem>): List<MediaItem> {
+        val converted = items.map { convertTrack(it.mediaId.toInt()) }
+        val filtered = converted.filterNotNull()
+        return filtered
+    }
+
+    private suspend fun convertTrack(id: Int): MediaItem? {
+        val track = trackRepository.getById(id) ?: return null
+        val album = track.let { albumRepository.getById(it.albumId) } ?: return null
+
         val conversionId = preferencesDataSource.conversionId.value
         val firstConversion by lazy { codecConversionRepository.getFirst() }
-        val conversionParam = if (conversionId != null && codecConversionRepository.getById(conversionId) != null) {
-            "&codec_conversion_id=$conversionId"
-        } else if (firstConversion != null) {
-            "&codec_conversion_id=${firstConversion!!.id}"
-        } else {
-            ""
-        }
+        val conversion = conversionId?.let { codecConversionRepository.getById(conversionId) } ?: firstConversion
+        val conversionParam = conversion?.let { "&codec_conversion_id=${it.id}" } ?: ""
         val mediaUri = "${authenticationDataSource.getServer()}/api/tracks/${track.id}/audio" +
             "?secret=${authenticationDataSource.getSecret()}" +
             "&device_id=${authenticationDataSource.getDeviceId()}" +
             conversionParam
 
-        val builder = MediaMetadata.Builder()
-        builder.putString(MediaMetadata.METADATA_KEY_TITLE, track.title)
-        builder.putString(MediaMetadata.METADATA_KEY_ALBUM, album.title)
-        builder.putString(MediaMetadata.METADATA_KEY_ARTIST, track.stringifyTrackArtists())
-        builder.putString(MediaMetadata.METADATA_KEY_DATE, album.release.toString())
-        builder.putString(
-            MediaMetadata.METADATA_KEY_ALBUM_ARTIST,
-            album.stringifyAlbumArtists().let {
-                if (it.isEmpty()) application.getString(R.string.various_artists) else it
-            }
-        )
-        builder.putString(MediaMetadata.METADATA_KEY_ART_URI, album.image500)
-        builder.putString(MediaMetadata.METADATA_KEY_ALBUM_ART_URI, album.image500)
-        builder.putString(MediaMetadata.METADATA_KEY_MEDIA_URI, mediaUri)
-        builder.putString(MediaMetadata.METADATA_KEY_MEDIA_ID, track.id.toString())
+        val metadata = MediaMetadata.Builder()
+            .setTitle(track.title)
+            .setArtist(track.stringifyTrackArtists())
+            .setAlbumTitle(album.title)
+            .setAlbumArtist(album.stringifyAlbumArtists().let { if (it.isEmpty()) application.getString(R.string.various_artists) else it })
+            .setArtworkUri(Uri.parse(album.image500))
+            .setTrackNumber(track.number)
+            .setReleaseYear(album.release.year)
+            .setReleaseMonth(album.release.monthValue)
+            .setReleaseDay(album.release.dayOfMonth)
+            .build()
 
-        return MediaItem.Builder().setMetadata(builder.build()).build()
-    }
-
-    override fun onGetSession(info: MediaSession.ControllerInfo): MediaSession? = mediaSession
-
-    override fun onUpdateNotification(session: MediaSession): MediaSessionService.MediaNotification? {
-        mainScope.launch(IO) {
-            val notification = if (session.player.currentMediaItem?.metadata != null) {
-                notificationBuilder.buildNotification(session)
-            } else { null }
-
-            when (session.player.playerState) {
-                SessionPlayer.PLAYER_STATE_PLAYING -> {
-                    if (notification != null) {
-                        notificationManager.notify(NOW_PLAYING_NOTIFICATION, notification)
-                        if (!isForegroudService) {
-                            ContextCompat.startForegroundService(application, Intent(application, this.javaClass))
-                            startForeground(NOW_PLAYING_NOTIFICATION, notification)
-                            isForegroudService = true
-                        }
-                    }
-                }
-                else -> {
-                    if (isForegroudService) {
-                        stopForeground(false)
-                        isForegroudService = false
-
-                        if (session.player.playerState == SessionPlayer.PLAYER_STATE_IDLE) {
-                            stopSelf()
-                        }
-
-                        if (notification != null) {
-                            notificationManager.notify(NOW_PLAYING_NOTIFICATION, notification)
-                        } else {
-                            notificationManager.cancel(NOW_PLAYING_NOTIFICATION)
-                        }
-                    }
-                }
-            }
-        }
-
-        // Don't use automatic foregrounding/notification showing/etc...
-        return null
+        return MediaItem.Builder()
+            .setMediaId(track.id.toString())
+            .setMediaMetadata(metadata)
+            .setUri(mediaUri)
+            .build()
     }
 }

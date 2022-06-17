@@ -57,6 +57,7 @@ android {
         disable 'VectorPath'
         disable 'InvalidPackage'
         disable 'GradleDependency'
+        disable 'ObsoleteLintCustomCheck'
         ignoreWarnings false
         warningsAsErrors true
         textReport true
@@ -118,12 +119,14 @@ dependencies {
     implementation("io.coil-kt:coil-compose:$coil_version")
     implementation("io.coil-kt:coil-gif:$coil_version")
 
-    // ExoPlayer
-    implementation "com.google.android.exoplayer:exoplayer-core:$exoplayer_version"
-    implementation "com.google.android.exoplayer:exoplayer-ui:$exoplayer_version"
-    implementation "com.google.android.exoplayer:extension-media2:$exoplayer_version"
-    // AndroidX media2
-    implementation "androidx.media2:media2-session:1.2.1"
+    // AndroidX media3
+    implementation "androidx.media:media:1.6.0" // For notification mediastyle
+    implementation "androidx.media3:media3-common:$media3_version"
+    implementation "androidx.media3:media3-database:$media3_version"
+    implementation "androidx.media3:media3-datasource:$media3_version"
+    implementation "androidx.media3:media3-datasource-okhttp:$media3_version"
+    implementation "androidx.media3:media3-exoplayer:$media3_version"
+    implementation "androidx.media3:media3-session:$media3_version"
 
     // Fuel
     implementation "com.github.kittinunf.fuel:fuel:$fuel_version"
