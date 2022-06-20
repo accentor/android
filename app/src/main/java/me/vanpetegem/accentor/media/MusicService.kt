@@ -181,7 +181,7 @@ class MusicService : MediaSessionService() {
             .setArtist(track.stringifyTrackArtists())
             .setAlbumTitle(album.title)
             .setAlbumArtist(album.stringifyAlbumArtists().let { if (it.isEmpty()) application.getString(R.string.various_artists) else it })
-            .setArtworkUri(Uri.parse(album.image500))
+            .setArtworkUri(album.image500?.let { Uri.parse(it) })
             .setTrackNumber(track.number)
             .setReleaseYear(album.release.year)
             .setReleaseMonth(album.release.monthValue)
