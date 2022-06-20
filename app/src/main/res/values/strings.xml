@@ -16,6 +16,7 @@
     <string name="open_drawer">Open drawer</string>
     <string name="navigation_icon">Navigation icon</string>
     <string name="artist_image">Image showing artist</string>
+    <string name="device_image">Image showing casting device</string>
     <string name="album_image">Image showing album</string>
     <string name="close_player">Close player</string>
     <string name="various_artists">Various Artists</string>
@@ -62,6 +63,7 @@
     <string name="artists">Artists</string>
     <string name="albums">Albums</string>
     <string name="tracks">Tracks</string>
+    <string name="devices">Devices</string>
     <string name="go_to_album">Go to album</string>
     <string name="go_to">Go to %s</string>
     <string name="search">Search</string>
@@ -69,4 +71,8 @@
     <string name="no_albums">No albums could be found</string>
     <string name="no_on_this_day">No albums were released on this day</string>
     <string name="no_artists">No artists could be found</string>
+    <string name="title_activity_device_view">DeviceView</string>
+    <string name="local_device">Play on this device</string>
+    <string name="local_device_description">Sound coming from your device</string>
+    <string name="devices_available">Stream to devices</string>
 </resources>

@@ -1,8 +1,12 @@
 package me.vanpetegem.accentor.ui.main
 
 import android.app.Activity
+import android.content.ComponentName
+import android.content.Context
 import android.content.Intent
+import android.content.ServiceConnection
 import android.os.Bundle
+import android.os.IBinder
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
@@ -49,6 +53,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -73,6 +78,9 @@ import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import me.vanpetegem.accentor.R
+import me.vanpetegem.accentor.devices.Device
+import me.vanpetegem.accentor.devices.DeviceManager
+import me.vanpetegem.accentor.devices.DeviceService
 import me.vanpetegem.accentor.ui.AccentorTheme
 import me.vanpetegem.accentor.ui.albums.AlbumGrid
 import me.vanpetegem.accentor.ui.albums.AlbumToolbar
@@ -81,14 +89,27 @@ import me.vanpetegem.accentor.ui.albums.AlbumViewDropdown
 import me.vanpetegem.accentor.ui.artists.ArtistGrid
 import me.vanpetegem.accentor.ui.artists.ArtistToolbar
 import me.vanpetegem.accentor.ui.artists.ArtistView
+import me.vanpetegem.accentor.ui.devices.Devices
 import me.vanpetegem.accentor.ui.home.Home
 import me.vanpetegem.accentor.ui.login.LoginActivity
 import me.vanpetegem.accentor.ui.player.PlayerOverlay
 import me.vanpetegem.accentor.ui.player.PlayerViewModel
 import me.vanpetegem.accentor.ui.preferences.PreferencesActivity
+import org.fourthline.cling.android.AndroidUpnpService
+import org.fourthline.cling.android.FixedAndroidLogHandler
+import org.fourthline.cling.model.message.header.ServiceTypeHeader
+import org.fourthline.cling.model.meta.RemoteDevice
+import org.fourthline.cling.model.types.ServiceType
+import org.fourthline.cling.model.types.UDN
+import org.seamless.util.logging.LoggingUtil
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    @Inject
+    lateinit var deviceManager: DeviceManager
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -96,6 +117,12 @@ class MainActivity : ComponentActivity() {
                 Content()
             }
         }
+
+        // Fix the logging integration between java.util.logging and Android internal logging
+        LoggingUtil.resetRootHandler(FixedAndroidLogHandler())
+        //Logger.getLogger("org.fourthline.cling").level = Level.FINE
+
+        applicationContext.bindService(Intent(this, DeviceService::class.java), deviceManager.connection, Context.BIND_AUTO_CREATE)
     }
 }
 
@@ -154,6 +181,7 @@ fun Content(mainViewModel: MainViewModel = viewModel(), playerViewModel: PlayerV
                     AlbumView(entry.arguments!!.getInt("albumId"), navController, playerViewModel)
                 }
             }
+            composable("devices") { Base(navController, mainViewModel, playerViewModel) { Devices() } }
         }
     }
 }
@@ -184,6 +212,10 @@ fun Base(
             }
             DrawerRow(stringResource(R.string.albums), currentNavigation?.destination?.route == "albums", R.drawable.ic_menu_albums) {
                 navController.navigate("albums")
+                scope.launch { scaffoldState.drawerState.close() }
+            }
+            DrawerRow(stringResource(R.string.devices), currentNavigation?.destination?.route == "devices", R.drawable.ic_menu_devices) {
+                navController.navigate("devices")
                 scope.launch { scaffoldState.drawerState.close() }
             }
             Divider()
