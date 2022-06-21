@@ -7,6 +7,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations.map
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import java.time.Instant
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
@@ -17,6 +18,7 @@ import me.vanpetegem.accentor.data.artists.ArtistRepository
 import me.vanpetegem.accentor.data.authentication.AuthenticationRepository
 import me.vanpetegem.accentor.data.codecconversions.CodecConversionRepository
 import me.vanpetegem.accentor.data.plays.PlayRepository
+import me.vanpetegem.accentor.data.preferences.PreferencesDataSource
 import me.vanpetegem.accentor.data.tracks.TrackRepository
 import me.vanpetegem.accentor.data.users.User
 import me.vanpetegem.accentor.data.users.UserRepository
@@ -31,6 +33,7 @@ class MainViewModel @Inject constructor(
     private val trackRepository: TrackRepository,
     private val codecConversionRepository: CodecConversionRepository,
     private val playRepository: PlayRepository,
+    private val preferencesDataSource: PreferencesDataSource,
 ) : AndroidViewModel(application) {
     private val refreshing = MutableLiveData<Int>(0)
     val isRefreshing: LiveData<Boolean> = map(refreshing) { if (it != null) it > 0 else false }
@@ -43,43 +46,42 @@ class MainViewModel @Inject constructor(
 
         refreshing.value?.let { refreshing.value = it + 1 }
         viewModelScope.launch(IO) {
-            codecConversionRepository.refresh {
-                withContext(Main) { refreshing.value?.let { refreshing.value = it - 1 } }
-            }
+            codecConversionRepository.refresh { decrementRefresh() }
         }
 
         refreshing.value?.let { refreshing.value = it + 1 }
         viewModelScope.launch(IO) {
-            userRepository.refresh {
-                withContext(Main) { refreshing.value?.let { refreshing.value = it - 1 } }
-            }
+            userRepository.refresh { decrementRefresh() }
         }
 
         refreshing.value?.let { refreshing.value = it + 1 }
         viewModelScope.launch(IO) {
-            trackRepository.refresh {
-                withContext(Main) { refreshing.value?.let { refreshing.value = it - 1 } }
-            }
+            trackRepository.refresh { decrementRefresh() }
         }
 
         refreshing.value?.let { refreshing.value = it + 1 }
         viewModelScope.launch(IO) {
-            artistRepository.refresh {
-                withContext(Main) { refreshing.value?.let { refreshing.value = it - 1 } }
-            }
+            artistRepository.refresh { decrementRefresh() }
         }
 
         refreshing.value?.let { refreshing.value = it + 1 }
         viewModelScope.launch(IO) {
-            albumRepository.refresh {
-                withContext(Main) { refreshing.value?.let { refreshing.value = it - 1 } }
-            }
+            albumRepository.refresh { decrementRefresh() }
         }
 
         refreshing.value?.let { refreshing.value = it + 1 }
         viewModelScope.launch(IO) {
-            playRepository.refresh {
-                withContext(Main) { refreshing.value?.let { refreshing.value = it - 1 } }
+            playRepository.refresh { decrementRefresh() }
+        }
+    }
+
+    suspend fun decrementRefresh() {
+        withContext(Main) {
+            refreshing.value?.let {
+                refreshing.value = it - 1
+                if (refreshing.value == 0) {
+                    withContext(IO) { preferencesDataSource.setLastSyncFinished(Instant.now()) }
+                }
             }
         }
     }
