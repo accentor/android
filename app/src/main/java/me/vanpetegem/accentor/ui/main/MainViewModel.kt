@@ -22,6 +22,8 @@ import me.vanpetegem.accentor.data.preferences.PreferencesDataSource
 import me.vanpetegem.accentor.data.tracks.TrackRepository
 import me.vanpetegem.accentor.data.users.User
 import me.vanpetegem.accentor.data.users.UserRepository
+import me.vanpetegem.accentor.ui.util.Event
+import me.vanpetegem.accentor.util.Result
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
@@ -37,6 +39,10 @@ class MainViewModel @Inject constructor(
 ) : AndroidViewModel(application) {
     private val refreshing = MutableLiveData<Int>(0)
     val isRefreshing: LiveData<Boolean> = map(refreshing) { if (it != null) it > 0 else false }
+    private var errorSinceLastRefresh: Boolean = false
+
+    private val _latestError = MutableLiveData<Event<String>?>(null)
+    val latestError: LiveData<Event<String>?> = _latestError
 
     val currentUser: LiveData<User?> = userRepository.currentUser
     val loginState: LiveData<Boolean> = authenticationRepository.isLoggedIn
@@ -44,44 +50,49 @@ class MainViewModel @Inject constructor(
     fun refresh() {
         if ((refreshing.value ?: 0) > 0) return
 
+        errorSinceLastRefresh = false
+
         refreshing.value?.let { refreshing.value = it + 1 }
         viewModelScope.launch(IO) {
-            codecConversionRepository.refresh { decrementRefresh() }
+            codecConversionRepository.refresh { decrementRefresh(it) }
         }
 
         refreshing.value?.let { refreshing.value = it + 1 }
         viewModelScope.launch(IO) {
-            userRepository.refresh { decrementRefresh() }
+            userRepository.refresh { decrementRefresh(it) }
         }
 
         refreshing.value?.let { refreshing.value = it + 1 }
         viewModelScope.launch(IO) {
-            trackRepository.refresh { decrementRefresh() }
+            trackRepository.refresh { decrementRefresh(it) }
         }
 
         refreshing.value?.let { refreshing.value = it + 1 }
         viewModelScope.launch(IO) {
-            artistRepository.refresh { decrementRefresh() }
+            artistRepository.refresh { decrementRefresh(it) }
         }
 
         refreshing.value?.let { refreshing.value = it + 1 }
         viewModelScope.launch(IO) {
-            albumRepository.refresh { decrementRefresh() }
+            albumRepository.refresh { decrementRefresh(it) }
         }
 
         refreshing.value?.let { refreshing.value = it + 1 }
         viewModelScope.launch(IO) {
-            playRepository.refresh { decrementRefresh() }
+            playRepository.refresh { decrementRefresh(it) }
         }
     }
 
-    suspend fun decrementRefresh() {
+    suspend fun decrementRefresh(result: Result<Unit>) {
         withContext(Main) {
-            refreshing.value?.let {
-                refreshing.value = it - 1
-                if (refreshing.value == 0) {
-                    withContext(IO) { preferencesDataSource.setLastSyncFinished(Instant.now()) }
-                }
+            refreshing.value?.let { refreshing.value = it - 1 }
+            if (result is Result.Error) {
+                errorSinceLastRefresh = true
+                _latestError.value = Event(result.exception.message!!)
+            }
+
+            if (refreshing.value == 0 && !errorSinceLastRefresh) {
+                withContext(IO) { preferencesDataSource.setLastSyncFinished(Instant.now()) }
             }
         }
     }
