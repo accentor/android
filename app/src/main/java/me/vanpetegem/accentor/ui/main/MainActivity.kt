@@ -3,6 +3,7 @@ package me.vanpetegem.accentor.ui.main
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
@@ -117,6 +118,14 @@ fun Content(mainViewModel: MainViewModel = viewModel(), playerViewModel: PlayerV
                 isFirstRender = false
                 mainViewModel.refresh()
             }
+        }
+    }
+
+    val latestError by mainViewModel.latestError.observeAsState()
+    LaunchedEffect(latestError) {
+        val error = latestError?.get()
+        if (error != null) {
+            Toast.makeText(context, error, Toast.LENGTH_LONG).show()
         }
     }
 

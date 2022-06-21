@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations.map
 import androidx.lifecycle.Transformations.switchMap
 import dagger.hilt.android.lifecycle.HiltViewModel
+import java.time.Instant
 import javax.inject.Inject
 import me.vanpetegem.accentor.data.authentication.AuthenticationRepository
 import me.vanpetegem.accentor.data.codecconversions.CodecConversion
@@ -28,6 +29,7 @@ class PreferencesViewModel @Inject constructor(
     val server: LiveData<String> = authenticationRepository.server
     val imageCacheSize: LiveData<Long> = preferencesDataSource.imageCacheSize
     val musicCacheSize: LiveData<Long> = preferencesDataSource.musicCacheSize
+    val lastSyncFinished: LiveData<Instant> = preferencesDataSource.lastSyncFinished
     val conversion: LiveData<CodecConversion> = switchMap(codecConversionRepository.allCodecConversionsById) { ccsMap ->
         switchMap(codecConversionRepository.allCodecConversions) { ccs ->
             map(conversionId) { it?.let { ccsMap[it] } ?: ccs.firstOrNull() }

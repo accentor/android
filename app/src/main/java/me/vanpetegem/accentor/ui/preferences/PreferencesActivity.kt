@@ -2,6 +2,7 @@ package me.vanpetegem.accentor.ui.preferences
 
 import android.app.Activity
 import android.os.Bundle
+import android.text.format.DateUtils
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.clickable
@@ -75,12 +76,17 @@ fun Content(preferencesViewModel: PreferencesViewModel = viewModel()) {
     ) { innerPadding ->
         val currentUser by preferencesViewModel.currentUser.observeAsState()
         val server by preferencesViewModel.server.observeAsState()
+        val lastSyncFinished by preferencesViewModel.lastSyncFinished.observeAsState()
         val imageCacheSize by preferencesViewModel.imageCacheSize.observeAsState()
         val musicCacheSize by preferencesViewModel.musicCacheSize.observeAsState()
         val conversion by preferencesViewModel.conversion.observeAsState()
         val possibleConversions by preferencesViewModel.possibleConversions.observeAsState()
+        val formattedTime = lastSyncFinished?.let {
+            DateUtils.formatDateTime(context, it.toEpochMilli(), DateUtils.FORMAT_SHOW_TIME or DateUtils.FORMAT_SHOW_DATE)
+        } ?: stringResource(R.string.not_finished_yet)
         Column(modifier = Modifier.padding(innerPadding)) {
             Setting(stringResource(R.string.logged_in_as, "${currentUser?.name}"), server!!)
+            Setting(stringResource(R.string.last_sync_finished), formattedTime)
             Header(stringResource(R.string.playback_settings))
             var musicCacheOpen by remember { mutableStateOf(false) }
             var newMusicCacheValue by remember { mutableStateOf("${musicCacheSize!! / 1024L / 1024L}") }
