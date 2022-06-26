@@ -189,7 +189,7 @@ class MediaSessionConnection @Inject constructor(
         }
     }
 
-    suspend fun previous() = mainScope.launch(Main) { mediaController.seekToPreviousMediaItem() }
+    suspend fun previous() = mainScope.launch(Main) { mediaController.seekToPrevious() }
 
     suspend fun pause() = mainScope.launch(Main) { mediaController.pause() }
 
@@ -198,7 +198,7 @@ class MediaSessionConnection @Inject constructor(
         mediaController.play()
     }
 
-    suspend fun next() = mainScope.launch(Main) { mediaController.seekToNextMediaItem() }
+    suspend fun next() = mainScope.launch(Main) { mediaController.seekToNext() }
 
     suspend fun seekTo(time: Int) = mainScope.launch(Main) { mediaController.seekTo(time.toLong() * 1000) }
 

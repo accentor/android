@@ -72,7 +72,7 @@ class MusicService : MediaSessionService() {
         )
     }
 
-    private val exoPlayer: ExoPlayer by lazy {
+    private val player: Player by lazy {
         ExoPlayer.Builder(this)
             .setMediaSourceFactory(
                 ProgressiveMediaSource.Factory(
@@ -108,8 +108,8 @@ class MusicService : MediaSessionService() {
                     override fun onPlaybackStateChanged(state: Int) {
                         if (trackId != null && state == Player.STATE_ENDED) {
                             reportPlay()
-                            exoPlayer.stop()
-                            exoPlayer.seekTo(0, 0)
+                            player.stop()
+                            player.seekTo(0, 0)
                         }
                     }
 
@@ -127,7 +127,7 @@ class MusicService : MediaSessionService() {
         val openIntent = Intent(this, MainActivity::class.java)
         val pendingIntent = PendingIntent.getActivity(this, 0, openIntent, PendingIntent.FLAG_IMMUTABLE)
 
-        mediaSession = MediaSession.Builder(baseContext, exoPlayer)
+        mediaSession = MediaSession.Builder(baseContext, player)
             .setSessionActivity(pendingIntent)
             .setCallback(object : MediaSession.Callback {
                 override fun onAddMediaItems(
