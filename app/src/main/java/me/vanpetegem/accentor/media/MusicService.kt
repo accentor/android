@@ -108,7 +108,7 @@ class MusicService : MediaSessionService() {
                     override fun onPlaybackStateChanged(state: Int) {
                         if (trackId != null && state == Player.STATE_ENDED) {
                             reportPlay()
-                            player.stop()
+                            player.pause()
                             player.seekTo(0, 0)
                         }
                     }
