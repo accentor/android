@@ -43,10 +43,9 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
         freeCompilerArgs += [
-            "-Xopt-in=androidx.compose.foundation.ExperimentalFoundationApi",
-            "-Xopt-in=androidx.compose.material.ExperimentalMaterialApi",
-            "-Xopt-in=androidx.compose.ui.ExperimentalComposeUiApi",
-            "-Xopt-in=coil.annotation.ExperimentalCoilApi"
+            "-opt-in=androidx.compose.material.ExperimentalMaterialApi",
+            "-opt-in=androidx.compose.ui.ExperimentalComposeUiApi",
+            "-opt-in=coil.annotation.ExperimentalCoilApi"
         ]
     }
     lintOptions {
