@@ -203,7 +203,7 @@ fun Base(
         },
         drawerGesturesEnabled = !(isPlayerOpen ?: false),
         topBar = { toolbar(scaffoldState) },
-    ) { _ ->
+    ) {
         val isRefreshing by mainViewModel.isRefreshing.observeAsState()
         SwipeRefresh(
             state = rememberSwipeRefreshState(isRefreshing ?: false),

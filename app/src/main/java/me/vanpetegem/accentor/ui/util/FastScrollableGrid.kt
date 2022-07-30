@@ -21,6 +21,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -56,16 +57,20 @@ fun ScrollBar(
     val color = MaterialTheme.colors.secondary
     val coroutineScope = rememberCoroutineScope()
     var scrollbarOffset by remember { mutableStateOf(0.dp) }
-    val firstVisibleElementIndex = state.layoutInfo.visibleItemsInfo.firstOrNull()?.index
+    val firstVisibleElementIndex by remember(state) {
+        derivedStateOf { state.layoutInfo.visibleItemsInfo.firstOrNull()?.index }
+    }
 
     if (alpha > 0.0f && firstVisibleElementIndex != null) {
-        val sectionName = getSectionName(firstVisibleElementIndex)
+        val sectionName = getSectionName(firstVisibleElementIndex!!)
 
-        val totalItemsCount = state.layoutInfo.totalItemsCount
-        val itemHeight = state.layoutInfo.visibleItemsInfo[0].size.height
+        val totalItemsCount by remember(state) { derivedStateOf { state.layoutInfo.totalItemsCount } }
+        val itemHeight by remember(state) { derivedStateOf { state.layoutInfo.visibleItemsInfo[0].size.height } }
         val totalHeight = itemHeight * totalItemsCount
-        val boxHeight = state.layoutInfo.viewportEndOffset
-        val currentPosition = firstVisibleElementIndex * itemHeight + state.firstVisibleItemScrollOffset
+        val boxHeight by remember(state) { derivedStateOf { state.layoutInfo.viewportEndOffset } }
+        val currentPosition by remember(state) {
+            derivedStateOf { firstVisibleElementIndex!! * itemHeight + state.firstVisibleItemScrollOffset }
+        }
         val topDistance = maxOf(0.dp, scrollbarOffset - (minimumHeight / 2))
 
         if (dragging) {
