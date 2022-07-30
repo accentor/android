@@ -124,7 +124,7 @@ fun <T> FastScrollableGrid(gridItems: List<T>, getSectionName: (T) -> String, it
             items(gridItems.size) { i -> itemView(gridItems[i]) }
         }
         if (gridItems.size / maxOf(cardsPerRow, 2) > 8) {
-            ScrollBar(gridState, getSectionName = { getSectionName(gridItems[it * maxOf(cardsPerRow, 2)]) })
+            ScrollBar(gridState, getSectionName = { getSectionName(gridItems[it]) })
         }
     }
 }
