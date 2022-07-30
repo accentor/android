@@ -203,13 +203,13 @@ fun Base(
         },
         drawerGesturesEnabled = !(isPlayerOpen ?: false),
         topBar = { toolbar(scaffoldState) },
-    ) { _ ->
+    ) { contentPadding ->
         val isRefreshing by mainViewModel.isRefreshing.observeAsState()
         SwipeRefresh(
             state = rememberSwipeRefreshState(isRefreshing ?: false),
             onRefresh = { mainViewModel.refresh() },
             indicator = { state, trigger -> SwipeRefreshIndicator(state, trigger, contentColor = MaterialTheme.colors.secondary) },
-            content = mainContent,
+            content = { Box(modifier = Modifier.padding(contentPadding)) { mainContent() } },
         )
     }
 }

@@ -12,15 +12,16 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.GridCells
-import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.LazyVerticalGrid
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyGridState
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,7 +42,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun ScrollBar(
-    state: LazyListState,
+    state: LazyGridState,
     width: Dp = 8.dp,
     minimumHeight: Dp = 48.dp,
     getSectionName: ((Int) -> String)
@@ -56,16 +57,20 @@ fun ScrollBar(
     val color = MaterialTheme.colors.secondary
     val coroutineScope = rememberCoroutineScope()
     var scrollbarOffset by remember { mutableStateOf(0.dp) }
-    val firstVisibleElementIndex = state.layoutInfo.visibleItemsInfo.firstOrNull()?.index
+    val firstVisibleElementIndex by remember(state) {
+        derivedStateOf { state.layoutInfo.visibleItemsInfo.firstOrNull()?.index }
+    }
 
     if (alpha > 0.0f && firstVisibleElementIndex != null) {
-        val sectionName = getSectionName(firstVisibleElementIndex)
+        val sectionName = getSectionName(firstVisibleElementIndex!!)
 
-        val totalItemsCount = state.layoutInfo.totalItemsCount
-        val itemHeight = state.layoutInfo.visibleItemsInfo[0].size
+        val totalItemsCount by remember(state) { derivedStateOf { state.layoutInfo.totalItemsCount } }
+        val itemHeight by remember(state) { derivedStateOf { state.layoutInfo.visibleItemsInfo[0].size.height } }
         val totalHeight = itemHeight * totalItemsCount
-        val boxHeight = state.layoutInfo.viewportEndOffset
-        val currentPosition = firstVisibleElementIndex * itemHeight + state.firstVisibleItemScrollOffset
+        val boxHeight by remember(state) { derivedStateOf { state.layoutInfo.viewportEndOffset } }
+        val currentPosition by remember(state) {
+            derivedStateOf { firstVisibleElementIndex!! * itemHeight + state.firstVisibleItemScrollOffset }
+        }
         val topDistance = maxOf(0.dp, scrollbarOffset - (minimumHeight / 2))
 
         if (dragging) {
@@ -112,19 +117,19 @@ fun ScrollBar(
 
 @Composable
 fun <T> FastScrollableGrid(gridItems: List<T>, getSectionName: (T) -> String, itemView: @Composable (T) -> Unit) {
-    val listState = rememberLazyListState()
+    val gridState = rememberLazyGridState()
     var boxSize by remember { mutableStateOf(IntSize.Zero) }
     val cardsPerRow: Int = with(LocalDensity.current) { boxSize.width / 192.dp.toPx().toInt() }
     Box(Modifier.fillMaxSize(), Alignment.TopEnd) {
         LazyVerticalGrid(
-            cells = if (cardsPerRow >= 2) GridCells.Adaptive(minSize = 192.dp) else GridCells.Fixed(2),
-            state = listState,
+            columns = if (cardsPerRow >= 2) GridCells.Adaptive(minSize = 192.dp) else GridCells.Fixed(2),
+            state = gridState,
             modifier = Modifier.onGloballyPositioned { boxSize = it.size },
         ) {
             items(gridItems.size) { i -> itemView(gridItems[i]) }
         }
         if (gridItems.size / maxOf(cardsPerRow, 2) > 8) {
-            ScrollBar(listState, getSectionName = { getSectionName(gridItems[it * maxOf(cardsPerRow, 2)]) })
+            ScrollBar(gridState, getSectionName = { getSectionName(gridItems[it]) })
         }
     }
 }
