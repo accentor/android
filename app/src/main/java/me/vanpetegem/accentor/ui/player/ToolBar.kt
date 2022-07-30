@@ -70,7 +70,7 @@ fun ToolBar(
                 }
             }
             var expanded by remember { mutableStateOf(false) }
-            Box(modifier = Modifier.height(56.dp).aspectRatio(1f).wrapContentSize(Alignment.CenterStart)) {
+            Box(modifier = Modifier.height(40.dp).aspectRatio(1f).wrapContentSize(Alignment.TopStart)) {
                 IconButton(onClick = { expanded = true }) {
                     Icon(Icons.Default.MoreVert, contentDescription = stringResource(R.string.open_menu))
                 }
