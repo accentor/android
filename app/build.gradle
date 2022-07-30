@@ -107,7 +107,7 @@ dependencies {
     implementation "androidx.activity:activity-compose:1.5.0"
 
     // AndroidX Compose SwipeRefresh
-    implementation "com.google.accompanist:accompanist-swiperefresh:0.23.1"
+    implementation "com.google.accompanist:accompanist-swiperefresh:0.25.0"
 
     // AndroidX Hilt (dependency injection)
     implementation "com.google.dagger:hilt-android:$hilt_version"
