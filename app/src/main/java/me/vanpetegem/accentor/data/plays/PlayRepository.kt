@@ -15,11 +15,19 @@ class PlayRepository @Inject constructor(
     suspend fun refresh(handler: suspend (Result<Unit>) -> Unit) {
         val fetchStart = Instant.now()
 
+        var toUpsert = ArrayList<Play>()
+        var count = 0
         for (result in index(authenticationRepository.server.value!!, authenticationRepository.authData.value!!)) {
             when (result) {
                 is Result.Success -> {
                     val fetchTime = Instant.now()
-                    playDao.upsertAll(result.data.map { Play.fromApi(it, fetchTime) })
+                    toUpsert.addAll(result.data.map { Play.fromApi(it, fetchTime) })
+                    count += 1
+                    if (count >= 5) {
+                        playDao.upsertAll(toUpsert)
+                        toUpsert.clear()
+                        count = 0
+                    }
                 }
                 is Result.Error -> {
                     handler(Result.Error(result.exception))
@@ -27,6 +35,7 @@ class PlayRepository @Inject constructor(
                 }
             }
         }
+        playDao.upsertAll(toUpsert)
         playDao.deleteFetchedBefore(fetchStart)
         handler(Result.Success(Unit))
     }

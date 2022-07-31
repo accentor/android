@@ -36,11 +36,19 @@ class ArtistRepository @Inject constructor(
     suspend fun refresh(handler: suspend (Result<Unit>) -> Unit) {
         val fetchStart = Instant.now()
 
+        var toUpsert = ArrayList<Artist>()
+        var count = 0
         for (result in index(authenticationRepository.server.value!!, authenticationRepository.authData.value!!)) {
             when (result) {
                 is Result.Success -> {
                     val fetchTime = Instant.now()
-                    artistDao.upsertAll(result.data.map { Artist.fromApi(it, fetchTime) })
+                    toUpsert.addAll(result.data.map { Artist.fromApi(it, fetchTime) })
+                    count += 1
+                    if (count >= 5) {
+                        artistDao.upsertAll(toUpsert)
+                        toUpsert.clear()
+                        count = 0
+                    }
                 }
                 is Result.Error -> {
                     handler(Result.Error(result.exception))
@@ -48,6 +56,7 @@ class ArtistRepository @Inject constructor(
                 }
             }
         }
+        artistDao.upsertAll(toUpsert)
         artistDao.deleteFetchedBefore(fetchStart)
         handler(Result.Success(Unit))
     }
