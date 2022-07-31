@@ -13,6 +13,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import java.time.Instant
+import javax.inject.Singleton
 import me.vanpetegem.accentor.data.albums.AlbumDao
 import me.vanpetegem.accentor.data.albums.DbAlbum
 import me.vanpetegem.accentor.data.albums.DbAlbumArtist
@@ -64,6 +65,7 @@ abstract class AccentorDatabase : RoomDatabase() {
 @InstallIn(SingletonComponent::class)
 internal object DatabaseModule {
     @Provides
+    @Singleton
     fun provideAccentorDatabase(@ApplicationContext context: Context): AccentorDatabase {
         return Room.databaseBuilder(
             context.applicationContext,

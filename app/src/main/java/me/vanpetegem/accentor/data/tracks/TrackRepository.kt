@@ -24,11 +24,20 @@ class TrackRepository @Inject constructor(
 
     suspend fun refresh(handler: suspend (Result<Unit>) -> Unit) {
         val fetchStart = Instant.now()
+
+        var toUpsert = ArrayList<Track>()
+        var count = 0
         for (result in index(authenticationRepository.server.value!!, authenticationRepository.authData.value!!)) {
             when (result) {
                 is Result.Success -> {
                     val fetchTime = Instant.now()
-                    trackDao.upsertAll(result.data.map { Track.fromApi(it, fetchTime) })
+                    toUpsert.addAll(result.data.map { Track.fromApi(it, fetchTime) })
+                    count += 1
+                    if (count >= 5) {
+                        trackDao.upsertAll(toUpsert)
+                        toUpsert.clear()
+                        count = 0
+                    }
                 }
                 is Result.Error -> {
                     handler(Result.Error(result.exception))
@@ -36,6 +45,7 @@ class TrackRepository @Inject constructor(
                 }
             }
         }
+        trackDao.upsertAll(toUpsert)
         trackDao.deleteFetchedBefore(fetchStart)
         handler(Result.Success(Unit))
     }
