@@ -37,6 +37,7 @@ class PlayRepository @Inject constructor(
         }
         playDao.upsertAll(toUpsert)
         playDao.deleteFetchedBefore(fetchStart)
+        reportUnreportedPlays()
         handler(Result.Success(Unit))
     }
 
