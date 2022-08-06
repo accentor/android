@@ -17,6 +17,7 @@ import me.vanpetegem.accentor.data.albums.AlbumRepository
 import me.vanpetegem.accentor.data.artists.ArtistRepository
 import me.vanpetegem.accentor.data.authentication.AuthenticationRepository
 import me.vanpetegem.accentor.data.codecconversions.CodecConversionRepository
+import me.vanpetegem.accentor.data.playlists.PlaylistRepository
 import me.vanpetegem.accentor.data.plays.PlayRepository
 import me.vanpetegem.accentor.data.preferences.PreferencesDataSource
 import me.vanpetegem.accentor.data.tracks.TrackRepository
@@ -34,6 +35,7 @@ class MainViewModel @Inject constructor(
     private val artistRepository: ArtistRepository,
     private val trackRepository: TrackRepository,
     private val codecConversionRepository: CodecConversionRepository,
+    private val playlistRepository: PlaylistRepository,
     private val playRepository: PlayRepository,
     private val preferencesDataSource: PreferencesDataSource,
 ) : AndroidViewModel(application) {
@@ -81,6 +83,11 @@ class MainViewModel @Inject constructor(
         viewModelScope.launch(IO) {
             playRepository.refresh { decrementRefresh(it) }
         }
+
+        refreshing.value?.let { refreshing.value = it + 1 }
+        viewModelScope.launch(IO) {
+            playlistRepository.refresh { decrementRefresh(it) }
+        }
     }
 
     suspend fun decrementRefresh(result: Result<Unit>) {
@@ -103,6 +110,7 @@ class MainViewModel @Inject constructor(
         viewModelScope.launch(IO) { artistRepository.clear() }
         viewModelScope.launch(IO) { trackRepository.clear() }
         viewModelScope.launch(IO) { playRepository.clear() }
+        viewModelScope.launch(IO) { playlistRepository.clear() }
         viewModelScope.launch(IO) { codecConversionRepository.clear() }
         viewModelScope.launch(IO) { authenticationRepository.logout() }
     }

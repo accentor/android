@@ -4,6 +4,8 @@ import androidx.room.TypeConverter
 import java.time.Instant
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import me.vanpetegem.accentor.data.playlists.Access
+import me.vanpetegem.accentor.data.playlists.PlaylistType
 import me.vanpetegem.accentor.data.tracks.Role
 import me.vanpetegem.accentor.data.users.Permission
 
@@ -55,6 +57,48 @@ class RoomTypeConverters {
             Role.REMIXER -> 5
             Role.PRODUCER -> 6
             Role.ARRANGER -> 7
+        }
+    }
+
+    @TypeConverter
+    fun playlistTypeFromInt(value: Int?): PlaylistType? {
+        return when (value) {
+            null -> null
+            1 -> PlaylistType.ALBUM
+            2 -> PlaylistType.ARTIST
+            3 -> PlaylistType.TRACK
+            else -> null
+        }
+    }
+
+    @TypeConverter
+    fun playlistTypeToInt(value: PlaylistType?): Int? {
+        return when (value) {
+            null -> null
+            PlaylistType.ALBUM -> 1
+            PlaylistType.ARTIST -> 2
+            PlaylistType.TRACK -> 3
+        }
+    }
+
+    @TypeConverter
+    fun accessFromInt(value: Int?): Access? {
+        return when (value) {
+            null -> null
+            1 -> Access.SHARED
+            2 -> Access.PERSONAL
+            3 -> Access.SECRET
+            else -> null
+        }
+    }
+
+    @TypeConverter
+    fun accessToInt(value: Access?): Int? {
+        return when (value) {
+            null -> null
+            Access.SHARED -> 1
+            Access.PERSONAL -> 2
+            Access.SECRET -> 3
         }
     }
 
