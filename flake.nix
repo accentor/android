@@ -18,8 +18,6 @@
         pkgs = import nixpkgs { inherit system; config = { android_sdk.accept_license = true; allowUnfree = true; }; overlays = [ devshell.overlay ]; };
         buildToolsVersion = "32.0.0";
         composed = pkgs.androidenv.composeAndroidPackages {
-          toolsVersion = "26.1.1";
-          platformToolsVersion = "33.0.1";
           buildToolsVersions = [ buildToolsVersion ];
           platformVersions = [ "32" ];
         };
