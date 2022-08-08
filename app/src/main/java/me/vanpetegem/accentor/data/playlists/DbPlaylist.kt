@@ -33,5 +33,7 @@ data class DbPlaylistItem(
     @ColumnInfo(name = "playlist_id")
     val playlistId: Int,
     @ColumnInfo(name = "item_id")
-    val itemId: Int
+    val itemId: Int,
+    @ColumnInfo(name = "order")
+    val order: Int,
 )

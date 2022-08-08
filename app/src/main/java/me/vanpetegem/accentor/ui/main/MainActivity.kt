@@ -85,6 +85,8 @@ import me.vanpetegem.accentor.ui.home.Home
 import me.vanpetegem.accentor.ui.login.LoginActivity
 import me.vanpetegem.accentor.ui.player.PlayerOverlay
 import me.vanpetegem.accentor.ui.player.PlayerViewModel
+import me.vanpetegem.accentor.ui.playlists.PlaylistList
+import me.vanpetegem.accentor.ui.playlists.PlaylistToolbar
 import me.vanpetegem.accentor.ui.preferences.PreferencesActivity
 
 @AndroidEntryPoint
@@ -162,6 +164,11 @@ fun Content(mainViewModel: MainViewModel = viewModel(), playerViewModel: PlayerV
                     AlbumView(entry.arguments!!.getInt("albumId"), navController, playerViewModel)
                 }
             }
+            composable("playlists") {
+                Base(
+                    navController, mainViewModel, playerViewModel, toolbar = { PlaylistToolbar(it, mainViewModel) }
+                ) { PlaylistList(navController, playerViewModel) }
+            }
         }
     }
 }
@@ -199,6 +206,10 @@ fun Base(
                 DrawerRow(stringResource(R.string.albums), currentNavigation?.destination?.route == "albums", R.drawable.ic_menu_albums) {
                     navController.navigate("albums")
                     scope.launch { drawerState.close() }
+                }
+                DrawerRow(stringResource(R.string.playlists), currentNavigation?.destination?.route == "playlists", R.drawable.ic_menu_playlists) {
+                    navController.navigate("playlists")
+                    scope.launch { scaffoldState.drawerState.close() }
                 }
                 Divider()
                 DrawerRow(stringResource(R.string.preferences), false, R.drawable.ic_menu_preferences) {

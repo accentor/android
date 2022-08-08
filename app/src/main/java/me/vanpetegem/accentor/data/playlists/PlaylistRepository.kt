@@ -1,5 +1,6 @@
 package me.vanpetegem.accentor.data.playlists
 
+import androidx.lifecycle.LiveData
 import dagger.Reusable
 import java.time.Instant
 import javax.inject.Inject
@@ -12,6 +13,8 @@ class PlaylistRepository @Inject constructor(
     private val playlistDao: PlaylistDao,
     private val authenticationRepository: AuthenticationRepository,
 ) {
+    val allPlaylists: LiveData<List<Playlist>> = playlistDao.getAll()
+
     suspend fun refresh(handler: suspend (Result<Unit>) -> Unit) {
         val fetchStart = Instant.now()
 

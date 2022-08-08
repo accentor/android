@@ -1,5 +1,9 @@
 package me.vanpetegem.accentor.data.playlists
 
+import android.util.SparseArray
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Transformations.map
+import androidx.lifecycle.Transformations.switchMap
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -9,6 +13,24 @@ import java.time.Instant
 
 @Dao
 abstract class PlaylistDao {
+
+    open fun getAll(): LiveData<List<Playlist>> = switchMap(getAllDbPlaylists()) { playlists ->
+        map(playlistItemsByPlaylistId()) { playlistItems ->
+            playlists.map { p -> Playlist.fromDb(p, playlistItems.get(p.id, ArrayList())) }
+        }
+    }
+
+    protected open fun playlistItemsByPlaylistId(): LiveData<SparseArray<MutableList<Int>>> =
+        map(getAllPlaylistItems()) {
+            val mapping = SparseArray<MutableList<Int>>()
+            for (pi in it) {
+                val l = mapping.get(pi.playlistId, ArrayList())
+                l.add(pi.itemId)
+                mapping.put(pi.playlistId, l)
+            }
+            return@map mapping
+        }
+
     @Transaction
     open fun upsertAll(playlists: List<Playlist>) {
         playlists.forEach { playlist: Playlist ->
@@ -26,8 +48,8 @@ abstract class PlaylistDao {
                 )
             )
             deletePlaylistItemsById(playlist.id)
-            for (iId in playlist.itemIds) {
-                insert(DbPlaylistItem(playlist.id, iId))
+            for (i in 0 until playlist.itemIds.size) {
+                insert(DbPlaylistItem(playlist.id, playlist.itemIds[i], i))
             }
         }
     }
@@ -43,6 +65,12 @@ abstract class PlaylistDao {
         deletePlaylistsFetchedBefore(time)
         deleteUnusedPlaylistItems()
     }
+
+    @Query("SELECT * FROM playlists ORDER BY name ASC, id ASC")
+    protected abstract fun getAllDbPlaylists(): LiveData<List<DbPlaylist>>
+
+    @Query("SELECT * FROM playlist_items ORDER BY `order` ASC")
+    protected abstract fun getAllPlaylistItems(): LiveData<List<DbPlaylistItem>>
 
     @Query("DELETE FROM playlists WHERE fetched_at < :time")
     protected abstract fun deletePlaylistsFetchedBefore(time: Instant)

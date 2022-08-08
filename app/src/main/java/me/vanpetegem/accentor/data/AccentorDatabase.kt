@@ -290,6 +290,7 @@ internal object DatabaseModule {
                             CREATE TABLE IF NOT EXISTS `playlist_items` (
                                 `playlist_id` INTEGER NOT NULL,
                                 `item_id` INTEGER NOT NULL,
+                                `order` INTEGER NOT NULL,
                                 PRIMARY KEY(`playlist_id`, `item_id`)
                             )
                             """
