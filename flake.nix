@@ -2,7 +2,7 @@
   description = "Accentor android app";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
+    nixpkgs.url = "github:chvp/nixpkgs/androidenv-build-tools-33";
     devshell = {
       url = "github:numtide/devshell";
       inputs = {
@@ -16,10 +16,10 @@
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = import nixpkgs { inherit system; config = { android_sdk.accept_license = true; allowUnfree = true; }; overlays = [ devshell.overlay ]; };
-        buildToolsVersion = "32.0.0";
+        buildToolsVersion = "33.0.0";
         composed = pkgs.androidenv.composeAndroidPackages {
           buildToolsVersions = [ buildToolsVersion ];
-          platformVersions = [ "32" ];
+          platformVersions = [ "33" ];
         };
         fhsEnv = pkgs.buildFHSUserEnv {
           name = "android-sdk-env";

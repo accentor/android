@@ -20,6 +20,7 @@
         android:extractNativeLibs="false"
         android:supportsRtl="true"
         android:usesCleartextTraffic="true"
+        android:enableOnBackInvokedCallback="true"
         android:windowSoftInputMode="adjustResize">
         <activity android:name=".ui.login.LoginActivity" />
         <activity

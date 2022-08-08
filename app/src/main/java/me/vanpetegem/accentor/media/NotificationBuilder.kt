@@ -95,6 +95,7 @@ class NotificationBuilder(private val context: Context, private val scope: Corou
             .setSmallIcon(R.drawable.ic_notification)
             .setStyle(mediaStyle)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+            .setOngoing(player.isPlaying)
 
         metadata?.artworkUri?.let { uri ->
             scope.launch(IO) {

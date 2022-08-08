@@ -1,6 +1,7 @@
 package me.vanpetegem.accentor
 
 import android.app.Application
+import android.content.pm.PackageManager
 import android.os.Build
 import coil.ImageLoader
 import coil.ImageLoaderFactory
@@ -19,7 +20,13 @@ class Accentor : Application(), ImageLoaderFactory {
 
     override fun onCreate() {
         super.onCreate()
-        version = applicationContext.packageManager.getPackageInfo(packageName, 0).versionName
+        version = if (Build.VERSION.SDK_INT >= 33) {
+            applicationContext.packageManager.getPackageInfo(
+                packageName, PackageManager.PackageInfoFlags.of(0)
+            ).versionName
+        } else {
+            applicationContext.packageManager.getPackageInfo(packageName, 0).versionName
+        }
         userAgent = "Accentor/$version"
         FuelManager.instance.baseHeaders = mapOf("User-Agent" to userAgent)
     }
