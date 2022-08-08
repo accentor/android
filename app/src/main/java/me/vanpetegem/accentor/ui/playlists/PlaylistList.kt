@@ -1,5 +1,6 @@
 package me.vanpetegem.accentor.ui.playlists
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
@@ -71,13 +72,18 @@ fun PlaylistListItem(navController: NavController, playerViewModel: PlayerViewMo
     if (index != 0) {
         Divider()
     }
-    val itemInfo = when (playlist.playlistType) {
-        PlaylistType.ALBUM -> pluralStringResource(R.plurals.playlist_albums, playlist.itemIds.size, playlist.itemIds.size)
-        PlaylistType.ARTIST -> pluralStringResource(R.plurals.playlist_artists, playlist.itemIds.size, playlist.itemIds.size)
-        PlaylistType.TRACK -> pluralStringResource(R.plurals.playlist_tracks, playlist.itemIds.size, playlist.itemIds.size)
-    }
-    Row(modifier = Modifier.padding(8.dp)) {
-        Column() {
+    val itemInfo = pluralStringResource(
+        when (playlist.playlistType) {
+            PlaylistType.ALBUM -> R.plurals.playlist_albums
+            PlaylistType.ARTIST -> R.plurals.playlist_artists
+            PlaylistType.TRACK -> R.plurals.playlist_tracks
+        },
+        playlist.itemIds.size, playlist.itemIds.size
+    )
+    Row(
+        modifier = Modifier.padding(8.dp).clickable { navController.navigate("playlists/${playlist.id}") }
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
             Text(
                 playlist.name,
                 style = MaterialTheme.typography.subtitle1,

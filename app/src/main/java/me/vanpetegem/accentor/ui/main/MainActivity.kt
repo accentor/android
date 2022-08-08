@@ -87,6 +87,7 @@ import me.vanpetegem.accentor.ui.player.PlayerOverlay
 import me.vanpetegem.accentor.ui.player.PlayerViewModel
 import me.vanpetegem.accentor.ui.playlists.PlaylistList
 import me.vanpetegem.accentor.ui.playlists.PlaylistToolbar
+import me.vanpetegem.accentor.ui.playlists.PlaylistView
 import me.vanpetegem.accentor.ui.preferences.PreferencesActivity
 
 @AndroidEntryPoint
@@ -168,6 +169,11 @@ fun Content(mainViewModel: MainViewModel = viewModel(), playerViewModel: PlayerV
                 Base(
                     navController, mainViewModel, playerViewModel, toolbar = { PlaylistToolbar(it, mainViewModel) }
                 ) { PlaylistList(navController, playerViewModel) }
+            }
+            composable("playlists/{playlistId}", arguments = listOf(navArgument("playlistId") { type = NavType.IntType })) { entry ->
+                Base(navController, mainViewModel, playerViewModel) {
+                    PlaylistView(entry.arguments!!.getInt("playlistId"), navController, playerViewModel)
+                }
             }
         }
     }
