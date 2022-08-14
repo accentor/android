@@ -6,9 +6,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.ContentAlpha
-import androidx.compose.material.LocalContentColor
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -33,7 +33,7 @@ fun CurrentTrackInfo(playerViewModel: PlayerViewModel = viewModel()) {
             placeholder = painterResource(R.drawable.ic_album),
             fallback = painterResource(R.drawable.ic_album),
             contentDescription = stringResource(R.string.album_cover_of_current_track),
-            modifier = Modifier.weight(1f).fillMaxWidth().background(MaterialTheme.colors.surface),
+            modifier = Modifier.weight(1f).fillMaxWidth().background(MaterialTheme.colorScheme.surface),
             contentScale = ContentScale.Fit,
             alignment = Alignment.TopCenter,
         )
@@ -42,14 +42,14 @@ fun CurrentTrackInfo(playerViewModel: PlayerViewModel = viewModel()) {
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier.padding(horizontal = 8.dp),
-            style = MaterialTheme.typography.h6,
+            style = MaterialTheme.typography.titleLarge,
         )
         Text(
             currentTrack?.stringifyTrackArtists() ?: "",
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier.padding(horizontal = 8.dp),
-            style = MaterialTheme.typography.subtitle1,
+            style = MaterialTheme.typography.titleMedium,
             color = LocalContentColor.current.copy(alpha = ContentAlpha.medium),
         )
         Text(
@@ -57,7 +57,7 @@ fun CurrentTrackInfo(playerViewModel: PlayerViewModel = viewModel()) {
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier.padding(horizontal = 8.dp),
-            style = MaterialTheme.typography.subtitle2,
+            style = MaterialTheme.typography.titleSmall,
             color = LocalContentColor.current.copy(alpha = ContentAlpha.medium),
         )
     }

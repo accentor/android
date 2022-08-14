@@ -12,19 +12,19 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.DismissValue
-import androidx.compose.material.Divider
-import androidx.compose.material.DropdownMenu
-import androidx.compose.material.DropdownMenuItem
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.LocalContentColor
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
 import androidx.compose.material.SwipeToDismiss
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.rememberDismissState
+import androidx.compose.material3.Divider
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -108,20 +108,20 @@ fun QueueItem(
                             track.title,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
-                            style = MaterialTheme.typography.subtitle1,
+                            style = MaterialTheme.typography.titleMedium,
                         )
                         Text(
                             track.stringifyTrackArtists(),
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
-                            style = MaterialTheme.typography.subtitle2,
+                            style = MaterialTheme.typography.titleSmall,
                             color = LocalContentColor.current.copy(alpha = ContentAlpha.medium),
                         )
                     }
                     Text(
                         track.length.formatTrackLength(),
                         maxLines = 1,
-                        style = MaterialTheme.typography.body2,
+                        style = MaterialTheme.typography.bodyMedium,
                         color = LocalContentColor.current.copy(alpha = ContentAlpha.medium),
                     )
                     Box(modifier = Modifier.height(40.dp).aspectRatio(1f).wrapContentSize(Alignment.TopStart)) {
@@ -135,20 +135,18 @@ fun QueueItem(
                                     expanded = false
                                     navController.navigate("albums/${track.albumId}")
                                     closePlayer()
-                                }
-                            ) {
-                                Text(stringResource(R.string.go_to_album))
-                            }
+                                },
+                                text = { Text(stringResource(R.string.go_to_album)) },
+                            )
                             for (ta in track.trackArtists.sortedBy { ta -> ta.order }) {
                                 DropdownMenuItem(
                                     onClick = {
                                         expanded = false
                                         navController.navigate("artists/${ta.artistId}")
                                         closePlayer()
-                                    }
-                                ) {
-                                    Text(stringResource(R.string.go_to, ta.name))
-                                }
+                                    },
+                                    text = { Text(stringResource(R.string.go_to, ta.name)) }
+                                )
                             }
                         }
                     }

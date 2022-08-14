@@ -7,40 +7,39 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.ContentAlpha
-import androidx.compose.material.Divider
-import androidx.compose.material.DropdownMenu
-import androidx.compose.material.DropdownMenuItem
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.ListItem
 import androidx.compose.material.LocalContentAlpha
-import androidx.compose.material.LocalContentColor
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.ScaffoldState
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
-import androidx.compose.material.TextFieldDefaults
-import androidx.compose.material.TopAppBar
-import androidx.compose.material.contentColorFor
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.primarySurface
-import androidx.compose.material.rememberScaffoldState
+import androidx.compose.material3.DismissibleDrawerSheet
+import androidx.compose.material3.DismissibleNavigationDrawer
+import androidx.compose.material3.Divider
+import androidx.compose.material3.DrawerState
+import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationDrawerItem
+import androidx.compose.material3.NavigationDrawerItemDefaults
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SmallTopAppBar
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.contentColorFor
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -150,9 +149,9 @@ fun Content(mainViewModel: MainViewModel = viewModel(), playerViewModel: PlayerV
                     navController,
                     mainViewModel,
                     playerViewModel,
-                    toolbar = { scaffoldState ->
+                    toolbar = { drawerState ->
                         BaseToolbar(
-                            scaffoldState,
+                            drawerState,
                             mainViewModel,
                             extraDropdownItems = {
                                 AlbumViewDropdown(entry.arguments!!.getInt("albumId"), navController, it)
@@ -172,60 +171,70 @@ fun Base(
     navController: NavController,
     mainViewModel: MainViewModel = viewModel(),
     playerViewModel: PlayerViewModel = viewModel(),
-    toolbar: @Composable ((ScaffoldState) -> Unit) = { scaffoldState -> BaseToolbar(scaffoldState, mainViewModel) },
+    toolbar: @Composable ((DrawerState) -> Unit) = { drawerState -> BaseToolbar(drawerState, mainViewModel) },
     mainContent: @Composable (() -> Unit),
 ) {
-    val scaffoldState = rememberScaffoldState()
+    val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     val currentNavigation by navController.currentBackStackEntryAsState()
     val isPlayerOpen by playerViewModel.isOpen.observeAsState()
     val context = LocalContext.current
-    Scaffold(
-        scaffoldState = scaffoldState,
+    BackHandler(enabled = drawerState.isOpen) {
+        scope.launch {
+            drawerState.close()
+        }
+    }
+    DismissibleNavigationDrawer(
+        drawerState = drawerState,
         drawerContent = {
-            DrawerRow(stringResource(R.string.home), currentNavigation?.destination?.route == "home", R.drawable.ic_menu_home) {
-                navController.navigate("home")
-                scope.launch { scaffoldState.drawerState.close() }
-            }
-            DrawerRow(stringResource(R.string.artists), currentNavigation?.destination?.route == "artists", R.drawable.ic_menu_artists) {
-                navController.navigate("artists")
-                scope.launch { scaffoldState.drawerState.close() }
-            }
-            DrawerRow(stringResource(R.string.albums), currentNavigation?.destination?.route == "albums", R.drawable.ic_menu_albums) {
-                navController.navigate("albums")
-                scope.launch { scaffoldState.drawerState.close() }
-            }
-            Divider()
-            DrawerRow(stringResource(R.string.preferences), false, R.drawable.ic_menu_preferences) {
-                context.startActivity(Intent(context, PreferencesActivity::class.java))
-                scope.launch { scaffoldState.drawerState.close() }
+            DismissibleDrawerSheet {
+                DrawerRow(stringResource(R.string.home), currentNavigation?.destination?.route == "home", R.drawable.ic_menu_home) {
+                    navController.navigate("home")
+                    scope.launch { drawerState.close() }
+                }
+                DrawerRow(stringResource(R.string.artists), currentNavigation?.destination?.route == "artists", R.drawable.ic_menu_artists) {
+                    navController.navigate("artists")
+                    scope.launch { drawerState.close() }
+                }
+                DrawerRow(stringResource(R.string.albums), currentNavigation?.destination?.route == "albums", R.drawable.ic_menu_albums) {
+                    navController.navigate("albums")
+                    scope.launch { drawerState.close() }
+                }
+                Divider()
+                DrawerRow(stringResource(R.string.preferences), false, R.drawable.ic_menu_preferences) {
+                    context.startActivity(Intent(context, PreferencesActivity::class.java))
+                    scope.launch { drawerState.close() }
+                }
             }
         },
-        drawerGesturesEnabled = !(isPlayerOpen ?: false),
-        topBar = { toolbar(scaffoldState) },
-    ) { contentPadding ->
-        val isRefreshing by mainViewModel.isRefreshing.observeAsState()
-        SwipeRefresh(
-            state = rememberSwipeRefreshState(isRefreshing ?: false),
-            onRefresh = { mainViewModel.refresh() },
-            indicator = { state, trigger -> SwipeRefreshIndicator(state, trigger, contentColor = MaterialTheme.colors.secondary) },
-            content = { Box(modifier = Modifier.padding(contentPadding)) { mainContent() } },
-        )
+        gesturesEnabled = !(isPlayerOpen ?: false),
+    ) {
+        Scaffold(
+            topBar = { toolbar(drawerState) },
+        ) { contentPadding ->
+            val isRefreshing by mainViewModel.isRefreshing.observeAsState()
+            SwipeRefresh(
+                state = rememberSwipeRefreshState(isRefreshing ?: false),
+                onRefresh = { mainViewModel.refresh() },
+                indicator = { state, trigger -> SwipeRefreshIndicator(state, trigger, contentColor = MaterialTheme.colorScheme.secondary) },
+                content = { Box(modifier = Modifier.padding(contentPadding)) { mainContent() } },
+            )
+        }
     }
 }
 
 @Composable
 fun BaseToolbar(
-    scaffoldState: ScaffoldState,
+    drawerState: DrawerState,
     mainViewModel: MainViewModel = viewModel(),
     extraActions: @Composable (() -> Unit)? = null,
     extraDropdownItems: @Composable ((() -> Unit) -> Unit)? = null,
 ) {
     val scope = rememberCoroutineScope()
-    TopAppBar(
+    SmallTopAppBar(
         title = { Text(stringResource(R.string.app_name)) },
         navigationIcon = {
-            IconButton(onClick = { scope.launch { scaffoldState.drawerState.open() } }) {
+            IconButton(onClick = { scope.launch { drawerState.open() } }) {
                 Icon(Icons.Filled.Menu, contentDescription = stringResource(R.string.open_drawer))
             }
         },
@@ -244,18 +253,16 @@ fun BaseToolbar(
                         onClick = {
                             mainViewModel.refresh()
                             expanded = false
-                        }
-                    ) {
-                        Text(stringResource(R.string.action_refresh))
-                    }
+                        },
+                        text = { Text(stringResource(R.string.action_refresh)) },
+                    )
                     DropdownMenuItem(
                         onClick = {
                             mainViewModel.logout()
                             expanded = false
-                        }
-                    ) {
-                        Text(stringResource(R.string.action_sign_out))
-                    }
+                        },
+                        text = { Text(stringResource(R.string.action_sign_out)) },
+                    )
                 }
             }
         },
@@ -266,38 +273,42 @@ fun BaseToolbar(
 fun SearchToolbar(value: String, update: (String) -> Unit, exit: () -> Unit) {
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusRequester = remember { FocusRequester() }
-    TopAppBar(contentPadding = PaddingValues(0.dp)) {
-        IconButton(
-            onClick = { exit() },
-            modifier = Modifier.padding(start = 8.dp),
-        ) {
-            Icon(Icons.Filled.ArrowBack, contentDescription = stringResource(R.string.stop_searching))
-        }
-        TextField(
-            value,
-            update,
-            singleLine = true,
-            placeholder = {
-                Text(
-                    stringResource(R.string.search),
-                    color = MaterialTheme.colors.contentColorFor(MaterialTheme.colors.primarySurface).copy(ContentAlpha.medium)
-                )
-            },
-            colors = TextFieldDefaults.textFieldColors(
-                backgroundColor = Color.Transparent,
-                cursorColor = LocalContentColor.current.copy(LocalContentAlpha.current),
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent,
-            ),
-            modifier = Modifier.weight(1f).fillMaxHeight().focusRequester(focusRequester),
-            keyboardActions = KeyboardActions(
-                onDone = {
-                    keyboardController?.hide()
-                    focusRequester.freeFocus()
+    SmallTopAppBar(
+        navigationIcon = {
+            IconButton(
+                onClick = { exit() },
+                modifier = Modifier.padding(start = 8.dp),
+            ) {
+                Icon(Icons.Filled.ArrowBack, contentDescription = stringResource(R.string.stop_searching))
+            }
+        },
+        title = {
+            TextField(
+                value,
+                update,
+                singleLine = true,
+                placeholder = {
+                    Text(
+                        stringResource(R.string.search),
+                        color = MaterialTheme.colorScheme.contentColorFor(MaterialTheme.colorScheme.primaryContainer).copy(ContentAlpha.medium)
+                    )
                 },
-            ),
-        )
-    }
+                colors = TextFieldDefaults.textFieldColors(
+                    containerColor = Color.Transparent,
+                    cursorColor = LocalContentColor.current.copy(LocalContentAlpha.current),
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent,
+                ),
+                modifier = Modifier.fillMaxSize().focusRequester(focusRequester),
+                keyboardActions = KeyboardActions(
+                    onDone = {
+                        keyboardController?.hide()
+                        focusRequester.freeFocus()
+                    },
+                ),
+            )
+        }
+    )
     LaunchedEffect(focusRequester) {
         focusRequester.requestFocus()
     }
@@ -306,12 +317,11 @@ fun SearchToolbar(value: String, update: (String) -> Unit, exit: () -> Unit) {
 
 @Composable
 fun DrawerRow(title: String, selected: Boolean, icon: Int, onClick: () -> Unit) {
-    val background = if (selected) MaterialTheme.colors.primary.copy(alpha = 0.12f) else Color.Transparent
-    val textColor = if (selected) MaterialTheme.colors.primary else MaterialTheme.colors.onSurface
-    ListItem(modifier = Modifier.clickable(onClick = onClick).background(background)) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(painterResource(icon), contentDescription = stringResource(R.string.navigation_icon), tint = textColor)
-            Text(title, modifier = Modifier.padding(16.dp, 8.dp), color = textColor)
-        }
-    }
+    NavigationDrawerItem(
+        label = { Text(title, modifier = Modifier.padding(16.dp, 8.dp)) },
+        selected = selected,
+        onClick = onClick,
+        modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
+        icon = { Icon(painterResource(icon), contentDescription = stringResource(R.string.navigation_icon)) },
+    )
 }

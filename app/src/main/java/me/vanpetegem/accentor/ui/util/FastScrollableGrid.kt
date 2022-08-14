@@ -17,9 +17,9 @@ import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -54,7 +54,7 @@ fun ScrollBar(
         targetValue = targetAlpha,
         animationSpec = tween(duration),
     )
-    val color = MaterialTheme.colors.secondary
+    val color = MaterialTheme.colorScheme.secondary
     val coroutineScope = rememberCoroutineScope()
     var scrollbarOffset by remember { mutableStateOf(0.dp) }
     val firstVisibleElementIndex by remember(state) {
@@ -80,7 +80,7 @@ fun ScrollBar(
                 color = color,
             ) {
                 Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
-                    Text(sectionName, style = MaterialTheme.typography.h5)
+                    Text(sectionName, style = MaterialTheme.typography.titleLarge)
                 }
             }
         }

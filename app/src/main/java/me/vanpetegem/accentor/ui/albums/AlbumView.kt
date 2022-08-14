@@ -8,12 +8,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.ContentAlpha
-import androidx.compose.material.DropdownMenuItem
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.LocalContentColor
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -61,14 +61,14 @@ fun AlbumView(
                     Column {
                         Text(
                             if (album.editionDescription == null) album.title else "${album.title} (${album.editionDescription})",
-                            style = MaterialTheme.typography.h5,
+                            style = MaterialTheme.typography.titleLarge,
                             modifier = Modifier.padding(start = 8.dp),
                             maxLines = 2,
                             overflow = TextOverflow.Ellipsis,
                         )
                         Text(
                             album.stringifyAlbumArtists().let { if (it.isEmpty()) stringResource(R.string.various_artists) else it },
-                            style = MaterialTheme.typography.subtitle1,
+                            style = MaterialTheme.typography.titleMedium,
                             color = LocalContentColor.current.copy(alpha = ContentAlpha.medium),
                             modifier = Modifier.padding(start = 8.dp),
                             maxLines = 1,
@@ -76,7 +76,7 @@ fun AlbumView(
                         )
                         Text(
                             if (album.edition == null) album.release.format() else "${album.release.format()} (${album.edition.format()})",
-                            style = MaterialTheme.typography.subtitle2,
+                            style = MaterialTheme.typography.titleSmall,
                             color = LocalContentColor.current.copy(alpha = ContentAlpha.medium),
                             modifier = Modifier.padding(start = 8.dp),
                             maxLines = 1,
@@ -110,10 +110,9 @@ fun AlbumViewDropdown(id: Int, navController: NavController, dismiss: (() -> Uni
                 onClick = {
                     dismiss()
                     navController.navigate("artists/${aa.artistId}")
-                }
-            ) {
-                Text(stringResource(R.string.go_to, aa.name))
-            }
+                },
+                text = { Text(stringResource(R.string.go_to, aa.name)) },
+            )
         }
     }
 }

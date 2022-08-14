@@ -5,16 +5,16 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.material.DropdownMenu
-import androidx.compose.material.DropdownMenuItem
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SmallTopAppBar
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -41,20 +41,20 @@ fun ToolBar(
 ) {
     val scope = rememberCoroutineScope()
     val queuePosStr by playerViewModel.queuePosStr.observeAsState()
-    TopAppBar(
+    SmallTopAppBar(
         title = {
             Column {
                 Text(
                     stringResource(R.string.now_playing),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    style = MaterialTheme.typography.h6,
+                    style = MaterialTheme.typography.titleLarge,
                 )
                 Text(
                     queuePosStr ?: "0/0",
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    style = MaterialTheme.typography.subtitle1,
+                    style = MaterialTheme.typography.titleMedium,
                 )
             }
         },
@@ -79,10 +79,9 @@ fun ToolBar(
                         onClick = {
                             expanded = false
                             scope.launch(IO) { playerViewModel.clearQueue() }
-                        }
-                    ) {
-                        Text(stringResource(R.string.clear_queue))
-                    }
+                        },
+                        text = { Text(stringResource(R.string.clear_queue)) },
+                    )
                 }
             }
         }
