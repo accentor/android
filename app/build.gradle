@@ -51,12 +51,13 @@ android {
     lintOptions {
         quiet true
         checkAllWarnings true
+        disable 'GradleDependency'
+        disable 'InvalidPackage'
+        disable 'ObsoleteLintCustomCheck'
         disable 'OldTargetApi'
         disable 'SyntheticAccessor'
+        disable 'UnusedAttribute'
         disable 'VectorPath'
-        disable 'InvalidPackage'
-        disable 'GradleDependency'
-        disable 'ObsoleteLintCustomCheck'
         ignoreWarnings false
         warningsAsErrors true
         textReport true
