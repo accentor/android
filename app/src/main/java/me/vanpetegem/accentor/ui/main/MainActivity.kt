@@ -234,8 +234,14 @@ fun BaseToolbar(
     SmallTopAppBar(
         title = { Text(stringResource(R.string.app_name)) },
         navigationIcon = {
-            IconButton(onClick = { scope.launch { drawerState.open() } }) {
-                Icon(Icons.Filled.Menu, contentDescription = stringResource(R.string.open_drawer))
+            if (drawerState.isOpen) {
+                IconButton(onClick = { scope.launch { drawerState.close() } }) {
+                    Icon(Icons.Filled.Menu, contentDescription = stringResource(R.string.close_drawer))
+                }
+            } else {
+                IconButton(onClick = { scope.launch { drawerState.open() } }) {
+                    Icon(Icons.Filled.Menu, contentDescription = stringResource(R.string.open_drawer))
+                }
             }
         },
         actions = {
