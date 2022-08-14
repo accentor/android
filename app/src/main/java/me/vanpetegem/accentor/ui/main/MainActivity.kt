@@ -216,9 +216,9 @@ fun Base(
             SwipeRefresh(
                 state = rememberSwipeRefreshState(isRefreshing ?: false),
                 onRefresh = { mainViewModel.refresh() },
+                indicatorPadding = contentPadding,
                 indicator = { state, trigger -> SwipeRefreshIndicator(state, trigger, contentColor = MaterialTheme.colorScheme.secondary) },
-                content = { Box(modifier = Modifier.padding(contentPadding)) { mainContent() } },
-            )
+            ) { Box(modifier = Modifier.padding(contentPadding)) { mainContent() } }
         }
     }
 }
