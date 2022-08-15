@@ -135,12 +135,12 @@ fun AccentorTheme(content: @Composable () -> Unit) {
     val lightColors: ColorScheme
     val darkColors: ColorScheme
     if (Build.VERSION.SDK_INT >= 31) {
-        lightColors = LightColors
-        darkColors = DarkColors
-    } else {
         val context = LocalContext.current
         lightColors = dynamicLightColorScheme(context)
         darkColors = dynamicDarkColorScheme(context)
+    } else {
+        lightColors = LightColors
+        darkColors = DarkColors
     }
     val colorScheme = if (isSystemInDarkTheme()) darkColors else lightColors
     MaterialTheme(colorScheme = colorScheme, content = content)
