@@ -9,7 +9,7 @@ import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
 import coil.disk.DiskCache
 import com.github.kittinunf.fuel.core.FuelManager
-import com.google.android.material.color.DynamicColors;
+import com.google.android.material.color.DynamicColors
 import dagger.hilt.android.HiltAndroidApp
 import java.io.File
 import javax.inject.Inject
@@ -30,7 +30,7 @@ class Accentor : Application(), ImageLoaderFactory {
         }
         userAgent = "Accentor/$version"
         FuelManager.instance.baseHeaders = mapOf("User-Agent" to userAgent)
-        DynamicColors.applyToActivitiesIfAvailable(this);
+        DynamicColors.applyToActivitiesIfAvailable(this)
     }
 
     override fun newImageLoader(): ImageLoader =
