@@ -2,7 +2,7 @@
   description = "Accentor android app";
 
   inputs = {
-    nixpkgs.url = "github:chvp/nixpkgs/androidenv-build-tools-33";
+    nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
     devshell = {
       url = "github:numtide/devshell";
       inputs = {
