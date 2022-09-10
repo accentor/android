@@ -60,6 +60,7 @@ android {
         disable 'VectorPath'
         ignoreWarnings false
         warningsAsErrors true
+        lintConfig = file("lint.xml")
         textReport true
         textOutput "stdout"
         explainIssues !project.hasProperty("isCI")
