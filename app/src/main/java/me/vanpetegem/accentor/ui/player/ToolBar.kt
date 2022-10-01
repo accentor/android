@@ -2,18 +2,20 @@ package me.vanpetegem.accentor.ui.player
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SmallTopAppBar
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -41,9 +43,12 @@ fun ToolBar(
 ) {
     val scope = rememberCoroutineScope()
     val queuePosStr by playerViewModel.queuePosStr.observeAsState()
-    SmallTopAppBar(
-        title = {
-            Column {
+    Surface(modifier = Modifier.height(64.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            IconButton(onClick = closePlayer) {
+                Icon(Icons.Filled.KeyboardArrowDown, contentDescription = stringResource(R.string.close_player))
+            }
+            Column(modifier = Modifier.padding(start = 8.dp).weight(1f)) {
                 Text(
                     stringResource(R.string.now_playing),
                     maxLines = 1,
@@ -57,13 +62,6 @@ fun ToolBar(
                     style = MaterialTheme.typography.titleMedium,
                 )
             }
-        },
-        navigationIcon = {
-            IconButton(onClick = closePlayer) {
-                Icon(Icons.Filled.ArrowBack, contentDescription = stringResource(R.string.close_player))
-            }
-        },
-        actions = {
             if (showQueueButton) {
                 IconButton(onClick = { playerViewModel.toggleQueue() }) {
                     Icon(painterResource(R.drawable.ic_play_queue), contentDescription = stringResource(R.string.toggle_queue))
@@ -85,5 +83,5 @@ fun ToolBar(
                 }
             }
         }
-    )
+    }
 }
