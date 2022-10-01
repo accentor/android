@@ -68,7 +68,7 @@
                   rm -f "$APK_DIR/"*
                   gradle assembleRelease
                   "$BUILD_TOOLS_PATH/zipalign" -v -p 4 "$APK_DIR/app-release-unsigned.apk" "$APK_DIR/app-release-unsigned-aligned.apk"
-                  "$BUILD_TOOLS_PATH/apksigner" sign --ks "$HOME/.android/debug.keystore" --out "$APK_DIR/app-release.apk" "$APK_DIR/app-release-unsigned-aligned.apk"
+                  echo android | "$BUILD_TOOLS_PATH/apksigner" sign --ks "$HOME/.android/debug.keystore" --out "$APK_DIR/app-release.apk" "$APK_DIR/app-release-unsigned-aligned.apk"
                   adb install -r "$APK_DIR/app-release.apk"
                 '';
               }
