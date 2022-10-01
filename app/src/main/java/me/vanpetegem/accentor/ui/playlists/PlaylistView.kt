@@ -4,14 +4,14 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material.ContentAlpha
-import androidx.compose.material.LocalContentColor
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -31,8 +31,8 @@ import me.vanpetegem.accentor.data.playlists.Playlist
 import me.vanpetegem.accentor.data.playlists.PlaylistType
 import me.vanpetegem.accentor.ui.albums.AlbumCard
 import me.vanpetegem.accentor.ui.artists.ArtistCard
-import me.vanpetegem.accentor.ui.tracks.TrackRow
 import me.vanpetegem.accentor.ui.player.PlayerViewModel
+import me.vanpetegem.accentor.ui.tracks.TrackRow
 
 @Composable
 fun PlaylistView(
@@ -58,11 +58,11 @@ fun PlaylistView(
             Column(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
                 Text(
                     playlist.name,
-                    style = MaterialTheme.typography.h4,
+                    style = MaterialTheme.typography.headlineLarge,
                 )
                 Text(
                     (user?.name ?: "") + " · " + itemInfo,
-                    style = MaterialTheme.typography.subtitle1,
+                    style = MaterialTheme.typography.headlineMedium,
                     color = LocalContentColor.current.copy(alpha = ContentAlpha.medium),
                 )
             }
@@ -87,13 +87,13 @@ fun PlaylistAlbumContent(
     val cardsPerRow: Int = with(LocalDensity.current) { boxSize.width / 192.dp.toPx().toInt() }
     val gridState = rememberLazyGridState()
     if (albums != null) {
-    LazyVerticalGrid(
-        columns = if (cardsPerRow >= 2) GridCells.Adaptive(minSize = 192.dp) else GridCells.Fixed(2),
-        state = gridState,
-        modifier = Modifier.onGloballyPositioned { boxSize = it.size },
-    ) {
-        items(playlist.itemIds.size) { i -> AlbumCard(albums!![playlist.itemIds[i]], navController, playerViewModel) }
-    }
+        LazyVerticalGrid(
+            columns = if (cardsPerRow >= 2) GridCells.Adaptive(minSize = 192.dp) else GridCells.Fixed(2),
+            state = gridState,
+            modifier = Modifier.onGloballyPositioned { boxSize = it.size },
+        ) {
+            items(playlist.itemIds.size) { i -> AlbumCard(albums!![playlist.itemIds[i]], navController, playerViewModel) }
+        }
     }
 }
 
@@ -108,13 +108,13 @@ fun PlaylistArtistContent(
     val cardsPerRow: Int = with(LocalDensity.current) { boxSize.width / 192.dp.toPx().toInt() }
     val gridState = rememberLazyGridState()
     if (artists != null) {
-    LazyVerticalGrid(
-        columns = if (cardsPerRow >= 2) GridCells.Adaptive(minSize = 192.dp) else GridCells.Fixed(2),
-        state = gridState,
-        modifier = Modifier.onGloballyPositioned { boxSize = it.size },
-    ) {
-        items(playlist.itemIds.size) { i -> ArtistCard(navController, artists!![playlist.itemIds[i]]) }
-    }
+        LazyVerticalGrid(
+            columns = if (cardsPerRow >= 2) GridCells.Adaptive(minSize = 192.dp) else GridCells.Fixed(2),
+            state = gridState,
+            modifier = Modifier.onGloballyPositioned { boxSize = it.size },
+        ) {
+            items(playlist.itemIds.size) { i -> ArtistCard(navController, artists!![playlist.itemIds[i]]) }
+        }
     }
 }
 

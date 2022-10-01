@@ -7,15 +7,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.ContentAlpha
-import androidx.compose.material.Divider
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.LocalContentColor
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.ScaffoldState
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Divider
+import androidx.compose.material3.DrawerState
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -34,7 +34,8 @@ import me.vanpetegem.accentor.ui.main.MainViewModel
 import me.vanpetegem.accentor.ui.main.SearchToolbar
 import me.vanpetegem.accentor.ui.player.PlayerViewModel
 
-@Composable fun PlaylistList(navController: NavController, playerViewModel: PlayerViewModel, playlistsViewModel: PlaylistsViewModel = hiltViewModel()) {
+@Composable
+fun PlaylistList(navController: NavController, playerViewModel: PlayerViewModel, playlistsViewModel: PlaylistsViewModel = hiltViewModel()) {
     val playlists by playlistsViewModel.filteredPlaylists.observeAsState()
     val users by playlistsViewModel.allUsersById.observeAsState()
     val state = rememberLazyListState()
@@ -46,7 +47,7 @@ import me.vanpetegem.accentor.ui.player.PlayerViewModel
 }
 
 @Composable
-fun PlaylistToolbar(scaffoldState: ScaffoldState, mainViewModel: MainViewModel, playlistsViewModel: PlaylistsViewModel = hiltViewModel()) {
+fun PlaylistToolbar(drawerState: DrawerState, mainViewModel: MainViewModel, playlistsViewModel: PlaylistsViewModel = hiltViewModel()) {
     val searching by playlistsViewModel.searching.observeAsState()
     if (searching ?: false) {
         val query by playlistsViewModel.query.observeAsState()
@@ -56,7 +57,7 @@ fun PlaylistToolbar(scaffoldState: ScaffoldState, mainViewModel: MainViewModel, 
         }
     } else {
         BaseToolbar(
-            scaffoldState,
+            drawerState,
             mainViewModel,
             extraActions = {
                 IconButton(onClick = { playlistsViewModel.setSearching(true) }) {
@@ -86,11 +87,11 @@ fun PlaylistListItem(navController: NavController, playerViewModel: PlayerViewMo
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 playlist.name,
-                style = MaterialTheme.typography.subtitle1,
+                style = MaterialTheme.typography.titleMedium,
             )
             Text(
                 (user?.name ?: "") + " · " + itemInfo,
-                style = MaterialTheme.typography.subtitle2,
+                style = MaterialTheme.typography.titleSmall,
                 color = LocalContentColor.current.copy(alpha = ContentAlpha.medium),
             )
         }

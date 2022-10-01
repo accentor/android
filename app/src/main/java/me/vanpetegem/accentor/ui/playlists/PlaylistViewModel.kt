@@ -11,10 +11,10 @@ import me.vanpetegem.accentor.data.albums.Album
 import me.vanpetegem.accentor.data.albums.AlbumRepository
 import me.vanpetegem.accentor.data.artists.Artist
 import me.vanpetegem.accentor.data.artists.ArtistRepository
-import me.vanpetegem.accentor.data.tracks.Track
-import me.vanpetegem.accentor.data.tracks.TrackRepository
 import me.vanpetegem.accentor.data.playlists.Playlist
 import me.vanpetegem.accentor.data.playlists.PlaylistRepository
+import me.vanpetegem.accentor.data.tracks.Track
+import me.vanpetegem.accentor.data.tracks.TrackRepository
 import me.vanpetegem.accentor.data.users.User
 import me.vanpetegem.accentor.data.users.UserRepository
 
@@ -38,5 +38,4 @@ class PlaylistViewModel @Inject constructor(
         it.forEach { t -> map.put(t.id, t) }
         map
     }
-
 }

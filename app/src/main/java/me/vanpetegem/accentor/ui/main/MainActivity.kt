@@ -215,7 +215,7 @@ fun Base(
                 }
                 DrawerRow(stringResource(R.string.playlists), currentNavigation?.destination?.route == "playlists", R.drawable.ic_menu_playlists) {
                     navController.navigate("playlists")
-                    scope.launch { scaffoldState.drawerState.close() }
+                    scope.launch { drawerState.close() }
                 }
                 Divider()
                 DrawerRow(stringResource(R.string.preferences), false, R.drawable.ic_menu_preferences) {
