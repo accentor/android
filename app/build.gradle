@@ -7,6 +7,7 @@ plugins {
 }
 
 android {
+    namespace 'me.vanpetegem.accentor'
     compileSdkVersion 33
     buildToolsVersion "33.0.0"
     defaultConfig {
