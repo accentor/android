@@ -34,10 +34,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.NavigationDrawerItemDefaults
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SmallTopAppBar
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.contentColorFor
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
@@ -231,7 +231,7 @@ fun BaseToolbar(
     extraDropdownItems: @Composable ((() -> Unit) -> Unit)? = null,
 ) {
     val scope = rememberCoroutineScope()
-    SmallTopAppBar(
+    TopAppBar(
         title = { Text(stringResource(R.string.app_name)) },
         navigationIcon = {
             if (drawerState.isOpen) {
@@ -279,7 +279,7 @@ fun BaseToolbar(
 fun SearchToolbar(value: String, update: (String) -> Unit, exit: () -> Unit) {
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusRequester = remember { FocusRequester() }
-    SmallTopAppBar(
+    TopAppBar(
         navigationIcon = {
             IconButton(
                 onClick = { exit() },
