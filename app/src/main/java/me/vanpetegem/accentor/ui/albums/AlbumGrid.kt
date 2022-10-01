@@ -1,10 +1,10 @@
 package me.vanpetegem.accentor.ui.albums
 
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.ScaffoldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.DrawerState
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -27,7 +27,7 @@ fun AlbumGrid(navController: NavController, playerViewModel: PlayerViewModel, al
 }
 
 @Composable
-fun AlbumToolbar(scaffoldState: ScaffoldState, mainViewModel: MainViewModel, albumsViewModel: AlbumsViewModel = hiltViewModel()) {
+fun AlbumToolbar(drawerState: DrawerState, mainViewModel: MainViewModel, albumsViewModel: AlbumsViewModel = hiltViewModel()) {
     val searching by albumsViewModel.searching.observeAsState()
     if (searching ?: false) {
         val query by albumsViewModel.query.observeAsState()
@@ -37,7 +37,7 @@ fun AlbumToolbar(scaffoldState: ScaffoldState, mainViewModel: MainViewModel, alb
         }
     } else {
         BaseToolbar(
-            scaffoldState,
+            drawerState,
             mainViewModel,
             extraActions = {
                 IconButton(onClick = { albumsViewModel.setSearching(true) }) {

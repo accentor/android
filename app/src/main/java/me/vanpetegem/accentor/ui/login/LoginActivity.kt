@@ -3,6 +3,7 @@ package me.vanpetegem.accentor.ui.login
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Column
@@ -13,14 +14,13 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Button
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
-import androidx.compose.material.rememberScaffoldState
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SmallTopAppBar
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -78,14 +78,13 @@ class LoginActivity : ComponentActivity() {
 @Composable
 fun Content(loginViewModel: LoginViewModel = viewModel()) {
     val context = LocalContext.current
-    val scaffoldState = rememberScaffoldState()
     val scope = rememberCoroutineScope()
 
     suspend fun tryLogin(server: String, username: String, password: String) {
         val result: LoginResult = loginViewModel.login(server, username, password)
         withContext(Main) {
             if (result.error != null) {
-                scaffoldState.snackbarHostState.showSnackbar(context.getString(result.error))
+                Toast.makeText(context, context.getString(result.error), Toast.LENGTH_LONG).show()
             } else {
                 context.startActivity(Intent(context, MainActivity::class.java))
                 (context as Activity).finish()
@@ -94,9 +93,8 @@ fun Content(loginViewModel: LoginViewModel = viewModel()) {
     }
 
     Scaffold(
-        scaffoldState = scaffoldState,
         topBar = {
-            TopAppBar(title = { Text(stringResource(R.string.sign_in)) })
+            SmallTopAppBar(title = { Text(stringResource(R.string.sign_in)) })
         },
         content = { innerPadding ->
             Column(
@@ -184,7 +182,7 @@ fun Content(loginViewModel: LoginViewModel = viewModel()) {
                     enabled = formState?.isDataValid ?: false,
                     modifier = Modifier.padding(bottom = 16.dp, start = 16.dp, end = 16.dp, top = 8.dp),
                 ) {
-                    Text(stringResource(R.string.sign_in), style = MaterialTheme.typography.button)
+                    Text(stringResource(R.string.sign_in), style = MaterialTheme.typography.labelLarge)
                 }
                 if (loading ?: false) {
                     CircularProgressIndicator()

@@ -10,17 +10,17 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.material.Card
 import androidx.compose.material.ContentAlpha
-import androidx.compose.material.DropdownMenu
-import androidx.compose.material.DropdownMenuItem
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.LocalContentColor
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.Card
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -61,7 +61,7 @@ public fun AlbumCard(album: Album, navController: NavController, playerViewModel
                         album.title,
                         maxLines = 1,
                         modifier = Modifier.padding(top = 4.dp, start = 4.dp, end = 4.dp),
-                        style = MaterialTheme.typography.body1,
+                        style = MaterialTheme.typography.bodyLarge,
                         overflow = TextOverflow.Ellipsis,
                     )
                     Text(
@@ -70,7 +70,7 @@ public fun AlbumCard(album: Album, navController: NavController, playerViewModel
                         },
                         maxLines = 1,
                         modifier = Modifier.padding(bottom = 4.dp, start = 4.dp, end = 4.dp),
-                        style = MaterialTheme.typography.body2,
+                        style = MaterialTheme.typography.bodyMedium,
                         color = LocalContentColor.current.copy(alpha = ContentAlpha.medium),
                         overflow = TextOverflow.Ellipsis,
                     )
@@ -85,36 +85,32 @@ public fun AlbumCard(album: Album, navController: NavController, playerViewModel
                             onClick = {
                                 expanded = false
                                 scope.launch(IO) { playerViewModel.play(album) }
-                            }
-                        ) {
-                            Text(stringResource(R.string.play_now))
-                        }
+                            },
+                            text = { Text(stringResource(R.string.play_now)) },
+                        )
                         DropdownMenuItem(
                             onClick = {
                                 expanded = false
                                 scope.launch(IO) { playerViewModel.addTracksToQueue(album, maxOf(0, playerViewModel.queuePosition.value ?: 0)) }
-                            }
-                        ) {
-                            Text(stringResource(R.string.play_next))
-                        }
+                            },
+                            text = { Text(stringResource(R.string.play_next)) },
+                        )
                         DropdownMenuItem(
                             onClick = {
                                 expanded = false
                                 scope.launch(IO) { playerViewModel.addTracksToQueue(album) }
-                            }
-                        ) {
-                            Text(stringResource(R.string.play_last))
-                        }
+                            },
+                            text = { Text(stringResource(R.string.play_last)) },
+                        )
                         for (aa in album.albumArtists.sortedBy { it.order }) {
                             if (aa.artistId != hideArtist) {
                                 DropdownMenuItem(
                                     onClick = {
                                         expanded = false
                                         navController.navigate("artists/${aa.artistId}")
-                                    }
-                                ) {
-                                    Text(stringResource(R.string.go_to, aa.name))
-                                }
+                                    },
+                                    text = { Text(stringResource(R.string.go_to, aa.name)) },
+                                )
                             }
                         }
                     }

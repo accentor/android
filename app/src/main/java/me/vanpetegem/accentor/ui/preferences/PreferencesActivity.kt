@@ -11,23 +11,22 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.material.AlertDialog
 import androidx.compose.material.ContentAlpha
-import androidx.compose.material.Divider
-import androidx.compose.material.DropdownMenu
-import androidx.compose.material.DropdownMenuItem
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.LocalContentColor
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
-import androidx.compose.material.TextButton
-import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.rememberScaffoldState
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Divider
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SmallTopAppBar
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -59,12 +58,10 @@ class PreferencesActivity : ComponentActivity() {
 
 @Composable
 fun Content(preferencesViewModel: PreferencesViewModel = viewModel()) {
-    val scaffoldState = rememberScaffoldState()
     val context = LocalContext.current
     Scaffold(
-        scaffoldState = scaffoldState,
         topBar = {
-            TopAppBar(
+            SmallTopAppBar(
                 title = { Text(stringResource(R.string.preferences)) },
                 navigationIcon = {
                     IconButton(onClick = { (context as Activity).finish() }) {
@@ -138,10 +135,9 @@ fun Content(preferencesViewModel: PreferencesViewModel = viewModel()) {
                                 onClick = {
                                     preferencesViewModel.setConversionId(pConversion.id)
                                     conversionsExpanded = false
-                                }
-                            ) {
-                                Text(pConversion.name)
-                            }
+                                },
+                                text = { Text(pConversion.name) },
+                            )
                         }
                     }
                 }
@@ -156,8 +152,8 @@ fun Content(preferencesViewModel: PreferencesViewModel = viewModel()) {
 fun Header(text: String) {
     Text(
         text,
-        color = MaterialTheme.colors.secondary,
-        style = MaterialTheme.typography.subtitle2,
+        color = MaterialTheme.colorScheme.secondary,
+        style = MaterialTheme.typography.titleSmall,
         modifier = Modifier.padding(start = 8.dp, top = 16.dp)
     )
 }
@@ -174,7 +170,7 @@ fun Setting(text: String, subtext: String? = null, onClick: (() -> Unit)? = null
             Text(
                 subtext,
                 modifier = Modifier.padding(bottom = 8.dp, start = 8.dp),
-                style = MaterialTheme.typography.body2,
+                style = MaterialTheme.typography.bodyMedium,
                 color = LocalContentColor.current.copy(alpha = ContentAlpha.medium)
             )
         }
@@ -193,7 +189,7 @@ fun SettingDialog(
     if (opened) {
         AlertDialog(
             onDismissRequest = dismiss,
-            title = { Text(title, style = MaterialTheme.typography.h6) },
+            title = { Text(title, style = MaterialTheme.typography.titleLarge) },
             text = content,
             dismissButton = {
                 TextButton(onClick = dismiss) { Text(stringResource(R.string.cancel)) }

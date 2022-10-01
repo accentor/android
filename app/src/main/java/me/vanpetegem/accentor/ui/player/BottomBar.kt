@@ -6,11 +6,11 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.BottomAppBar
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -39,20 +39,20 @@ fun ControlBar(playerViewModel: PlayerViewModel = viewModel()) {
             placeholder = painterResource(R.drawable.ic_album),
             fallback = painterResource(R.drawable.ic_album),
             contentDescription = stringResource(R.string.album_cover_of_current_track),
-            modifier = Modifier.fillMaxHeight().aspectRatio(1f).background(MaterialTheme.colors.surface),
+            modifier = Modifier.fillMaxHeight().aspectRatio(1f).background(MaterialTheme.colorScheme.surface),
             contentScale = ContentScale.Crop,
         )
         Column(modifier = Modifier.padding(start = 8.dp).weight(1f)) {
             Text(
                 currentTrack?.title ?: "",
-                style = MaterialTheme.typography.h6,
+                style = MaterialTheme.typography.titleLarge,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
             Text(
                 currentTrack?.stringifyTrackArtists() ?: "",
                 maxLines = 1,
-                style = MaterialTheme.typography.subtitle1,
+                style = MaterialTheme.typography.titleMedium,
                 overflow = TextOverflow.Ellipsis,
             )
         }

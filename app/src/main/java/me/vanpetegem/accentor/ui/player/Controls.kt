@@ -6,13 +6,13 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
 import androidx.compose.material.LocalContentAlpha
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Slider
-import androidx.compose.material.SliderDefaults
-import androidx.compose.material.Text
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -48,7 +48,7 @@ fun Controls(playerViewModel: PlayerViewModel = viewModel()) {
                             painterResource(R.drawable.ic_repeat_all),
                             contentDescription = stringResource(R.string.repeat_all),
                             modifier = Modifier.height(32.dp).aspectRatio(1f),
-                            tint = MaterialTheme.colors.secondary.copy(alpha = LocalContentAlpha.current),
+                            tint = MaterialTheme.colorScheme.secondary.copy(alpha = LocalContentAlpha.current),
                         )
                     }
                 }
@@ -58,7 +58,7 @@ fun Controls(playerViewModel: PlayerViewModel = viewModel()) {
                             painterResource(R.drawable.ic_repeat_one),
                             contentDescription = stringResource(R.string.repeat_one),
                             modifier = Modifier.height(32.dp).aspectRatio(1f),
-                            tint = MaterialTheme.colors.secondary.copy(alpha = LocalContentAlpha.current),
+                            tint = MaterialTheme.colorScheme.secondary.copy(alpha = LocalContentAlpha.current),
                         )
                     }
                 }
@@ -127,7 +127,7 @@ fun Controls(playerViewModel: PlayerViewModel = viewModel()) {
                         painterResource(R.drawable.ic_shuffle_all),
                         contentDescription = stringResource(R.string.shuffle_all),
                         modifier = Modifier.height(32.dp).aspectRatio(1f),
-                        tint = MaterialTheme.colors.secondary.copy(alpha = LocalContentAlpha.current),
+                        tint = MaterialTheme.colorScheme.secondary.copy(alpha = LocalContentAlpha.current),
                     )
                 }
             } else {
@@ -160,8 +160,8 @@ fun Controls(playerViewModel: PlayerViewModel = viewModel()) {
                 modifier = Modifier.weight(1f).padding(horizontal = 8.dp),
                 valueRange = 0f..(trackLength.toFloat()),
                 colors = SliderDefaults.colors(
-                    thumbColor = MaterialTheme.colors.secondary,
-                    activeTrackColor = MaterialTheme.colors.secondary,
+                    thumbColor = MaterialTheme.colorScheme.secondary,
+                    activeTrackColor = MaterialTheme.colorScheme.secondary,
                 ),
             )
             Text(currentTrack?.length.formatTrackLength())

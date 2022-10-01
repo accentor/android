@@ -10,16 +10,16 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.ContentAlpha
-import androidx.compose.material.Divider
-import androidx.compose.material.DropdownMenu
-import androidx.compose.material.DropdownMenuItem
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.LocalContentColor
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.Divider
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -57,13 +57,13 @@ fun TrackRow(
                 track.title,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
-                style = MaterialTheme.typography.subtitle1,
+                style = MaterialTheme.typography.titleMedium,
             )
             Text(
                 track.stringifyTrackArtists(),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
-                style = MaterialTheme.typography.subtitle2,
+                style = MaterialTheme.typography.titleSmall,
                 color = LocalContentColor.current.copy(alpha = ContentAlpha.medium),
             )
         }
@@ -77,27 +77,24 @@ fun TrackRow(
                     onClick = {
                         expanded = false
                         scope.launch(IO) { playerViewModel.addTrackToQueue(track, maxOf(0, playerViewModel.queuePosition.value ?: 0)) }
-                    }
-                ) {
-                    Text(stringResource(R.string.play_next))
-                }
+                    },
+                    text = { Text(stringResource(R.string.play_next)) },
+                )
                 DropdownMenuItem(
                     onClick = {
                         expanded = false
                         scope.launch(IO) { playerViewModel.addTrackToQueue(track) }
-                    }
-                ) {
-                    Text(stringResource(R.string.play_last))
-                }
+                    },
+                    text = { Text(stringResource(R.string.play_last)) },
+                )
                 if (!hideAlbum) {
                     DropdownMenuItem(
                         onClick = {
                             expanded = false
                             navController.navigate("albums/${track.albumId}")
-                        }
-                    ) {
-                        Text(stringResource(R.string.go_to_album))
-                    }
+                        },
+                        text = { Text(stringResource(R.string.go_to_album)) }
+                    )
                 }
                 val used = HashSet<Pair<Int, String>>()
                 for (ta in track.trackArtists.sortedBy { ta -> ta.order }) {
@@ -107,10 +104,9 @@ fun TrackRow(
                             onClick = {
                                 expanded = false
                                 navController.navigate("artists/${ta.artistId}")
-                            }
-                        ) {
-                            Text(stringResource(R.string.go_to, ta.name))
-                        }
+                            },
+                            text = { Text(stringResource(R.string.go_to, ta.name)) }
+                        )
                     }
                 }
             }

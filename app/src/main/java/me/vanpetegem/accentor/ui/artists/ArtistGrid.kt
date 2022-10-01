@@ -1,10 +1,10 @@
 package me.vanpetegem.accentor.ui.artists
 
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.ScaffoldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.DrawerState
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -26,7 +26,7 @@ fun ArtistGrid(navController: NavController, artistsViewModel: ArtistsViewModel 
 }
 
 @Composable
-fun ArtistToolbar(scaffoldState: ScaffoldState, mainViewModel: MainViewModel, artistsViewModel: ArtistsViewModel = hiltViewModel()) {
+fun ArtistToolbar(drawerState: DrawerState, mainViewModel: MainViewModel, artistsViewModel: ArtistsViewModel = hiltViewModel()) {
     val searching by artistsViewModel.searching.observeAsState()
     if (searching ?: false) {
         val query by artistsViewModel.query.observeAsState()
@@ -36,7 +36,7 @@ fun ArtistToolbar(scaffoldState: ScaffoldState, mainViewModel: MainViewModel, ar
         }
     } else {
         BaseToolbar(
-            scaffoldState,
+            drawerState,
             mainViewModel,
             extraActions = {
                 IconButton(onClick = { artistsViewModel.setSearching(true) }) {
