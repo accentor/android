@@ -1,6 +1,7 @@
 <resources>
     <style name="AppTheme" parent="Theme.Material3.Light">
-        <item name="android:statusBarColor">@color/md_theme_light_background</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">true</item>
         <item name="colorPrimary">@color/md_theme_light_primary</item>
         <item name="colorOnPrimary">@color/md_theme_light_onPrimary</item>
         <item name="colorPrimaryContainer">@color/md_theme_light_primaryContainer</item>
