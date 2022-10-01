@@ -9,8 +9,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -48,12 +48,12 @@ fun ArtistView(id: Int, navController: NavController, playerViewModel: PlayerVie
                         contentScale = ContentScale.Crop,
                         modifier = Modifier.width(80.dp).aspectRatio(1f).clip(CircleShape),
                     )
-                    Text(artist.name, style = MaterialTheme.typography.h4, modifier = Modifier.padding(start = 8.dp))
+                    Text(artist.name, style = MaterialTheme.typography.headlineLarge, modifier = Modifier.padding(start = 8.dp))
                 }
             }
             item {
                 if (albums != null && albums!!.size > 0) {
-                    Text(stringResource(R.string.albums), style = MaterialTheme.typography.h5, modifier = Modifier.padding(8.dp))
+                    Text(stringResource(R.string.albums), style = MaterialTheme.typography.headlineMedium, modifier = Modifier.padding(8.dp))
                     LazyRow {
                         items(albums!!.size) { i ->
                             Box(modifier = Modifier.width(192.dp)) {
@@ -65,7 +65,7 @@ fun ArtistView(id: Int, navController: NavController, playerViewModel: PlayerVie
             }
             if (tracks != null && tracks!!.size > 0) {
                 item {
-                    Text(stringResource(R.string.tracks), style = MaterialTheme.typography.h5, modifier = Modifier.padding(8.dp))
+                    Text(stringResource(R.string.tracks), style = MaterialTheme.typography.headlineMedium, modifier = Modifier.padding(8.dp))
                 }
                 items(tracks!!.size) { i -> TrackRow(tracks!![i], navController, playerViewModel, hideArtist = id) }
             }
