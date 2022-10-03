@@ -1,7 +1,10 @@
 package me.vanpetegem.accentor.ui.playlists
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -9,6 +12,9 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material.ContentAlpha
+import androidx.compose.material3.Divider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -17,15 +23,20 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.launch
 import me.vanpetegem.accentor.R
 import me.vanpetegem.accentor.data.playlists.Playlist
 import me.vanpetegem.accentor.data.playlists.PlaylistType
@@ -41,6 +52,7 @@ fun PlaylistView(
     playerViewModel: PlayerViewModel,
     playlistViewModel: PlaylistViewModel = hiltViewModel(),
 ) {
+    val scope = rememberCoroutineScope()
     val users by playlistViewModel.allUsersById.observeAsState()
     val playlistState by playlistViewModel.getPlaylist(id).observeAsState()
     if (playlistState != null) {
@@ -65,6 +77,14 @@ fun PlaylistView(
                     style = MaterialTheme.typography.headlineMedium,
                     color = LocalContentColor.current.copy(alpha = ContentAlpha.medium),
                 )
+                Row(modifier = Modifier.padding(8.dp)) {
+                    IconButton(onClick = { scope.launch(IO) { playerViewModel.play(playlist) } }) {
+                        Icon(painterResource(R.drawable.ic_play), contentDescription = stringResource(R.string.play_now))
+                    }
+                    IconButton(onClick = { scope.launch(IO) { playerViewModel.addTracksToQueue(playlist) } }) {
+                        Icon(painterResource(R.drawable.ic_queue_add), contentDescription = stringResource(R.string.play_last))
+                    }
+                }
             }
             when (playlist.playlistType) {
                 PlaylistType.ALBUM -> PlaylistAlbumContent(navController, playerViewModel, playlistViewModel, playlist)
@@ -92,7 +112,14 @@ fun PlaylistAlbumContent(
             state = gridState,
             modifier = Modifier.onGloballyPositioned { boxSize = it.size },
         ) {
-            items(playlist.itemIds.size) { i -> AlbumCard(albums!![playlist.itemIds[i]], navController, playerViewModel) }
+            items(playlist.itemIds.size) { i ->
+                val album = albums!![playlist.itemIds[i]]
+                if (album != null) {
+                    AlbumCard(albums!![playlist.itemIds[i]], navController, playerViewModel)
+                } else {
+                    Box(Modifier.height(192.dp)) {}
+                }
+            }
         }
     }
 }
@@ -113,7 +140,14 @@ fun PlaylistArtistContent(
             state = gridState,
             modifier = Modifier.onGloballyPositioned { boxSize = it.size },
         ) {
-            items(playlist.itemIds.size) { i -> ArtistCard(navController, artists!![playlist.itemIds[i]]) }
+            items(playlist.itemIds.size) { i ->
+                val artist = artists!![playlist.itemIds[i]]
+                if (artist != null) {
+                    ArtistCard(navController, artists!![playlist.itemIds[i]])
+                } else {
+                    Box(Modifier.height(192.dp)) {}
+                }
+            }
         }
     }
 }
@@ -128,7 +162,15 @@ fun PlaylistTrackContent(
     val tracks by playlistViewModel.getTracksForPlaylist(playlist).observeAsState()
     if (tracks != null) {
         LazyColumn() {
-            items(playlist.itemIds.size) { i -> TrackRow(tracks!![playlist.itemIds[i]], navController, playerViewModel) }
+            items(playlist.itemIds.size) { i ->
+                val track = tracks!![playlist.itemIds[i]]
+                if (track != null) {
+                    TrackRow(tracks!![playlist.itemIds[i]], navController, playerViewModel)
+                } else {
+                    Box(Modifier.height(30.dp)) {}
+                    Divider()
+                }
+            }
         }
     }
 }

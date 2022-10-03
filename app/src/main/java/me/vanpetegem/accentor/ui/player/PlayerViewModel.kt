@@ -7,6 +7,7 @@ import androidx.lifecycle.MutableLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import me.vanpetegem.accentor.data.albums.Album
+import me.vanpetegem.accentor.data.playlists.Playlist
 import me.vanpetegem.accentor.data.tracks.Track
 import me.vanpetegem.accentor.media.MediaSessionConnection
 
@@ -44,8 +45,10 @@ class PlayerViewModel @Inject constructor(
     suspend fun stop() = mediaSessionConnection.stop()
     suspend fun play(album: Album) = mediaSessionConnection.play(album)
     suspend fun play(track: Track) = mediaSessionConnection.play(track)
+    suspend fun play(playlist: Playlist) = mediaSessionConnection.play(playlist)
     suspend fun addTrackToQueue(track: Track) = mediaSessionConnection.addTrackToQueue(track)
     suspend fun addTracksToQueue(album: Album) = mediaSessionConnection.addTracksToQueue(album)
+    suspend fun addTracksToQueue(playlist: Playlist) = mediaSessionConnection.addTracksToQueue(playlist)
     suspend fun addTrackToQueue(track: Track, index: Int) = mediaSessionConnection.addTrackToQueue(track, index)
     suspend fun addTracksToQueue(album: Album, index: Int) = mediaSessionConnection.addTracksToQueue(album, index)
     suspend fun clearQueue() = mediaSessionConnection.clearQueue()
