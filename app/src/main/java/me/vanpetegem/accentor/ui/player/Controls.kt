@@ -1,5 +1,6 @@
 package me.vanpetegem.accentor.ui.player
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -11,7 +12,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
-import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -48,7 +48,7 @@ fun Controls(playerViewModel: PlayerViewModel = viewModel()) {
                             painterResource(R.drawable.ic_repeat_all),
                             contentDescription = stringResource(R.string.repeat_all),
                             modifier = Modifier.height(32.dp).aspectRatio(1f),
-                            tint = MaterialTheme.colorScheme.secondary.copy(alpha = LocalContentAlpha.current),
+                            tint = MaterialTheme.colorScheme.primary.copy(alpha = LocalContentAlpha.current),
                         )
                     }
                 }
@@ -58,7 +58,7 @@ fun Controls(playerViewModel: PlayerViewModel = viewModel()) {
                             painterResource(R.drawable.ic_repeat_one),
                             contentDescription = stringResource(R.string.repeat_one),
                             modifier = Modifier.height(32.dp).aspectRatio(1f),
-                            tint = MaterialTheme.colorScheme.secondary.copy(alpha = LocalContentAlpha.current),
+                            tint = MaterialTheme.colorScheme.primary.copy(alpha = LocalContentAlpha.current),
                         )
                     }
                 }
@@ -127,7 +127,7 @@ fun Controls(playerViewModel: PlayerViewModel = viewModel()) {
                         painterResource(R.drawable.ic_shuffle_all),
                         contentDescription = stringResource(R.string.shuffle_all),
                         modifier = Modifier.height(32.dp).aspectRatio(1f),
-                        tint = MaterialTheme.colorScheme.secondary.copy(alpha = LocalContentAlpha.current),
+                        tint = MaterialTheme.colorScheme.primary.copy(alpha = LocalContentAlpha.current),
                     )
                 }
             } else {
@@ -148,22 +148,19 @@ fun Controls(playerViewModel: PlayerViewModel = viewModel()) {
             val trackLength = currentTrack?.length ?: 1
             Timer { playerViewModel.updateCurrentPosition() }
             Text(if (seekPosition != null) seekPosition.formatTrackLength() else currentPosition.formatTrackLength())
-            Slider(
-                seekPosition?.toFloat() ?: (currentPosition?.toFloat() ?: 0f),
-                onValueChange = { seekPosition = it.toInt() },
-                onValueChangeFinished = {
-                    val positionCopy = seekPosition!!
-                    scope.launch(IO) { playerViewModel.seekTo(positionCopy) }
-                    seekPosition = null
-                },
-                enabled = !buffering,
-                modifier = Modifier.weight(1f).padding(horizontal = 8.dp),
-                valueRange = 0f..(trackLength.toFloat()),
-                colors = SliderDefaults.colors(
-                    thumbColor = MaterialTheme.colorScheme.secondary,
-                    activeTrackColor = MaterialTheme.colorScheme.secondary,
-                ),
-            )
+            Box(modifier = Modifier.weight(1f).padding(horizontal = 8.dp)) {
+                Slider(
+                    seekPosition?.toFloat() ?: (currentPosition?.toFloat() ?: 0f),
+                    onValueChange = { seekPosition = it.toInt() },
+                    onValueChangeFinished = {
+                        val positionCopy = seekPosition!!
+                        scope.launch(IO) { playerViewModel.seekTo(positionCopy) }
+                        seekPosition = null
+                    },
+                    enabled = !buffering,
+                    valueRange = 0f..(trackLength.toFloat()),
+                )
+            }
             Text(currentTrack?.length.formatTrackLength())
         }
     }
