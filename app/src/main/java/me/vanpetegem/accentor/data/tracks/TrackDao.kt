@@ -25,6 +25,15 @@ abstract class TrackDao {
         return tracks.map { t -> Track.fromDb(t, trackArtists.get(t.id, ArrayList()), trackGenres.get(t.id, ArrayList())) }
     }
 
+    open fun getByIds(ids: List<Int>): List<Track> {
+        val tracks = getDbTracksByIds(ids)
+        val tracksByIds = SparseArray<DbTrack>()
+        tracks.forEach { tracksByIds.put(it.id, it) }
+        val trackGenres = getTrackGenresByTrackIdWhereTrackIds(ids)
+        val trackArtists = getTrackArtistsByTrackIdWhereTrackIds(ids)
+        return ids.map { Track.fromDb(tracksByIds.get(it), trackArtists.get(it, ArrayList()), trackGenres.get(it, ArrayList())) }
+    }
+
     open fun findByIds(ids: List<Int>): LiveData<List<Track>> = switchMap(findDbTracksByIds(ids)) { tracks ->
         switchMap(findTrackArtistsByTrackIdWhereTrackIds(ids)) { trackArtists ->
             map(findTrackGenresByTrackIdWhereTrackIds(ids)) { trackGenres ->
@@ -90,6 +99,9 @@ abstract class TrackDao {
 
     @Query("SELECT * FROM tracks WHERE id IN (:ids)")
     protected abstract fun findDbTracksByIds(ids: List<Int>): LiveData<List<DbTrack>>
+
+    @Query("SELECT * FROM tracks WHERE id IN (:ids)")
+    protected abstract fun getDbTracksByIds(ids: List<Int>): List<DbTrack>
 
     @Query("SELECT * FROM tracks WHERE album_id = :id")
     protected abstract fun findDbTracksByAlbumId(id: Int): LiveData<List<DbTrack>>

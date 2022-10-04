@@ -1,6 +1,11 @@
 package me.vanpetegem.accentor.data.playlists
 
+import android.util.SparseArray
 import java.time.Instant
+import me.vanpetegem.accentor.data.albums.Album
+import me.vanpetegem.accentor.data.albums.AlbumRepository
+import me.vanpetegem.accentor.data.tracks.Track
+import me.vanpetegem.accentor.data.tracks.TrackRepository
 
 data class Playlist(
     val id: Int,
@@ -42,5 +47,22 @@ data class Playlist(
                 p.access,
                 fetchTime,
             )
+    }
+
+    fun toTrackAlbumPairs(trackRepository: TrackRepository, albumRepository: AlbumRepository): List<Pair<Track, Album>> {
+        return when (playlistType) {
+            PlaylistType.TRACK -> {
+                val albumMap = SparseArray<Album>()
+                trackRepository.getByIds(itemIds).map {
+                    val album = albumRepository.getById(it.albumId)!!
+                    albumMap.put(it.albumId, album)
+                    Pair(it, album)
+                }
+            }
+            PlaylistType.ALBUM -> albumRepository.getByIds(itemIds).flatMap { a ->
+                trackRepository.getByAlbum(a).map { t -> Pair(t, a) }
+            }
+            PlaylistType.ARTIST -> ArrayList()
+        }
     }
 }

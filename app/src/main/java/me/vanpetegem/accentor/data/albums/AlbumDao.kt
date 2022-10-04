@@ -32,6 +32,15 @@ abstract class AlbumDao {
         }
     }
 
+    open fun getByIds(ids: List<Int>): List<Album> {
+        val albums = getDbAlbumsByIds(ids)
+        val albumsByIds = SparseArray<DbAlbum>()
+        albums.forEach { albumsByIds.put(it.id, it) }
+        val albumArtists = getAlbumArtistsByAlbumIdWhereAlbumIds(ids)
+        val albumLabels = getAlbumLabelsByAlbumIdWhereAlbumIds(ids)
+        return ids.map { Album.fromDb(albumsByIds.get(it), albumLabels.get(it, ArrayList()), albumArtists.get(it, ArrayList())) }
+    }
+
     open fun findByIds(ids: List<Int>): LiveData<List<Album>> = switchMap(findDbAlbumsByIds(ids)) { albums ->
         switchMap(albumArtistsByAlbumIdWhereAlbumIds(ids)) { albumArtists ->
             map(albumLabelsByAlbumIdWhereAlbumIds(ids)) { albumLabels ->
@@ -88,6 +97,9 @@ abstract class AlbumDao {
     @Query("SELECT * FROM albums WHERE id IN (:ids)")
     protected abstract fun findDbAlbumsByIds(ids: List<Int>): LiveData<List<DbAlbum>>
 
+    @Query("SELECT * FROM albums WHERE id IN (:ids)")
+    protected abstract fun getDbAlbumsByIds(ids: List<Int>): List<DbAlbum>
+
     @Query(
         """
            SELECT * FROM albums WHERE release LIKE '%' || :day || '%'
@@ -124,7 +136,7 @@ abstract class AlbumDao {
         }
 
     protected open fun albumLabelsByAlbumIdWhereAlbumIds(ids: List<Int>): LiveData<SparseArray<MutableList<AlbumLabel>>> =
-        map(getAllAlbumLabelsWhereAlbumIds(ids)) {
+        map(findAllAlbumLabelsWhereAlbumIds(ids)) {
             val map = SparseArray<MutableList<AlbumLabel>>()
             for (al in it) {
                 val l = map.get(al.albumId, ArrayList())
@@ -133,6 +145,17 @@ abstract class AlbumDao {
             }
             return@map map
         }
+
+    protected open fun getAlbumLabelsByAlbumIdWhereAlbumIds(ids: List<Int>): SparseArray<MutableList<AlbumLabel>> {
+        val albumLabels = getAllAlbumLabelsWhereAlbumIds(ids)
+        val map = SparseArray<MutableList<AlbumLabel>>()
+        for (al in albumLabels) {
+            val l = map.get(al.albumId, ArrayList())
+            l.add(AlbumLabel(al.labelId, al.catalogueNumber))
+            map.put(al.albumId, l)
+        }
+        return map
+    }
 
     protected open fun albumArtistsByAlbumId(): LiveData<SparseArray<MutableList<AlbumArtist>>> =
         map(getAllAlbumArtists()) {
@@ -146,7 +169,7 @@ abstract class AlbumDao {
         }
 
     protected open fun albumArtistsByAlbumIdWhereAlbumIds(ids: List<Int>): LiveData<SparseArray<MutableList<AlbumArtist>>> =
-        map(getAllAlbumArtistsWhereAlbumIds(ids)) {
+        map(findAllAlbumArtistsWhereAlbumIds(ids)) {
             val map = SparseArray<MutableList<AlbumArtist>>()
             for (aa in it) {
                 val l = map.get(aa.albumId, ArrayList())
@@ -155,6 +178,17 @@ abstract class AlbumDao {
             }
             return@map map
         }
+
+    protected open fun getAlbumArtistsByAlbumIdWhereAlbumIds(ids: List<Int>): SparseArray<MutableList<AlbumArtist>> {
+        val albumArtists = getAllAlbumArtistsWhereAlbumIds(ids)
+        val map = SparseArray<MutableList<AlbumArtist>>()
+        for (aa in albumArtists) {
+            val l = map.get(aa.albumId, ArrayList())
+            l.add(AlbumArtist(aa.artistId, aa.name, aa.normalizedName, aa.order, aa.separator))
+            map.put(aa.albumId, l)
+        }
+        return map
+    }
 
     @Transaction
     open fun upsertAll(albums: List<Album>) {
@@ -207,13 +241,19 @@ abstract class AlbumDao {
     protected abstract fun getAllAlbumArtists(): LiveData<List<DbAlbumArtist>>
 
     @Query("SELECT * FROM album_artists WHERE album_id IN (:ids)")
-    protected abstract fun getAllAlbumArtistsWhereAlbumIds(ids: List<Int>): LiveData<List<DbAlbumArtist>>
+    protected abstract fun findAllAlbumArtistsWhereAlbumIds(ids: List<Int>): LiveData<List<DbAlbumArtist>>
+
+    @Query("SELECT * FROM album_artists WHERE album_id IN (:ids)")
+    protected abstract fun getAllAlbumArtistsWhereAlbumIds(ids: List<Int>): List<DbAlbumArtist>
 
     @Query("SELECT * FROM album_labels")
     protected abstract fun getAllAlbumLabels(): LiveData<List<DbAlbumLabel>>
 
     @Query("SELECT * FROM album_labels WHERE album_id IN (:ids)")
-    protected abstract fun getAllAlbumLabelsWhereAlbumIds(ids: List<Int>): LiveData<List<DbAlbumLabel>>
+    protected abstract fun findAllAlbumLabelsWhereAlbumIds(ids: List<Int>): LiveData<List<DbAlbumLabel>>
+
+    @Query("SELECT * FROM album_labels WHERE album_id IN (:ids)")
+    protected abstract fun getAllAlbumLabelsWhereAlbumIds(ids: List<Int>): List<DbAlbumLabel>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     protected abstract fun upsert(album: DbAlbum)

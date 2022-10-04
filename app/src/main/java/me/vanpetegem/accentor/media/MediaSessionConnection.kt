@@ -165,6 +165,8 @@ class MediaSessionConnection @Inject constructor(
     }
 
     suspend fun play(playlist: Playlist) {
+        val tracks = playlist.toTrackAlbumPairs(trackRepository, albumRepository)
+        play(tracks)
     }
 
     suspend fun play(track: Track) {
@@ -187,6 +189,8 @@ class MediaSessionConnection @Inject constructor(
     }
 
     suspend fun addTracksToQueue(playlist: Playlist, index: Int) {
+        val tracks = playlist.toTrackAlbumPairs(trackRepository, albumRepository)
+        addTracksToQueue(tracks, index)
     }
 
     suspend fun clearQueue() = mainScope.launch(Main) { mediaController.clearMediaItems() }
