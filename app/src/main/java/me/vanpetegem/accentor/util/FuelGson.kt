@@ -16,6 +16,8 @@ import java.io.Reader
 import java.time.Instant
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import me.vanpetegem.accentor.data.playlists.Access
+import me.vanpetegem.accentor.data.playlists.PlaylistType
 import me.vanpetegem.accentor.data.tracks.Role
 import me.vanpetegem.accentor.data.users.Permission
 
@@ -43,6 +45,32 @@ fun gsonObject(): Gson {
 
             override fun read(`in`: JsonReader): Permission {
                 return Permission.valueOf(`in`.nextString().uppercase())
+            }
+        }
+    )
+
+    builder.registerTypeAdapter(
+        Access::class.java,
+        object : TypeAdapter<Access>() {
+            override fun write(out: JsonWriter, value: Access) {
+                out.value(value.name.lowercase())
+            }
+
+            override fun read(`in`: JsonReader): Access {
+                return Access.valueOf(`in`.nextString().uppercase())
+            }
+        }
+    )
+
+    builder.registerTypeAdapter(
+        PlaylistType::class.java,
+        object : TypeAdapter<PlaylistType>() {
+            override fun write(out: JsonWriter, value: PlaylistType) {
+                out.value(value.name.lowercase())
+            }
+
+            override fun read(`in`: JsonReader): PlaylistType {
+                return PlaylistType.valueOf(`in`.nextString().uppercase())
             }
         }
     )

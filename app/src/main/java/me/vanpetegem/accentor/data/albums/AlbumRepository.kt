@@ -41,6 +41,7 @@ class AlbumRepository @Inject constructor(
 
     fun findById(id: Int): LiveData<Album?> = albumDao.findById(id)
     fun getById(id: Int): Album? = albumDao.getAlbumById(id)
+    fun getByIds(ids: List<Int>): List<Album> = albumDao.getByIds(ids)
 
     fun findByIds(ids: List<Int>): LiveData<List<Album>> = albumDao.findByIds(ids)
 

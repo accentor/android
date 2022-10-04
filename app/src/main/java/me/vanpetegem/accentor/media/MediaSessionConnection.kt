@@ -23,6 +23,7 @@ import me.vanpetegem.accentor.data.albums.Album
 import me.vanpetegem.accentor.data.albums.AlbumRepository
 import me.vanpetegem.accentor.data.authentication.AuthenticationDataSource
 import me.vanpetegem.accentor.data.codecconversions.CodecConversionRepository
+import me.vanpetegem.accentor.data.playlists.Playlist
 import me.vanpetegem.accentor.data.preferences.PreferencesDataSource
 import me.vanpetegem.accentor.data.tracks.Track
 import me.vanpetegem.accentor.data.tracks.TrackRepository
@@ -163,6 +164,11 @@ class MediaSessionConnection @Inject constructor(
         play(tracks)
     }
 
+    suspend fun play(playlist: Playlist) {
+        val tracks = playlist.toTrackAlbumPairs(trackRepository, albumRepository)
+        play(tracks)
+    }
+
     suspend fun play(track: Track) {
         val album = albumRepository.getById(track.albumId)
         album?.let { play(listOf(Pair(track, it))) }
@@ -170,6 +176,7 @@ class MediaSessionConnection @Inject constructor(
 
     suspend fun addTrackToQueue(track: Track): Unit = addTrackToQueue(track, _queue.value?.size ?: 0)
     suspend fun addTracksToQueue(album: Album): Unit = addTracksToQueue(album, _queue.value?.size ?: 0)
+    suspend fun addTracksToQueue(playlist: Playlist): Unit = addTracksToQueue(playlist, _queue.value?.size ?: 0)
 
     suspend fun addTrackToQueue(track: Track, index: Int) {
         val album = albumRepository.getById(track.albumId)
@@ -178,6 +185,11 @@ class MediaSessionConnection @Inject constructor(
 
     suspend fun addTracksToQueue(album: Album, index: Int) {
         val tracks = trackRepository.getByAlbum(album).map { Pair(it, album) }
+        addTracksToQueue(tracks, index)
+    }
+
+    suspend fun addTracksToQueue(playlist: Playlist, index: Int) {
+        val tracks = playlist.toTrackAlbumPairs(trackRepository, albumRepository)
         addTracksToQueue(tracks, index)
     }
 

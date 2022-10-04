@@ -18,7 +18,9 @@ class TrackRepository @Inject constructor(
     fun findById(id: Int): LiveData<Track?> = trackDao.findById(id)
     fun getById(id: Int): Track? = trackDao.getTrackById(id)
     fun findByIds(ids: List<Int>): LiveData<List<Track>> = trackDao.findByIds(ids)
+    fun getByIds(ids: List<Int>): List<Track> = trackDao.getByIds(ids)
     fun findByArtist(artist: Artist): LiveData<List<Track>> = trackDao.findByArtist(artist)
+    fun getByArtistId(id: Int): List<Track> = trackDao.getByArtistId(id)
     fun findByAlbum(album: Album): LiveData<List<Track>> = trackDao.findByAlbum(album)
     fun getByAlbum(album: Album): List<Track> = trackDao.getByAlbum(album)
 

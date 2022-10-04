@@ -25,6 +25,15 @@ abstract class TrackDao {
         return tracks.map { t -> Track.fromDb(t, trackArtists.get(t.id, ArrayList()), trackGenres.get(t.id, ArrayList())) }
     }
 
+    open fun getByIds(ids: List<Int>): List<Track> {
+        val tracks = getDbTracksByIds(ids)
+        val tracksByIds = SparseArray<DbTrack>()
+        tracks.forEach { tracksByIds.put(it.id, it) }
+        val trackGenres = getTrackGenresByTrackIdWhereTrackIds(ids)
+        val trackArtists = getTrackArtistsByTrackIdWhereTrackIds(ids)
+        return ids.map { Track.fromDb(tracksByIds.get(it), trackArtists.get(it, ArrayList()), trackGenres.get(it, ArrayList())) }
+    }
+
     open fun findByIds(ids: List<Int>): LiveData<List<Track>> = switchMap(findDbTracksByIds(ids)) { tracks ->
         switchMap(findTrackArtistsByTrackIdWhereTrackIds(ids)) { trackArtists ->
             map(findTrackGenresByTrackIdWhereTrackIds(ids)) { trackGenres ->
@@ -54,6 +63,14 @@ abstract class TrackDao {
                 tracks.map { Track.fromDb(it, trackArtists.get(it.id, ArrayList()), trackGenres.get(it.id, ArrayList())) }
             }
         }
+    }
+
+    open fun getByArtistId(id: Int): List<Track> {
+        val tracks = getDbTracksByArtistId(id)
+        val ids = tracks.map { it.id }
+        val trackArtists = getTrackArtistsByTrackIdWhereTrackIds(ids)
+        val trackGenres = getTrackGenresByTrackIdWhereTrackIds(ids)
+        return tracks.map { Track.fromDb(it, trackArtists.get(it.id, ArrayList()), trackGenres.get(it.id, ArrayList())) }
     }
 
     open fun findByAlbum(album: Album): LiveData<List<Track>> = switchMap(findDbTracksByAlbumId(album.id)) { tracks ->
@@ -91,11 +108,17 @@ abstract class TrackDao {
     @Query("SELECT * FROM tracks WHERE id IN (:ids)")
     protected abstract fun findDbTracksByIds(ids: List<Int>): LiveData<List<DbTrack>>
 
+    @Query("SELECT * FROM tracks WHERE id IN (:ids)")
+    protected abstract fun getDbTracksByIds(ids: List<Int>): List<DbTrack>
+
     @Query("SELECT * FROM tracks WHERE album_id = :id")
     protected abstract fun findDbTracksByAlbumId(id: Int): LiveData<List<DbTrack>>
 
     @Query("SELECT * FROM tracks WHERE id IN (SELECT track_id FROM track_artists WHERE artist_id = :id)")
     protected abstract fun findDbTracksByArtistId(id: Int): LiveData<List<DbTrack>>
+
+    @Query("SELECT * FROM tracks WHERE id IN (SELECT track_id FROM track_artists WHERE artist_id = :id)")
+    protected abstract fun getDbTracksByArtistId(id: Int): List<DbTrack>
 
     @Query("SELECT * FROM track_artists WHERE track_id = :id")
     protected abstract fun getDbTrackArtistsById(id: Int): List<DbTrackArtist>

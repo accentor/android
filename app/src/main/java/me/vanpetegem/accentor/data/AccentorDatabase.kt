@@ -22,6 +22,9 @@ import me.vanpetegem.accentor.data.artists.ArtistDao
 import me.vanpetegem.accentor.data.artists.DbArtist
 import me.vanpetegem.accentor.data.codecconversions.CodecConversionDao
 import me.vanpetegem.accentor.data.codecconversions.DbCodecConversion
+import me.vanpetegem.accentor.data.playlists.DbPlaylist
+import me.vanpetegem.accentor.data.playlists.DbPlaylistItem
+import me.vanpetegem.accentor.data.playlists.PlaylistDao
 import me.vanpetegem.accentor.data.plays.DbPlay
 import me.vanpetegem.accentor.data.plays.PlayDao
 import me.vanpetegem.accentor.data.plays.UnreportedPlay
@@ -44,17 +47,20 @@ import me.vanpetegem.accentor.util.RoomTypeConverters
         DbArtist::class,
         DbCodecConversion::class,
         DbPlay::class,
+        DbPlaylist::class,
+        DbPlaylistItem::class,
         DbTrack::class,
         DbTrackArtist::class,
         DbTrackGenre::class,
         UnreportedPlay::class,
     ],
-    version = 11
+    version = 12
 )
 abstract class AccentorDatabase : RoomDatabase() {
     abstract fun albumDao(): AlbumDao
     abstract fun artistDao(): ArtistDao
     abstract fun codecConversionDao(): CodecConversionDao
+    abstract fun playlistDao(): PlaylistDao
     abstract fun playDao(): PlayDao
     abstract fun trackDao(): TrackDao
     abstract fun userDao(): UserDao
@@ -259,6 +265,42 @@ internal object DatabaseModule {
                     }
                 }
             })
+            .addMigrations(object : Migration(11, 12) {
+                override fun migrate(database: SupportSQLiteDatabase) {
+                    database.beginTransaction()
+                    try {
+                        database.execSQL(
+                            """
+                            CREATE TABLE IF NOT EXISTS `playlists` (
+                                `id` INTEGER NOT NULL,
+                                `name` TEXT NOT NULL,
+                                `description` TEXT,
+                                `user_id` INTEGER NOT NULL,
+                                `playlist_type` INTEGER NOT NULL,
+                                `created_at` TEXT NOT NULL,
+                                `updated_at` TEXT NOT NULL,
+                                `access` INTEGER NOT NULL,
+                                `fetched_at` TEXT NOT NULL,
+                                PRIMARY KEY(`id`)
+                            )
+                            """
+                        )
+                        database.execSQL(
+                            """
+                            CREATE TABLE IF NOT EXISTS `playlist_items` (
+                                `playlist_id` INTEGER NOT NULL,
+                                `item_id` INTEGER NOT NULL,
+                                `order` INTEGER NOT NULL,
+                                PRIMARY KEY(`playlist_id`, `item_id`)
+                            )
+                            """
+                        )
+                        database.setTransactionSuccessful()
+                    } finally {
+                        database.endTransaction()
+                    }
+                }
+            })
             .build()
     }
 
@@ -268,6 +310,8 @@ internal object DatabaseModule {
     fun provideArtistDao(database: AccentorDatabase): ArtistDao = database.artistDao()
     @Provides
     fun provideCodecConversionDao(database: AccentorDatabase): CodecConversionDao = database.codecConversionDao()
+    @Provides
+    fun providePlaylistDao(database: AccentorDatabase): PlaylistDao = database.playlistDao()
     @Provides
     fun providePlayDao(database: AccentorDatabase): PlayDao = database.playDao()
     @Provides
