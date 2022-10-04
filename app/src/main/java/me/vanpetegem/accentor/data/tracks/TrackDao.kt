@@ -65,6 +65,14 @@ abstract class TrackDao {
         }
     }
 
+    open fun getByArtistId(id: Int): List<Track> {
+        val tracks = getDbTracksByArtistId(id)
+        val ids = tracks.map { it.id }
+        val trackArtists = getTrackArtistsByTrackIdWhereTrackIds(ids)
+        val trackGenres = getTrackGenresByTrackIdWhereTrackIds(ids)
+        return tracks.map { Track.fromDb(it, trackArtists.get(it.id, ArrayList()), trackGenres.get(it.id, ArrayList())) }
+    }
+
     open fun findByAlbum(album: Album): LiveData<List<Track>> = switchMap(findDbTracksByAlbumId(album.id)) { tracks ->
         val ids = tracks.map { it.id }
         switchMap(findTrackArtistsByTrackIdWhereTrackIds(ids)) { trackArtists ->
@@ -108,6 +116,9 @@ abstract class TrackDao {
 
     @Query("SELECT * FROM tracks WHERE id IN (SELECT track_id FROM track_artists WHERE artist_id = :id)")
     protected abstract fun findDbTracksByArtistId(id: Int): LiveData<List<DbTrack>>
+
+    @Query("SELECT * FROM tracks WHERE id IN (SELECT track_id FROM track_artists WHERE artist_id = :id)")
+    protected abstract fun getDbTracksByArtistId(id: Int): List<DbTrack>
 
     @Query("SELECT * FROM track_artists WHERE track_id = :id")
     protected abstract fun getDbTrackArtistsById(id: Int): List<DbTrackArtist>

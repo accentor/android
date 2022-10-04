@@ -53,16 +53,30 @@ data class Playlist(
         return when (playlistType) {
             PlaylistType.TRACK -> {
                 val albumMap = SparseArray<Album>()
-                trackRepository.getByIds(itemIds).map {
-                    val album = albumRepository.getById(it.albumId)!!
-                    albumMap.put(it.albumId, album)
-                    Pair(it, album)
+                val tracks = trackRepository.getByIds(itemIds)
+                tracks.forEach {
+                    if (albumMap.indexOfKey(it.albumId) < 0) {
+                        albumMap.put(it.albumId, albumRepository.getById(it.albumId)!!)
+                    }
                 }
+                tracks.map { Pair(it, albumMap.get(it.albumId)) }
             }
             PlaylistType.ALBUM -> albumRepository.getByIds(itemIds).flatMap { a ->
                 trackRepository.getByAlbum(a).map { t -> Pair(t, a) }
             }
-            PlaylistType.ARTIST -> ArrayList()
+            PlaylistType.ARTIST -> {
+                val albumMap = SparseArray<Album>()
+                itemIds.flatMap { id ->
+                    val tracks = trackRepository.getByArtistId(id).toMutableList()
+                    tracks.forEach {
+                        if (albumMap.indexOfKey(it.albumId) < 0) {
+                            albumMap.put(it.albumId, albumRepository.getById(it.albumId)!!)
+                        }
+                    }
+                    tracks.sortWith({ t1, t2 -> t1.compareAlphabetically(t2, albumMap) })
+                    tracks.map { Pair(it, albumMap.get(it.albumId)) }
+                }
+            }
         }
     }
 }
