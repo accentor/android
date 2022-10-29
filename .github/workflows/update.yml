@@ -20,6 +20,6 @@ jobs:
       - run: nix flake update
       - run: nix build -L --no-link .#devShells.$(nix eval --impure --expr "builtins.currentSystem").accentor-android
       - run: nix eval --json ".#devShells.$(nix eval --impure --expr 'builtins.currentSystem').accentor-android.outPath" | sed 's/"\(.*\)"/\1/' | cachix push accentor
-      - uses: stefanzweifel/git-auto-commit-action@v4.15.1
+      - uses: stefanzweifel/git-auto-commit-action@v4.15.3
         with:
           commit_message: "Update flake dependencies"
