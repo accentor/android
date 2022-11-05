@@ -20,6 +20,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.DismissibleDrawerSheet
 import androidx.compose.material3.DismissibleNavigationDrawer
 import androidx.compose.material3.Divider
@@ -67,9 +70,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.google.accompanist.swiperefresh.SwipeRefresh
-import com.google.accompanist.swiperefresh.SwipeRefreshIndicator
-import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import me.vanpetegem.accentor.R
@@ -230,12 +230,11 @@ fun Base(
             topBar = { toolbar(drawerState) },
         ) { contentPadding ->
             val isRefreshing by mainViewModel.isRefreshing.observeAsState()
-            SwipeRefresh(
-                state = rememberSwipeRefreshState(isRefreshing ?: false),
-                onRefresh = { mainViewModel.refresh() },
-                indicatorPadding = contentPadding,
-                indicator = { state, trigger -> SwipeRefreshIndicator(state, trigger, contentColor = MaterialTheme.colorScheme.secondary) },
-            ) { Box(modifier = Modifier.padding(contentPadding)) { mainContent() } }
+            val state = rememberPullRefreshState(isRefreshing ?: false, { mainViewModel.refresh() })
+            Box(modifier = Modifier.pullRefresh(state).padding(contentPadding)) {
+                mainContent()
+                PullRefreshIndicator(isRefreshing ?: false, state, Modifier.align(Alignment.TopCenter))
+            }
         }
     }
 }
