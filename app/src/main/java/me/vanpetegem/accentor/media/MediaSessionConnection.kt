@@ -147,15 +147,17 @@ class MediaSessionConnection @Inject constructor(
     suspend fun stop() {
         mainScope.launch(Main) {
             mediaController.stop()
-            clearQueue()
+            mediaController.clearMediaItems()
         }
     }
 
     suspend fun play(tracks: List<Pair<Track, Album>>) {
         mainScope.launch(Main) {
-            stop()
+            mediaController.stop()
+            mediaController.clearMediaItems()
             mediaController.setMediaItems(tracks.map { convertTrack(it.first) })
-            play()
+            mediaController.prepare()
+            mediaController.play()
         }
     }
 
