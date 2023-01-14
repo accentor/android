@@ -3,10 +3,9 @@ package me.vanpetegem.accentor.data.codecconversions
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations.map
 import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
+import androidx.room.Upsert
 import java.time.Instant
 
 @Dao
@@ -37,7 +36,7 @@ abstract class CodecConversionDao {
     @Query("SELECT * FROM codec_conversions ORDER BY id ASC")
     protected abstract fun getAllDbCodecConversions(): LiveData<List<DbCodecConversion>>
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Upsert
     protected abstract fun upsert(codecConversion: DbCodecConversion)
 
     @Query("SELECT * FROM codec_conversions WHERE id = :id")

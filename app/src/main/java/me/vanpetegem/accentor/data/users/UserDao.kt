@@ -3,10 +3,9 @@ package me.vanpetegem.accentor.data.users
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations.map
 import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
+import androidx.room.Upsert
 import java.time.Instant
 
 @Dao
@@ -23,7 +22,7 @@ abstract class UserDao {
     @Query("SELECT * FROM users ORDER BY name COLLATE NOCASE ASC")
     protected abstract fun getAllDbUsers(): LiveData<List<DbUser>>
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Upsert
     protected abstract fun upsert(user: DbUser)
 
     @Query("DELETE FROM users WHERE fetched_at < :time")

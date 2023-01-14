@@ -6,9 +6,9 @@ import androidx.lifecycle.Transformations.map
 import androidx.lifecycle.Transformations.switchMap
 import androidx.room.Dao
 import androidx.room.Insert
-import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
+import androidx.room.Upsert
 import java.time.Instant
 import me.vanpetegem.accentor.data.albums.Album
 import me.vanpetegem.accentor.data.artists.Artist
@@ -245,7 +245,7 @@ abstract class TrackDao {
     @Query("SELECT * FROM track_genres WHERE track_id IN (:ids)")
     protected abstract fun getAllTrackGenresWhereTrackIds(ids: List<Int>): List<DbTrackGenre>
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Upsert
     protected abstract fun upsert(track: DbTrack)
 
     @Insert

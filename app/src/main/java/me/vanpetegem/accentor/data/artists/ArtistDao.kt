@@ -3,11 +3,10 @@ package me.vanpetegem.accentor.data.artists
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations.map
 import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.RewriteQueriesToDropUnusedColumns
 import androidx.room.Transaction
+import androidx.room.Upsert
 import java.time.Instant
 
 @Dao
@@ -58,7 +57,7 @@ abstract class ArtistDao {
     )
     protected abstract fun getAllDbArtistsByPlayed(): LiveData<List<DbArtist>>
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Upsert
     protected abstract fun upsert(artist: DbArtist)
 
     @Query("DELETE FROM artists WHERE fetched_at < :time")

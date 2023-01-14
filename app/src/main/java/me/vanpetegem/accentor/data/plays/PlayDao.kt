@@ -2,9 +2,9 @@ package me.vanpetegem.accentor.data.plays
 
 import androidx.room.Dao
 import androidx.room.Insert
-import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
+import androidx.room.Upsert
 import java.time.Instant
 
 @Dao
@@ -21,7 +21,7 @@ abstract class PlayDao {
     @Insert
     protected abstract fun insert(play: DbPlay)
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Upsert
     protected abstract fun upsert(play: DbPlay)
 
     @Query("DELETE FROM plays WHERE fetched_at < :time")
