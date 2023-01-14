@@ -6,10 +6,10 @@ import androidx.lifecycle.Transformations.map
 import androidx.lifecycle.Transformations.switchMap
 import androidx.room.Dao
 import androidx.room.Insert
-import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.RewriteQueriesToDropUnusedColumns
 import androidx.room.Transaction
+import androidx.room.Upsert
 import java.time.Instant
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -255,7 +255,7 @@ abstract class AlbumDao {
     @Query("SELECT * FROM album_labels WHERE album_id IN (:ids)")
     protected abstract fun getAllAlbumLabelsWhereAlbumIds(ids: List<Int>): List<DbAlbumLabel>
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Upsert
     protected abstract fun upsert(album: DbAlbum)
 
     @Insert
