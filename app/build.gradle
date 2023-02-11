@@ -83,7 +83,7 @@ dependencies {
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-guava:$kotlinx_version"
 
     // AndroidX core
-    implementation 'androidx.appcompat:appcompat:1.6.0'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'androidx.core:core-ktx:1.9.0'
 
     // AndroidX navigation
