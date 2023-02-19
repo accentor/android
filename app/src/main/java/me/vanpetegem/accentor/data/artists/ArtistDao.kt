@@ -36,7 +36,7 @@ abstract class ArtistDao {
                     artist.image250,
                     artist.image100,
                     artist.imageType,
-                    artist.fetchedAt,
+                    artist.fetchedAt
                 )
             )
         }

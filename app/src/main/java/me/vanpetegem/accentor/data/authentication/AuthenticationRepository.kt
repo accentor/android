@@ -33,7 +33,7 @@ class AuthenticationRepository @Inject constructor(
     suspend fun login(
         server: String,
         username: String,
-        password: String,
+        password: String
     ): Result<Unit> {
         val result = create(server, username, password)
 

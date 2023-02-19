@@ -96,7 +96,7 @@ fun Content(preferencesViewModel: PreferencesViewModel = viewModel()) {
                 stringResource(R.string.change_music_cache_size),
                 musicCacheSizeValid,
                 { preferencesViewModel.setMusicCacheSize(newMusicCacheValue.toLong() * 1024L * 1024L) },
-                { musicCacheOpen = false },
+                { musicCacheOpen = false }
             ) {
                 Column {
                     Text(stringResource(R.string.music_cache_explanation), modifier = Modifier.padding(bottom = 16.dp))
@@ -115,7 +115,7 @@ fun Content(preferencesViewModel: PreferencesViewModel = viewModel()) {
                 stringResource(R.string.change_image_cache_size),
                 imageCacheSizeValid,
                 { preferencesViewModel.setImageCacheSize(newImageCacheValue.toLong() * 1024L * 1024L) },
-                { imageCacheOpen = false },
+                { imageCacheOpen = false }
             ) {
                 Column {
                     Text(stringResource(R.string.image_cache_explanation), modifier = Modifier.padding(bottom = 16.dp))
@@ -136,7 +136,7 @@ fun Content(preferencesViewModel: PreferencesViewModel = viewModel()) {
                                     preferencesViewModel.setConversionId(pConversion.id)
                                     conversionsExpanded = false
                                 },
-                                text = { Text(pConversion.name) },
+                                text = { Text(pConversion.name) }
                             )
                         }
                     }
@@ -196,7 +196,7 @@ fun SettingDialog(
             },
             confirmButton = {
                 TextButton(onClick = { save(); dismiss() }, enabled = canSave) { Text(stringResource(R.string.save)) }
-            },
+            }
         )
     }
 }

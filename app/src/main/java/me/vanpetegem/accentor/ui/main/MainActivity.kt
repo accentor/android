@@ -136,7 +136,10 @@ fun Content(mainViewModel: MainViewModel = viewModel(), playerViewModel: PlayerV
             composable("home") { Base(navController, mainViewModel, playerViewModel) { Home(navController, playerViewModel) } }
             composable("artists") {
                 Base(
-                    navController, mainViewModel, playerViewModel, toolbar = { ArtistToolbar(it, mainViewModel) }
+                    navController,
+                    mainViewModel,
+                    playerViewModel,
+                    toolbar = { ArtistToolbar(it, mainViewModel) }
                 ) { ArtistGrid(navController) }
             }
             composable("artists/{artistId}", arguments = listOf(navArgument("artistId") { type = NavType.IntType })) { entry ->
@@ -144,7 +147,10 @@ fun Content(mainViewModel: MainViewModel = viewModel(), playerViewModel: PlayerV
             }
             composable("albums") {
                 Base(
-                    navController, mainViewModel, playerViewModel, toolbar = { AlbumToolbar(it, mainViewModel) }
+                    navController,
+                    mainViewModel,
+                    playerViewModel,
+                    toolbar = { AlbumToolbar(it, mainViewModel) }
                 ) { AlbumGrid(navController, playerViewModel) }
             }
             composable("albums/{albumId}", arguments = listOf(navArgument("albumId") { type = NavType.IntType })) { entry ->
@@ -158,16 +164,19 @@ fun Content(mainViewModel: MainViewModel = viewModel(), playerViewModel: PlayerV
                             mainViewModel,
                             extraDropdownItems = {
                                 AlbumViewDropdown(entry.arguments!!.getInt("albumId"), navController, it)
-                            },
+                            }
                         )
-                    },
+                    }
                 ) {
                     AlbumView(entry.arguments!!.getInt("albumId"), navController, playerViewModel)
                 }
             }
             composable("playlists") {
                 Base(
-                    navController, mainViewModel, playerViewModel, toolbar = { PlaylistToolbar(it, mainViewModel) }
+                    navController,
+                    mainViewModel,
+                    playerViewModel,
+                    toolbar = { PlaylistToolbar(it, mainViewModel) }
                 ) { PlaylistList(navController, playerViewModel) }
             }
             composable("playlists/{playlistId}", arguments = listOf(navArgument("playlistId") { type = NavType.IntType })) { entry ->
@@ -185,7 +194,7 @@ fun Base(
     mainViewModel: MainViewModel = viewModel(),
     playerViewModel: PlayerViewModel = viewModel(),
     toolbar: @Composable ((DrawerState) -> Unit) = { drawerState -> BaseToolbar(drawerState, mainViewModel) },
-    mainContent: @Composable (() -> Unit),
+    mainContent: @Composable (() -> Unit)
 ) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -224,10 +233,10 @@ fun Base(
                 }
             }
         },
-        gesturesEnabled = !(isPlayerOpen ?: false),
+        gesturesEnabled = !(isPlayerOpen ?: false)
     ) {
         Scaffold(
-            topBar = { toolbar(drawerState) },
+            topBar = { toolbar(drawerState) }
         ) { contentPadding ->
             val isRefreshing by mainViewModel.isRefreshing.observeAsState()
             val state = rememberPullRefreshState(isRefreshing ?: false, { mainViewModel.refresh() })
@@ -244,7 +253,7 @@ fun BaseToolbar(
     drawerState: DrawerState,
     mainViewModel: MainViewModel = viewModel(),
     extraActions: @Composable (() -> Unit)? = null,
-    extraDropdownItems: @Composable ((() -> Unit) -> Unit)? = null,
+    extraDropdownItems: @Composable ((() -> Unit) -> Unit)? = null
 ) {
     val scope = rememberCoroutineScope()
     TopAppBar(
@@ -276,18 +285,18 @@ fun BaseToolbar(
                             mainViewModel.refresh()
                             expanded = false
                         },
-                        text = { Text(stringResource(R.string.action_refresh)) },
+                        text = { Text(stringResource(R.string.action_refresh)) }
                     )
                     DropdownMenuItem(
                         onClick = {
                             mainViewModel.logout()
                             expanded = false
                         },
-                        text = { Text(stringResource(R.string.action_sign_out)) },
+                        text = { Text(stringResource(R.string.action_sign_out)) }
                     )
                 }
             }
-        },
+        }
     )
 }
 
@@ -299,7 +308,7 @@ fun SearchToolbar(value: String, update: (String) -> Unit, exit: () -> Unit) {
         navigationIcon = {
             IconButton(
                 onClick = { exit() },
-                modifier = Modifier.padding(start = 8.dp),
+                modifier = Modifier.padding(start = 8.dp)
             ) {
                 Icon(Icons.Filled.ArrowBack, contentDescription = stringResource(R.string.stop_searching))
             }
@@ -319,15 +328,15 @@ fun SearchToolbar(value: String, update: (String) -> Unit, exit: () -> Unit) {
                     containerColor = Color.Transparent,
                     cursorColor = LocalContentColor.current.copy(LocalContentAlpha.current),
                     focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent
                 ),
                 modifier = Modifier.fillMaxSize().focusRequester(focusRequester),
                 keyboardActions = KeyboardActions(
                     onDone = {
                         keyboardController?.hide()
                         focusRequester.freeFocus()
-                    },
-                ),
+                    }
+                )
             )
         }
     )
@@ -344,6 +353,6 @@ fun DrawerRow(title: String, selected: Boolean, icon: Int, onClick: () -> Unit) 
         selected = selected,
         onClick = onClick,
         modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
-        icon = { Icon(painterResource(icon), contentDescription = stringResource(R.string.navigation_icon)) },
+        icon = { Icon(painterResource(icon), contentDescription = stringResource(R.string.navigation_icon)) }
     )
 }

@@ -10,7 +10,7 @@ import me.vanpetegem.accentor.util.Result
 class PlayRepository @Inject constructor(
     private val playDao: PlayDao,
     private val unreportedPlayDao: UnreportedPlayDao,
-    private val authenticationRepository: AuthenticationRepository,
+    private val authenticationRepository: AuthenticationRepository
 ) {
     suspend fun refresh(handler: suspend (Result<Unit>) -> Unit) {
         val fetchStart = Instant.now()

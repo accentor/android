@@ -35,7 +35,7 @@ class MediaSessionConnection @Inject constructor(
     private val trackRepository: TrackRepository,
     private val preferencesDataSource: PreferencesDataSource,
     private val codecConversionRepository: CodecConversionRepository,
-    private val authenticationDataSource: AuthenticationDataSource,
+    private val authenticationDataSource: AuthenticationDataSource
 ) {
     private val mainScope = MainScope()
     private val mediaControllerFuture: ListenableFuture<MediaController> =

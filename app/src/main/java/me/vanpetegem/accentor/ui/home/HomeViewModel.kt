@@ -14,7 +14,7 @@ import me.vanpetegem.accentor.data.artists.ArtistRepository
 class HomeViewModel @Inject constructor(
     application: Application,
     private val albumRepository: AlbumRepository,
-    private val artistRepository: ArtistRepository,
+    private val artistRepository: ArtistRepository
 ) : AndroidViewModel(application) {
     private val _currentDay = MutableLiveData<LocalDate>(LocalDate.now())
 

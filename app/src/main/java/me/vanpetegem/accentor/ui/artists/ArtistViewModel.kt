@@ -19,7 +19,7 @@ class ArtistViewModel @Inject constructor(
     application: Application,
     private val artistRepository: ArtistRepository,
     private val albumRepository: AlbumRepository,
-    private val trackRepository: TrackRepository,
+    private val trackRepository: TrackRepository
 ) : AndroidViewModel(application) {
     fun getArtist(id: Int): LiveData<Artist> = map(artistRepository.allArtistsById) { artists ->
         artists[id]

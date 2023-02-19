@@ -14,7 +14,7 @@ import me.vanpetegem.accentor.util.Result
 @Reusable
 class AlbumRepository @Inject constructor(
     private val albumDao: AlbumDao,
-    private val authenticationRepository: AuthenticationRepository,
+    private val authenticationRepository: AuthenticationRepository
 ) {
     val allAlbums: LiveData<List<Album>> = albumDao.getAll()
     val allAlbumsById: LiveData<SparseArray<Album>> = map(allAlbums) {

@@ -19,7 +19,7 @@ import me.vanpetegem.accentor.data.users.UserRepository
 class PlaylistsViewModel @Inject constructor(
     application: Application,
     private val playlistRepository: PlaylistRepository,
-    private val userRepository: UserRepository,
+    private val userRepository: UserRepository
 ) : AndroidViewModel(application) {
     val allPlaylists: LiveData<List<Playlist>> = playlistRepository.allPlaylists
     val allUsersById: LiveData<SparseArray<User>> = userRepository.allUsersById

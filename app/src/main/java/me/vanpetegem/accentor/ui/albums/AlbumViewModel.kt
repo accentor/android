@@ -15,7 +15,7 @@ import me.vanpetegem.accentor.data.tracks.TrackRepository
 class AlbumViewModel @Inject constructor(
     application: Application,
     private val albumRepository: AlbumRepository,
-    private val trackRepository: TrackRepository,
+    private val trackRepository: TrackRepository
 ) : AndroidViewModel(application) {
     fun getAlbum(id: Int): LiveData<Album> = map(albumRepository.allAlbumsById) { albums ->
         albums[id]

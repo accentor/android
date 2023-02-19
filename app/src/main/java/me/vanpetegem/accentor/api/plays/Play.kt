@@ -22,7 +22,7 @@ fun create(server: String, authenticationData: AuthenticationData, trackId: Int,
         .responseObject<ApiPlay>().third
         .fold(
             { play: ApiPlay -> Result.Success(play) },
-            { e: Throwable -> Result.Error(Exception("Error creating play", e)) },
+            { e: Throwable -> Result.Error(Exception("Error creating play", e)) }
         )
 }
 

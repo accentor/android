@@ -35,14 +35,14 @@ fun CurrentTrackInfo(playerViewModel: PlayerViewModel = viewModel()) {
             contentDescription = stringResource(R.string.album_cover_of_current_track),
             modifier = Modifier.weight(1f).fillMaxWidth().background(MaterialTheme.colorScheme.surface),
             contentScale = ContentScale.Fit,
-            alignment = Alignment.TopCenter,
+            alignment = Alignment.TopCenter
         )
         Text(
             currentTrack?.title ?: "",
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier.padding(horizontal = 8.dp),
-            style = MaterialTheme.typography.titleLarge,
+            style = MaterialTheme.typography.titleLarge
         )
         Text(
             currentTrack?.stringifyTrackArtists() ?: "",
@@ -50,7 +50,7 @@ fun CurrentTrackInfo(playerViewModel: PlayerViewModel = viewModel()) {
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier.padding(horizontal = 8.dp),
             style = MaterialTheme.typography.titleMedium,
-            color = LocalContentColor.current.copy(alpha = ContentAlpha.medium),
+            color = LocalContentColor.current.copy(alpha = ContentAlpha.medium)
         )
         Text(
             currentAlbum?.title ?: "",
@@ -58,7 +58,7 @@ fun CurrentTrackInfo(playerViewModel: PlayerViewModel = viewModel()) {
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier.padding(horizontal = 8.dp),
             style = MaterialTheme.typography.titleSmall,
-            color = LocalContentColor.current.copy(alpha = ContentAlpha.medium),
+            color = LocalContentColor.current.copy(alpha = ContentAlpha.medium)
         )
     }
 }

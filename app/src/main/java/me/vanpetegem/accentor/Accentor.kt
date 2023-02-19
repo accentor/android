@@ -23,7 +23,8 @@ class Accentor : Application(), ImageLoaderFactory {
         super.onCreate()
         version = if (Build.VERSION.SDK_INT >= 33) {
             applicationContext.packageManager.getPackageInfo(
-                packageName, PackageManager.PackageInfoFlags.of(0)
+                packageName,
+                PackageManager.PackageInfoFlags.of(0)
             ).versionName
         } else {
             applicationContext.packageManager.getPackageInfo(packageName, 0).versionName

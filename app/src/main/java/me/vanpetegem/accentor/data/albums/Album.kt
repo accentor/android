@@ -20,7 +20,7 @@ data class Album(
     val imageType: String?,
     val albumLabels: List<AlbumLabel>,
     val albumArtists: List<AlbumArtist>,
-    val fetchedAt: Instant,
+    val fetchedAt: Instant
 ) {
     fun stringifyAlbumArtists() =
         albumArtists.sortedBy { aa -> aa.order }.fold("") { acc, aa -> acc + aa.name + (aa.separator ?: "") }
@@ -54,7 +54,7 @@ data class Album(
                 a.imageType,
                 labels,
                 artists,
-                a.fetchedAt,
+                a.fetchedAt
             )
 
         fun fromApi(a: ApiAlbum, fetchTime: Instant) =
@@ -75,7 +75,7 @@ data class Album(
                 a.imageType,
                 a.albumLabels,
                 a.albumArtists,
-                fetchTime,
+                fetchTime
             )
     }
 }

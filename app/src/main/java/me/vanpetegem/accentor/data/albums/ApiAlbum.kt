@@ -19,5 +19,5 @@ data class ApiAlbum(
     val image100: String?,
     val imageType: String?,
     val albumLabels: List<AlbumLabel>,
-    val albumArtists: List<AlbumArtist>,
+    val albumArtists: List<AlbumArtist>
 )

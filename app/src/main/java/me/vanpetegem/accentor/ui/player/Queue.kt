@@ -108,21 +108,21 @@ fun QueueItem(
                             track.title,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
-                            style = MaterialTheme.typography.titleMedium,
+                            style = MaterialTheme.typography.titleMedium
                         )
                         Text(
                             track.stringifyTrackArtists(),
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                             style = MaterialTheme.typography.titleSmall,
-                            color = LocalContentColor.current.copy(alpha = ContentAlpha.medium),
+                            color = LocalContentColor.current.copy(alpha = ContentAlpha.medium)
                         )
                     }
                     Text(
                         track.length.formatTrackLength(),
                         maxLines = 1,
                         style = MaterialTheme.typography.bodyMedium,
-                        color = LocalContentColor.current.copy(alpha = ContentAlpha.medium),
+                        color = LocalContentColor.current.copy(alpha = ContentAlpha.medium)
                     )
                     Box(modifier = Modifier.height(40.dp).aspectRatio(1f).wrapContentSize(Alignment.TopStart)) {
                         var expanded by remember { mutableStateOf(false) }
@@ -136,7 +136,7 @@ fun QueueItem(
                                     navController.navigate("albums/${track.albumId}")
                                     closePlayer()
                                 },
-                                text = { Text(stringResource(R.string.go_to_album)) },
+                                text = { Text(stringResource(R.string.go_to_album)) }
                             )
                             for (ta in track.trackArtists.sortedBy { ta -> ta.order }) {
                                 DropdownMenuItem(
@@ -152,6 +152,6 @@ fun QueueItem(
                     }
                 }
             }
-        },
+        }
     )
 }

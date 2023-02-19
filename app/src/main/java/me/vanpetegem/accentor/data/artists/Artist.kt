@@ -14,7 +14,7 @@ data class Artist(
     val image250: String?,
     val image100: String?,
     val imageType: String?,
-    val fetchedAt: Instant,
+    val fetchedAt: Instant
 ) {
     fun firstCharacter() = String(intArrayOf(name.codePointAt(0)), 0, 1)
 
@@ -47,7 +47,7 @@ data class Artist(
                 a.image250,
                 a.image100,
                 a.imageType,
-                fetchTime,
+                fetchTime
             )
     }
 }

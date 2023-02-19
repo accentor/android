@@ -79,7 +79,8 @@ fun PlaylistListItem(navController: NavController, playerViewModel: PlayerViewMo
             PlaylistType.ARTIST -> R.plurals.playlist_artists
             PlaylistType.TRACK -> R.plurals.playlist_tracks
         },
-        playlist.itemIds.size, playlist.itemIds.size
+        playlist.itemIds.size,
+        playlist.itemIds.size
     )
     Row(
         modifier = Modifier.padding(8.dp).clickable { navController.navigate("playlists/${playlist.id}") }
@@ -87,12 +88,12 @@ fun PlaylistListItem(navController: NavController, playerViewModel: PlayerViewMo
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 playlist.name,
-                style = MaterialTheme.typography.titleMedium,
+                style = MaterialTheme.typography.titleMedium
             )
             Text(
                 (user?.name ?: "") + " · " + itemInfo,
                 style = MaterialTheme.typography.titleSmall,
-                color = LocalContentColor.current.copy(alpha = ContentAlpha.medium),
+                color = LocalContentColor.current.copy(alpha = ContentAlpha.medium)
             )
         }
     }

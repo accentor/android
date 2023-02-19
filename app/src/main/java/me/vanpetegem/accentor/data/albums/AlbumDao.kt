@@ -56,7 +56,7 @@ abstract class AlbumDao {
                     Album.fromDb(
                         dbAlbum,
                         albumLabels.map { AlbumLabel(it.labelId, it.catalogueNumber) },
-                        albumArtists.map { AlbumArtist(it.artistId, it.name, it.normalizedName, it.order, it.separator) },
+                        albumArtists.map { AlbumArtist(it.artistId, it.name, it.normalizedName, it.order, it.separator) }
                     )
                 } else {
                     null
@@ -84,7 +84,7 @@ abstract class AlbumDao {
         return Album.fromDb(
             dbAlbum,
             albumLabels.map { AlbumLabel(it.labelId, it.catalogueNumber) },
-            albumArtists.map { AlbumArtist(it.artistId, it.name, it.normalizedName, it.order, it.separator) },
+            albumArtists.map { AlbumArtist(it.artistId, it.name, it.normalizedName, it.order, it.separator) }
         )
     }
 
@@ -209,7 +209,7 @@ abstract class AlbumDao {
                     album.image250,
                     album.image100,
                     album.imageType,
-                    album.fetchedAt,
+                    album.fetchedAt
                 )
             )
             deleteAlbumLabelsById(album.id)

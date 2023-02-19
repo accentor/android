@@ -25,7 +25,7 @@ class PlaylistViewModel @Inject constructor(
     private val userRepository: UserRepository,
     private val albumRepository: AlbumRepository,
     private val artistRepository: ArtistRepository,
-    private val trackRepository: TrackRepository,
+    private val trackRepository: TrackRepository
 ) : AndroidViewModel(application) {
     val allUsersById: LiveData<SparseArray<User>> = userRepository.allUsersById
     val allAlbumsById: LiveData<SparseArray<Album>> = albumRepository.allAlbumsById

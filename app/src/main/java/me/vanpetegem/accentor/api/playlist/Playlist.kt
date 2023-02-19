@@ -26,7 +26,7 @@ fun index(server: String, authenticationData: AuthenticationData): Sequence<Resu
                             Result.Success(a)
                         }
                     },
-                    { e: Throwable -> Result.Error(Exception("Error getting playlists", e)) },
+                    { e: Throwable -> Result.Error(Exception("Error getting playlists", e)) }
                 )
         }
     }

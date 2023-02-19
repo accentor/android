@@ -33,25 +33,33 @@ class AuthenticationDataSource @Inject constructor(@ApplicationContext context: 
         authData = MediatorLiveData<AuthenticationData>().apply {
             val observer: Observer<Any> = Observer {
                 val id: Int = idData.value.let {
-                    if (it != null) it else {
+                    if (it != null) {
+                        it
+                    } else {
                         value = null
                         return@Observer
                     }
                 }
                 val userId: Int = userIdData.value.let {
-                    if (it != null) it else {
+                    if (it != null) {
+                        it
+                    } else {
                         value = null
                         return@Observer
                     }
                 }
                 val deviceId: String = deviceIdData.value.let {
-                    if (it != null) it else {
+                    if (it != null) {
+                        it
+                    } else {
                         value = null
                         return@Observer
                     }
                 }
                 val secret: String = secretData.value.let {
-                    if (it != null) it else {
+                    if (it != null) {
+                        it
+                    } else {
                         value = null
                         return@Observer
                     }
