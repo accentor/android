@@ -14,7 +14,7 @@ import me.vanpetegem.accentor.media.MediaSessionConnection
 @HiltViewModel
 class PlayerViewModel @Inject constructor(
     application: Application,
-    private val mediaSessionConnection: MediaSessionConnection,
+    private val mediaSessionConnection: MediaSessionConnection
 ) : AndroidViewModel(application) {
     private val _isOpen = MutableLiveData<Boolean>(false)
     val isOpen: LiveData<Boolean> = _isOpen

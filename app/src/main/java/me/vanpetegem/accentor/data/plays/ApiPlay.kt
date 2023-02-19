@@ -6,5 +6,5 @@ data class ApiPlay(
     val id: Int,
     val playedAt: Instant,
     val trackId: Int,
-    val userId: Int,
+    val userId: Int
 )

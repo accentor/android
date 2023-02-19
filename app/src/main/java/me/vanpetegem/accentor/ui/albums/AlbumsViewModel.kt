@@ -15,7 +15,7 @@ import me.vanpetegem.accentor.data.albums.AlbumRepository
 @HiltViewModel
 class AlbumsViewModel @Inject constructor(
     application: Application,
-    private val albumRepository: AlbumRepository,
+    private val albumRepository: AlbumRepository
 ) : AndroidViewModel(application) {
     val allAlbums: LiveData<List<Album>> = albumRepository.allAlbums
 

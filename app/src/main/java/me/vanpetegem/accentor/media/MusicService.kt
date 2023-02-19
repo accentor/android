@@ -48,10 +48,15 @@ class MusicService : MediaSessionService() {
     private val mainScope = MainScope()
 
     @Inject lateinit var authenticationDataSource: AuthenticationDataSource
+
     @Inject lateinit var preferencesDataSource: PreferencesDataSource
+
     @Inject lateinit var codecConversionRepository: CodecConversionRepository
+
     @Inject lateinit var trackRepository: TrackRepository
+
     @Inject lateinit var albumRepository: AlbumRepository
+
     @Inject lateinit var playRepository: PlayRepository
 
     private lateinit var mediaSession: MediaSession
@@ -146,7 +151,7 @@ class MusicService : MediaSessionService() {
                 session: MediaSession,
                 customLayout: ImmutableList<CommandButton>,
                 actionFactory: MediaNotification.ActionFactory,
-                onNotificationChangedCallback: MediaNotification.Provider.Callback,
+                onNotificationChangedCallback: MediaNotification.Provider.Callback
             ): MediaNotification =
                 notificationBuilder.buildNotification(session, actionFactory, onNotificationChangedCallback)
 

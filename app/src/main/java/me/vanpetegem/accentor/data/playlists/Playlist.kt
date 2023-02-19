@@ -17,7 +17,7 @@ data class Playlist(
     val updatedAt: Instant,
     val itemIds: List<Int>,
     val access: Access,
-    val fetchedAt: Instant,
+    val fetchedAt: Instant
 ) {
     companion object {
         fun fromDb(p: DbPlaylist, playlistItems: List<Int>) =
@@ -31,7 +31,7 @@ data class Playlist(
                 p.updatedAt,
                 playlistItems,
                 p.access,
-                p.fetchedAt,
+                p.fetchedAt
             )
 
         fun fromApi(p: ApiPlaylist, fetchTime: Instant) =
@@ -45,7 +45,7 @@ data class Playlist(
                 p.updatedAt,
                 p.itemIds,
                 p.access,
-                fetchTime,
+                fetchTime
             )
     }
 

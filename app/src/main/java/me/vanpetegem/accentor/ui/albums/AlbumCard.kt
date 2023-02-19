@@ -53,7 +53,7 @@ public fun AlbumCard(album: Album, navController: NavController, playerViewModel
                 placeholder = painterResource(R.drawable.ic_album),
                 contentDescription = stringResource(R.string.album_image),
                 contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxWidth().aspectRatio(1f),
+                modifier = Modifier.fillMaxWidth().aspectRatio(1f)
             )
             Row(horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                 Column(modifier = Modifier.weight(1f)) {
@@ -62,7 +62,7 @@ public fun AlbumCard(album: Album, navController: NavController, playerViewModel
                         maxLines = 1,
                         modifier = Modifier.padding(top = 4.dp, start = 4.dp, end = 4.dp),
                         style = MaterialTheme.typography.bodyLarge,
-                        overflow = TextOverflow.Ellipsis,
+                        overflow = TextOverflow.Ellipsis
                     )
                     Text(
                         album.stringifyAlbumArtists().let {
@@ -72,7 +72,7 @@ public fun AlbumCard(album: Album, navController: NavController, playerViewModel
                         modifier = Modifier.padding(bottom = 4.dp, start = 4.dp, end = 4.dp),
                         style = MaterialTheme.typography.bodyMedium,
                         color = LocalContentColor.current.copy(alpha = ContentAlpha.medium),
-                        overflow = TextOverflow.Ellipsis,
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
                 var expanded by remember { mutableStateOf(false) }
@@ -86,21 +86,21 @@ public fun AlbumCard(album: Album, navController: NavController, playerViewModel
                                 expanded = false
                                 scope.launch(IO) { playerViewModel.play(album) }
                             },
-                            text = { Text(stringResource(R.string.play_now)) },
+                            text = { Text(stringResource(R.string.play_now)) }
                         )
                         DropdownMenuItem(
                             onClick = {
                                 expanded = false
                                 scope.launch(IO) { playerViewModel.addTracksToQueue(album, maxOf(0, playerViewModel.queuePosition.value ?: 0)) }
                             },
-                            text = { Text(stringResource(R.string.play_next)) },
+                            text = { Text(stringResource(R.string.play_next)) }
                         )
                         DropdownMenuItem(
                             onClick = {
                                 expanded = false
                                 scope.launch(IO) { playerViewModel.addTracksToQueue(album) }
                             },
-                            text = { Text(stringResource(R.string.play_last)) },
+                            text = { Text(stringResource(R.string.play_last)) }
                         )
                         for (aa in album.albumArtists.sortedBy { it.order }) {
                             if (aa.artistId != hideArtist) {
@@ -109,7 +109,7 @@ public fun AlbumCard(album: Album, navController: NavController, playerViewModel
                                         expanded = false
                                         navController.navigate("artists/${aa.artistId}")
                                     },
-                                    text = { Text(stringResource(R.string.go_to, aa.name)) },
+                                    text = { Text(stringResource(R.string.go_to, aa.name)) }
                                 )
                             }
                         }

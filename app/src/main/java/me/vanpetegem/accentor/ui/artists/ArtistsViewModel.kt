@@ -15,7 +15,7 @@ import me.vanpetegem.accentor.data.artists.ArtistRepository
 @HiltViewModel
 class ArtistsViewModel @Inject constructor(
     application: Application,
-    private val artistRepository: ArtistRepository,
+    private val artistRepository: ArtistRepository
 ) : AndroidViewModel(application) {
     val allArtists: LiveData<List<Artist>> = artistRepository.allArtists
 

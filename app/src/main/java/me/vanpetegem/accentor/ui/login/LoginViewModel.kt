@@ -15,7 +15,7 @@ import me.vanpetegem.accentor.util.Result
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     application: Application,
-    private val repository: AuthenticationRepository,
+    private val repository: AuthenticationRepository
 ) : AndroidViewModel(application) {
     private val _loginForm = MutableLiveData<LoginFormState>()
     val loginFormState: LiveData<LoginFormState> = _loginForm

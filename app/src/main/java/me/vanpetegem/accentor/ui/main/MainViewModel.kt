@@ -37,7 +37,7 @@ class MainViewModel @Inject constructor(
     private val codecConversionRepository: CodecConversionRepository,
     private val playlistRepository: PlaylistRepository,
     private val playRepository: PlayRepository,
-    private val preferencesDataSource: PreferencesDataSource,
+    private val preferencesDataSource: PreferencesDataSource
 ) : AndroidViewModel(application) {
     private val refreshing = MutableLiveData<Int>(0)
     val isRefreshing: LiveData<Boolean> = map(refreshing) { if (it != null) it > 0 else false }

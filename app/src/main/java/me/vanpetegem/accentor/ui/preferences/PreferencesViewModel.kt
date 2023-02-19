@@ -21,7 +21,7 @@ class PreferencesViewModel @Inject constructor(
     private val preferencesDataSource: PreferencesDataSource,
     private val userRepository: UserRepository,
     private val authenticationRepository: AuthenticationRepository,
-    private val codecConversionRepository: CodecConversionRepository,
+    private val codecConversionRepository: CodecConversionRepository
 ) : AndroidViewModel(application) {
     private val conversionId: LiveData<Int> = preferencesDataSource.conversionId
 

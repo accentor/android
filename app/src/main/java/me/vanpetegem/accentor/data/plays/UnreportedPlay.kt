@@ -12,5 +12,5 @@ data class UnreportedPlay(
     @ColumnInfo(name = "track_id")
     val trackId: Int,
     @ColumnInfo(name = "played_at")
-    val playedAt: Instant,
+    val playedAt: Instant
 )

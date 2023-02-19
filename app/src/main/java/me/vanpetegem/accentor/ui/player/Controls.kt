@@ -48,7 +48,7 @@ fun Controls(playerViewModel: PlayerViewModel = viewModel()) {
                             painterResource(R.drawable.ic_repeat_all),
                             contentDescription = stringResource(R.string.repeat_all),
                             modifier = Modifier.height(32.dp).aspectRatio(1f),
-                            tint = MaterialTheme.colorScheme.primary.copy(alpha = LocalContentAlpha.current),
+                            tint = MaterialTheme.colorScheme.primary.copy(alpha = LocalContentAlpha.current)
                         )
                     }
                 }
@@ -58,7 +58,7 @@ fun Controls(playerViewModel: PlayerViewModel = viewModel()) {
                             painterResource(R.drawable.ic_repeat_one),
                             contentDescription = stringResource(R.string.repeat_one),
                             modifier = Modifier.height(32.dp).aspectRatio(1f),
-                            tint = MaterialTheme.colorScheme.primary.copy(alpha = LocalContentAlpha.current),
+                            tint = MaterialTheme.colorScheme.primary.copy(alpha = LocalContentAlpha.current)
                         )
                     }
                 }
@@ -67,7 +67,7 @@ fun Controls(playerViewModel: PlayerViewModel = viewModel()) {
                         Icon(
                             painterResource(R.drawable.ic_repeat_off),
                             contentDescription = stringResource(R.string.repeat_off),
-                            modifier = Modifier.height(32.dp).aspectRatio(1f),
+                            modifier = Modifier.height(32.dp).aspectRatio(1f)
                         )
                     }
                 }
@@ -76,48 +76,51 @@ fun Controls(playerViewModel: PlayerViewModel = viewModel()) {
             IconButton(
                 onClick = {
                     scope.launch(IO) { playerViewModel.previous() }
-                },
+                }
             ) {
                 Icon(
                     painterResource(R.drawable.ic_previous),
                     contentDescription = stringResource(R.string.previous),
-                    modifier = Modifier.height(56.dp).aspectRatio(1f),
+                    modifier = Modifier.height(56.dp).aspectRatio(1f)
                 )
             }
             if (isPlaying ?: false) {
                 IconButton(
                     onClick = {
                         scope.launch(IO) { playerViewModel.pause() }
-                    },
+                    }
                 ) {
                     Icon(
-                        painterResource(R.drawable.ic_pause), contentDescription = stringResource(R.string.pause),
+                        painterResource(R.drawable.ic_pause),
+                        contentDescription = stringResource(R.string.pause),
 
-                        modifier = Modifier.height(56.dp).aspectRatio(1f),
+                        modifier = Modifier.height(56.dp).aspectRatio(1f)
                     )
                 }
             } else {
                 IconButton(
                     onClick = {
                         scope.launch(IO) { playerViewModel.play() }
-                    },
+                    }
                 ) {
                     Icon(
-                        painterResource(R.drawable.ic_play), contentDescription = stringResource(R.string.play),
+                        painterResource(R.drawable.ic_play),
+                        contentDescription = stringResource(R.string.play),
 
-                        modifier = Modifier.height(56.dp).aspectRatio(1f),
+                        modifier = Modifier.height(56.dp).aspectRatio(1f)
                     )
                 }
             }
             IconButton(
                 onClick = {
                     scope.launch(IO) { playerViewModel.next() }
-                },
+                }
             ) {
                 Icon(
-                    painterResource(R.drawable.ic_next), contentDescription = stringResource(R.string.next),
+                    painterResource(R.drawable.ic_next),
+                    contentDescription = stringResource(R.string.next),
 
-                    modifier = Modifier.height(56.dp).aspectRatio(1f),
+                    modifier = Modifier.height(56.dp).aspectRatio(1f)
                 )
             }
             Spacer(Modifier.weight(1f))
@@ -127,7 +130,7 @@ fun Controls(playerViewModel: PlayerViewModel = viewModel()) {
                         painterResource(R.drawable.ic_shuffle_all),
                         contentDescription = stringResource(R.string.shuffle_all),
                         modifier = Modifier.height(32.dp).aspectRatio(1f),
-                        tint = MaterialTheme.colorScheme.primary.copy(alpha = LocalContentAlpha.current),
+                        tint = MaterialTheme.colorScheme.primary.copy(alpha = LocalContentAlpha.current)
                     )
                 }
             } else {
@@ -135,7 +138,7 @@ fun Controls(playerViewModel: PlayerViewModel = viewModel()) {
                     Icon(
                         painterResource(R.drawable.ic_shuffle_none),
                         contentDescription = stringResource(R.string.shuffle_none),
-                        modifier = Modifier.height(32.dp).aspectRatio(1f),
+                        modifier = Modifier.height(32.dp).aspectRatio(1f)
                     )
                 }
             }
@@ -158,7 +161,7 @@ fun Controls(playerViewModel: PlayerViewModel = viewModel()) {
                         seekPosition = null
                     },
                     enabled = !buffering,
-                    valueRange = 0f..(trackLength.toFloat()),
+                    valueRange = 0f..(trackLength.toFloat())
                 )
             }
             Text(currentTrack?.length.formatTrackLength())

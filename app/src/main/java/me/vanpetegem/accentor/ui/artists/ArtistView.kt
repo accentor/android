@@ -46,7 +46,7 @@ fun ArtistView(id: Int, navController: NavController, playerViewModel: PlayerVie
                         fallback = painterResource(R.drawable.ic_artist),
                         contentDescription = stringResource(R.string.artist_image),
                         contentScale = ContentScale.Crop,
-                        modifier = Modifier.width(80.dp).aspectRatio(1f).clip(CircleShape),
+                        modifier = Modifier.width(80.dp).aspectRatio(1f).clip(CircleShape)
                     )
                     Text(artist.name, style = MaterialTheme.typography.headlineLarge, modifier = Modifier.padding(start = 8.dp))
                 }

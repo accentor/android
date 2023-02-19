@@ -17,5 +17,5 @@ data class DbCodecConversion(
     @ColumnInfo(name = "resulting_codec_id")
     val resultingCodecId: Int,
     @ColumnInfo(name = "fetched_at")
-    val fetchedAt: Instant,
+    val fetchedAt: Instant
 )

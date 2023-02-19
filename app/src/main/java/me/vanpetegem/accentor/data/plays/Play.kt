@@ -7,7 +7,7 @@ data class Play(
     val playedAt: Instant,
     val trackId: Int,
     val userId: Int,
-    val fetchedAt: Instant,
+    val fetchedAt: Instant
 ) {
     fun toDb() = DbPlay(id, playedAt, trackId, userId, fetchedAt)
 
@@ -18,7 +18,7 @@ data class Play(
                 p.playedAt,
                 p.trackId,
                 p.userId,
-                fetchTime,
+                fetchTime
             )
     }
 }

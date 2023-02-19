@@ -44,7 +44,7 @@ fun TrackRow(
     navController: NavController,
     playerViewModel: PlayerViewModel,
     hideAlbum: Boolean = false,
-    hideArtist: Int? = null,
+    hideArtist: Int? = null
 ) {
     val scope = rememberCoroutineScope()
     Row(
@@ -57,14 +57,14 @@ fun TrackRow(
                 track.title,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
-                style = MaterialTheme.typography.titleMedium,
+                style = MaterialTheme.typography.titleMedium
             )
             Text(
                 track.stringifyTrackArtists(),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 style = MaterialTheme.typography.titleSmall,
-                color = LocalContentColor.current.copy(alpha = ContentAlpha.medium),
+                color = LocalContentColor.current.copy(alpha = ContentAlpha.medium)
             )
         }
         var expanded by remember { mutableStateOf(false) }
@@ -78,14 +78,14 @@ fun TrackRow(
                         expanded = false
                         scope.launch(IO) { playerViewModel.addTrackToQueue(track, maxOf(0, playerViewModel.queuePosition.value ?: 0)) }
                     },
-                    text = { Text(stringResource(R.string.play_next)) },
+                    text = { Text(stringResource(R.string.play_next)) }
                 )
                 DropdownMenuItem(
                     onClick = {
                         expanded = false
                         scope.launch(IO) { playerViewModel.addTrackToQueue(track) }
                     },
-                    text = { Text(stringResource(R.string.play_last)) },
+                    text = { Text(stringResource(R.string.play_last)) }
                 )
                 if (!hideAlbum) {
                     DropdownMenuItem(

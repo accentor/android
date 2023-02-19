@@ -52,7 +52,7 @@ fun ScrollBar(
     val duration = if (state.isScrollInProgress || dragging) 150 else 500
     val alpha by animateFloatAsState(
         targetValue = targetAlpha,
-        animationSpec = tween(duration),
+        animationSpec = tween(duration)
     )
     val color = MaterialTheme.colorScheme.secondary
     val coroutineScope = rememberCoroutineScope()
@@ -77,7 +77,7 @@ fun ScrollBar(
             Surface(
                 modifier = Modifier.height(minimumHeight).width(minimumHeight).offset(-width * 2, topDistance),
                 shape = RoundedCornerShape(50, 50, 0, 50),
-                color = color,
+                color = color
             ) {
                 Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
                     Text(sectionName, style = MaterialTheme.typography.titleLarge)
@@ -96,7 +96,7 @@ fun ScrollBar(
                     coroutineScope.launch { state.scrollToItem(newIndex, newOffset) }
                 },
                 onDragStarted = { _ -> dragging = true },
-                onDragStopped = { _ -> dragging = false },
+                onDragStopped = { _ -> dragging = false }
             )
         ) {
             val scrollbarHeight = maxOf(boxHeight * (boxHeight.toFloat() / totalHeight), minimumHeight.toPx())
@@ -109,7 +109,7 @@ fun ScrollBar(
                 cornerRadius = CornerRadius(width.toPx() / 2, width.toPx() / 2),
                 topLeft = Offset(if (layoutDirection == LayoutDirection.Ltr) width.toPx() else 0.0f, scrollbarOffsetY),
                 size = Size(width.toPx(), scrollbarHeight),
-                alpha = alpha,
+                alpha = alpha
             )
         }
     }
@@ -124,7 +124,7 @@ fun <T> FastScrollableGrid(gridItems: List<T>, getSectionName: (T) -> String, it
         LazyVerticalGrid(
             columns = if (cardsPerRow >= 2) GridCells.Adaptive(minSize = 192.dp) else GridCells.Fixed(2),
             state = gridState,
-            modifier = Modifier.onGloballyPositioned { boxSize = it.size },
+            modifier = Modifier.onGloballyPositioned { boxSize = it.size }
         ) {
             items(gridItems.size) { i -> itemView(gridItems[i]) }
         }

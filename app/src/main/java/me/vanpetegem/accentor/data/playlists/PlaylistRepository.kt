@@ -13,7 +13,7 @@ import me.vanpetegem.accentor.util.Result
 @Reusable
 class PlaylistRepository @Inject constructor(
     private val playlistDao: PlaylistDao,
-    private val authenticationRepository: AuthenticationRepository,
+    private val authenticationRepository: AuthenticationRepository
 ) {
     val allPlaylists: LiveData<List<Playlist>> = playlistDao.getAll()
     val allPlaylistsById: LiveData<SparseArray<Playlist>> = map(allPlaylists) {

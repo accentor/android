@@ -99,7 +99,7 @@ fun Content(loginViewModel: LoginViewModel = viewModel()) {
         content = { innerPadding ->
             Column(
                 Modifier.fillMaxSize().padding(innerPadding).verticalScroll(rememberScrollState()),
-                horizontalAlignment = Alignment.CenterHorizontally,
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 var server by rememberSaveable { mutableStateOf("https://") }
                 var username by rememberSaveable { mutableStateOf("") }
@@ -124,7 +124,7 @@ fun Content(loginViewModel: LoginViewModel = viewModel()) {
                         autoCorrect = false,
                         capitalization = KeyboardCapitalization.None,
                         imeAction = ImeAction.Next,
-                        keyboardType = KeyboardType.Uri,
+                        keyboardType = KeyboardType.Uri
                     ),
                     keyboardActions = KeyboardActions(onNext = { usernameFocusRequester.requestFocus() })
                 )
@@ -143,10 +143,10 @@ fun Content(loginViewModel: LoginViewModel = viewModel()) {
                     keyboardOptions = KeyboardOptions(
                         autoCorrect = false,
                         capitalization = KeyboardCapitalization.None,
-                        imeAction = ImeAction.Next,
+                        imeAction = ImeAction.Next
                     ),
                     keyboardActions = KeyboardActions(onNext = { passwordFocusRequester.requestFocus() }),
-                    singleLine = true,
+                    singleLine = true
                 )
                 val keyboardController = LocalSoftwareKeyboardController.current
                 val loading by loginViewModel.loading.observeAsState()
@@ -172,7 +172,7 @@ fun Content(loginViewModel: LoginViewModel = viewModel()) {
                     keyboardActions = KeyboardActions {
                         keyboardController?.hide()
                         scope.launch(IO) { tryLogin(server, username, password) }
-                    },
+                    }
                 )
                 Button(
                     onClick = {
@@ -180,7 +180,7 @@ fun Content(loginViewModel: LoginViewModel = viewModel()) {
                         scope.launch(IO) { tryLogin(server, username, password) }
                     },
                     enabled = formState?.isDataValid ?: false,
-                    modifier = Modifier.padding(bottom = 16.dp, start = 16.dp, end = 16.dp, top = 8.dp),
+                    modifier = Modifier.padding(bottom = 16.dp, start = 16.dp, end = 16.dp, top = 8.dp)
                 ) {
                     Text(stringResource(R.string.sign_in), style = MaterialTheme.typography.labelLarge)
                 }
@@ -196,7 +196,7 @@ fun Modifier.autofill(
     autofill: Autofill?,
     autofillTree: AutofillTree,
     autofillTypes: List<AutofillType>,
-    onFill: ((String) -> Unit),
+    onFill: ((String) -> Unit)
 ): Modifier {
     val node = AutofillNode(onFill = onFill, autofillTypes = autofillTypes)
     autofillTree += node

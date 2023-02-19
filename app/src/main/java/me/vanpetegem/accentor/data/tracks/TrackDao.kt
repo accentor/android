@@ -49,7 +49,7 @@ abstract class TrackDao {
                     Track.fromDb(
                         it,
                         trackArtists.map { TrackArtist(it.artistId, it.name, it.normalizedName, it.role, it.order, it.hidden) },
-                        trackGenres.map { it.genreId },
+                        trackGenres.map { it.genreId }
                     )
                 }
             }
@@ -92,7 +92,7 @@ abstract class TrackDao {
         return Track.fromDb(
             dbTrack,
             trackArtists.map { TrackArtist(it.artistId, it.name, it.normalizedName, it.role, it.order, it.hidden) },
-            trackGenres.map { it.genreId },
+            trackGenres.map { it.genreId }
         )
     }
 
@@ -144,7 +144,7 @@ abstract class TrackDao {
                         ta.normalizedName,
                         ta.role,
                         ta.order,
-                        ta.hidden,
+                        ta.hidden
                     )
                 )
                 map.put(ta.trackId, l)
@@ -163,7 +163,7 @@ abstract class TrackDao {
                     ta.normalizedName,
                     ta.role,
                     ta.order,
-                    ta.hidden,
+                    ta.hidden
                 )
             )
             map.put(ta.trackId, l)
@@ -209,7 +209,7 @@ abstract class TrackDao {
                     track.length,
                     track.bitrate,
                     track.locationId,
-                    track.fetchedAt,
+                    track.fetchedAt
                 )
             )
             deleteTrackArtistsById(track.id)
@@ -222,7 +222,7 @@ abstract class TrackDao {
                         ta.normalizedName,
                         ta.role,
                         ta.order,
-                        ta.hidden,
+                        ta.hidden
                     )
                 )
             }

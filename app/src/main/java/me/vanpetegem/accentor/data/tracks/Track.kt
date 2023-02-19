@@ -19,7 +19,7 @@ data class Track(
     val length: Int?,
     val bitrate: Int?,
     val locationId: Int?,
-    val fetchedAt: Instant,
+    val fetchedAt: Instant
 ) {
     fun stringifyTrackArtists() = trackArtists.filter { ta -> !ta.hidden }.sortedBy { ta -> ta.order }.joinToString(" / ") { ta -> ta.name }
 
@@ -63,7 +63,7 @@ data class Track(
                 t.length,
                 t.bitrate,
                 t.locationId,
-                t.fetchedAt,
+                t.fetchedAt
             )
 
         fun fromApi(t: ApiTrack, fetchTime: Instant) =
@@ -82,7 +82,7 @@ data class Track(
                 t.length,
                 t.bitrate,
                 t.locationId,
-                fetchTime,
+                fetchTime
             )
     }
 }
@@ -93,7 +93,7 @@ data class TrackArtist(
     val normalizedName: String,
     val role: Role,
     val order: Int,
-    val hidden: Boolean,
+    val hidden: Boolean
 )
 
 enum class Role {

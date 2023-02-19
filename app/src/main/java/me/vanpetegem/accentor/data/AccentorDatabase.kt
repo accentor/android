@@ -52,7 +52,7 @@ import me.vanpetegem.accentor.util.RoomTypeConverters
         DbTrack::class,
         DbTrackArtist::class,
         DbTrackGenre::class,
-        UnreportedPlay::class,
+        UnreportedPlay::class
     ],
     version = 12
 )
@@ -306,18 +306,25 @@ internal object DatabaseModule {
 
     @Provides
     fun provideAlbumDao(database: AccentorDatabase): AlbumDao = database.albumDao()
+
     @Provides
     fun provideArtistDao(database: AccentorDatabase): ArtistDao = database.artistDao()
+
     @Provides
     fun provideCodecConversionDao(database: AccentorDatabase): CodecConversionDao = database.codecConversionDao()
+
     @Provides
     fun providePlaylistDao(database: AccentorDatabase): PlaylistDao = database.playlistDao()
+
     @Provides
     fun providePlayDao(database: AccentorDatabase): PlayDao = database.playDao()
+
     @Provides
     fun provideTrackDao(database: AccentorDatabase): TrackDao = database.trackDao()
+
     @Provides
     fun provideUserDao(database: AccentorDatabase): UserDao = database.userDao()
+
     @Provides
     fun provideUnreportedPlayDao(database: AccentorDatabase): UnreportedPlayDao = database.unreportedPlayDao()
 }
