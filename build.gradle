@@ -10,7 +10,7 @@ buildscript {
         kotlin_version = '1.7.10'
         kotlinx_version = '1.6.4'
         lifecycle_version = '2.5.1'
-        media3_version = '1.0.0-rc01'
+        media3_version = '1.0.0-rc02'
         room_version = '2.5.0'
     }
     repositories {
