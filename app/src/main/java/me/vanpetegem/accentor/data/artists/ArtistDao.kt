@@ -1,7 +1,7 @@
 package me.vanpetegem.accentor.data.artists
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.Transformations.map
+import androidx.lifecycle.map
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.RewriteQueriesToDropUnusedColumns
@@ -12,11 +12,11 @@ import java.time.Instant
 @Dao
 abstract class ArtistDao {
 
-    open fun getAll(): LiveData<List<Artist>> = map(getAllDbArtists()) { list ->
+    open fun getAll(): LiveData<List<Artist>> = getAllDbArtists().map { list ->
         list.map { Artist.fromDb(it) }
     }
 
-    open fun getAllByPlayed(): LiveData<List<Artist>> = map(getAllDbArtistsByPlayed()) { list ->
+    open fun getAllByPlayed(): LiveData<List<Artist>> = getAllDbArtistsByPlayed().map { list ->
         list.map { Artist.fromDb(it) }
     }
 

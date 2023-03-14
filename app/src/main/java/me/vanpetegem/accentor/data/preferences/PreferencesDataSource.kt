@@ -2,7 +2,7 @@ package me.vanpetegem.accentor.data.preferences
 
 import android.content.Context
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.Transformations.map
+import androidx.lifecycle.map
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.time.Instant
 import javax.inject.Inject
@@ -23,10 +23,10 @@ class PreferencesDataSource @Inject constructor(@ApplicationContext private val 
     private val musicCacheSizeData = sharedPreferences.longLiveData(MUSIC_CACHE_SIZE_KEY, 10L * 1024L * 1024L * 1024L)
     private val lastSyncFinishedData = sharedPreferences.stringLiveData(LAST_SYNC_FINISHED)
 
-    val conversionId: LiveData<Int> = conversionIdData
-    val imageCacheSize: LiveData<Long> = imageCacheSizeData
-    val musicCacheSize: LiveData<Long> = musicCacheSizeData
-    val lastSyncFinished: LiveData<Instant> = map(lastSyncFinishedData) {
+    val conversionId: LiveData<Int?> = conversionIdData
+    val imageCacheSize: LiveData<Long?> = imageCacheSizeData
+    val musicCacheSize: LiveData<Long?> = musicCacheSizeData
+    val lastSyncFinished: LiveData<Instant?> = lastSyncFinishedData.map {
         it?.let { Instant.parse(it) }
     }
 

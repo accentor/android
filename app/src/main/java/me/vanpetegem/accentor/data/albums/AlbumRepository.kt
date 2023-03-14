@@ -2,7 +2,7 @@ package me.vanpetegem.accentor.data.albums
 
 import android.util.SparseArray
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.Transformations.map
+import androidx.lifecycle.map
 import dagger.Reusable
 import java.time.Instant
 import java.time.LocalDate
@@ -17,23 +17,23 @@ class AlbumRepository @Inject constructor(
     private val authenticationRepository: AuthenticationRepository
 ) {
     val allAlbums: LiveData<List<Album>> = albumDao.getAll()
-    val allAlbumsById: LiveData<SparseArray<Album>> = map(allAlbums) {
+    val allAlbumsById: LiveData<SparseArray<Album>> = allAlbums.map {
         val map = SparseArray<Album>()
         it.forEach { a -> map.put(a.id, a) }
         map
     }
-    val albumsByReleased: LiveData<List<Album>> = map(allAlbums) {
+    val albumsByReleased: LiveData<List<Album>> = allAlbums.map {
         val copy = it.toMutableList()
         copy.sortWith({ a1, a2 -> a2.release.compareTo(a1.release) })
         copy
     }
-    val albumsByAdded: LiveData<List<Album>> = map(allAlbums) {
+    val albumsByAdded: LiveData<List<Album>> = allAlbums.map {
         val copy = it.toMutableList()
         copy.sortWith({ a1, a2 -> a2.createdAt.compareTo(a1.createdAt) })
         copy
     }
     val albumsByPlayed: LiveData<List<Album>> = albumDao.getAllByPlayed()
-    val randomAlbums: LiveData<List<Album>> = map(allAlbums) {
+    val randomAlbums: LiveData<List<Album>> = allAlbums.map {
         val copy = it.toMutableList()
         copy.shuffle()
         copy

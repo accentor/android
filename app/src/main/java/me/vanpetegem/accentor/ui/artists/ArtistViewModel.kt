@@ -3,8 +3,8 @@ package me.vanpetegem.accentor.ui.artists
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.Transformations.map
-import androidx.lifecycle.Transformations.switchMap
+import androidx.lifecycle.map
+import androidx.lifecycle.switchMap
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import me.vanpetegem.accentor.data.albums.Album
@@ -21,18 +21,18 @@ class ArtistViewModel @Inject constructor(
     private val albumRepository: AlbumRepository,
     private val trackRepository: TrackRepository
 ) : AndroidViewModel(application) {
-    fun getArtist(id: Int): LiveData<Artist> = map(artistRepository.allArtistsById) { artists ->
+    fun getArtist(id: Int): LiveData<Artist> = artistRepository.allArtistsById.map { artists ->
         artists[id]
     }
 
-    fun albumsForArtist(artist: Artist): LiveData<List<Album>> = map(albumRepository.albumsByReleased) { albums ->
+    fun albumsForArtist(artist: Artist): LiveData<List<Album>> = albumRepository.albumsByReleased.map { albums ->
         val result = albums.filter { it.albumArtists.any { it.artistId == artist.id } }.toMutableList()
         result.reverse()
         result
     }
 
-    fun tracksForArtist(artist: Artist): LiveData<List<Track>> = switchMap(trackRepository.findByArtist(artist)) { tracks ->
-        map(albumRepository.allAlbumsById) { albums ->
+    fun tracksForArtist(artist: Artist): LiveData<List<Track>> = trackRepository.findByArtist(artist).switchMap { tracks ->
+        albumRepository.allAlbumsById.map { albums ->
             val copy = tracks.toMutableList()
             copy.sortWith({ t1, t2 -> t1.compareAlphabetically(t2, albums) })
             copy

@@ -5,8 +5,8 @@ import android.util.SparseArray
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations.map
-import androidx.lifecycle.Transformations.switchMap
+import androidx.lifecycle.map
+import androidx.lifecycle.switchMap
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.text.Normalizer
 import javax.inject.Inject
@@ -30,8 +30,8 @@ class PlaylistsViewModel @Inject constructor(
     private val _query = MutableLiveData<String>("")
     val query: LiveData<String> = _query
 
-    val filteredPlaylists: LiveData<List<Playlist>> = switchMap(allPlaylists) { playlists ->
-        map(query) { query ->
+    val filteredPlaylists: LiveData<List<Playlist>> = allPlaylists.switchMap { playlists ->
+        query.map { query ->
             if (query.equals("")) {
                 playlists
             } else {

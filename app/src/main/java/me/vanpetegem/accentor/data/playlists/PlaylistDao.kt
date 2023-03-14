@@ -2,8 +2,8 @@ package me.vanpetegem.accentor.data.playlists
 
 import android.util.SparseArray
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.Transformations.map
-import androidx.lifecycle.Transformations.switchMap
+import androidx.lifecycle.map
+import androidx.lifecycle.switchMap
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
@@ -14,14 +14,14 @@ import java.time.Instant
 @Dao
 abstract class PlaylistDao {
 
-    open fun getAll(): LiveData<List<Playlist>> = switchMap(getAllDbPlaylists()) { playlists ->
-        map(playlistItemsByPlaylistId()) { playlistItems ->
+    open fun getAll(): LiveData<List<Playlist>> = getAllDbPlaylists().switchMap { playlists ->
+        playlistItemsByPlaylistId().map { playlistItems ->
             playlists.map { p -> Playlist.fromDb(p, playlistItems.get(p.id, ArrayList())) }
         }
     }
 
     protected open fun playlistItemsByPlaylistId(): LiveData<SparseArray<MutableList<Int>>> =
-        map(getAllPlaylistItems()) {
+        getAllPlaylistItems().map {
             val mapping = SparseArray<MutableList<Int>>()
             for (pi in it) {
                 val l = mapping.get(pi.playlistId, ArrayList())

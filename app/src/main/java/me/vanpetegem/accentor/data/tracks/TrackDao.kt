@@ -2,8 +2,8 @@ package me.vanpetegem.accentor.data.tracks
 
 import android.util.SparseArray
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.Transformations.map
-import androidx.lifecycle.Transformations.switchMap
+import androidx.lifecycle.map
+import androidx.lifecycle.switchMap
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
@@ -34,17 +34,17 @@ abstract class TrackDao {
         return ids.map { Track.fromDb(tracksByIds.get(it), trackArtists.get(it, ArrayList()), trackGenres.get(it, ArrayList())) }
     }
 
-    open fun findByIds(ids: List<Int>): LiveData<List<Track>> = switchMap(findDbTracksByIds(ids)) { tracks ->
-        switchMap(findTrackArtistsByTrackIdWhereTrackIds(ids)) { trackArtists ->
-            map(findTrackGenresByTrackIdWhereTrackIds(ids)) { trackGenres ->
+    open fun findByIds(ids: List<Int>): LiveData<List<Track>> = findDbTracksByIds(ids).switchMap { tracks ->
+        findTrackArtistsByTrackIdWhereTrackIds(ids).switchMap { trackArtists ->
+            findTrackGenresByTrackIdWhereTrackIds(ids).map { trackGenres ->
                 tracks.map { t -> Track.fromDb(t, trackArtists.get(t.id, ArrayList()), trackGenres.get(t.id, ArrayList())) }
             }
         }
     }
 
-    open fun findById(id: Int): LiveData<Track?> = switchMap(findDbTrackById(id)) { dbTrack ->
-        switchMap(findDbTrackArtistsById(id)) { trackArtists ->
-            map(findDbTrackGenresById(id)) { trackGenres ->
+    open fun findById(id: Int): LiveData<Track?> = findDbTrackById(id).switchMap { dbTrack ->
+        findDbTrackArtistsById(id).switchMap { trackArtists ->
+            findDbTrackGenresById(id).map { trackGenres ->
                 dbTrack?.let {
                     Track.fromDb(
                         it,
@@ -56,10 +56,10 @@ abstract class TrackDao {
         }
     }
 
-    open fun findByArtist(artist: Artist): LiveData<List<Track>> = switchMap(findDbTracksByArtistId(artist.id)) { tracks ->
+    open fun findByArtist(artist: Artist): LiveData<List<Track>> = findDbTracksByArtistId(artist.id).switchMap { tracks ->
         val ids = tracks.map { it.id }
-        switchMap(findTrackArtistsByTrackIdWhereTrackIds(ids)) { trackArtists ->
-            map(findTrackGenresByTrackIdWhereTrackIds(ids)) { trackGenres ->
+        findTrackArtistsByTrackIdWhereTrackIds(ids).switchMap { trackArtists ->
+            findTrackGenresByTrackIdWhereTrackIds(ids).map { trackGenres ->
                 tracks.map { Track.fromDb(it, trackArtists.get(it.id, ArrayList()), trackGenres.get(it.id, ArrayList())) }
             }
         }
@@ -73,10 +73,10 @@ abstract class TrackDao {
         return tracks.map { Track.fromDb(it, trackArtists.get(it.id, ArrayList()), trackGenres.get(it.id, ArrayList())) }
     }
 
-    open fun findByAlbum(album: Album): LiveData<List<Track>> = switchMap(findDbTracksByAlbumId(album.id)) { tracks ->
+    open fun findByAlbum(album: Album): LiveData<List<Track>> = findDbTracksByAlbumId(album.id).switchMap { tracks ->
         val ids = tracks.map { it.id }
-        switchMap(findTrackArtistsByTrackIdWhereTrackIds(ids)) { trackArtists ->
-            map(findTrackGenresByTrackIdWhereTrackIds(ids)) { trackGenres ->
+        findTrackArtistsByTrackIdWhereTrackIds(ids).switchMap { trackArtists ->
+            findTrackGenresByTrackIdWhereTrackIds(ids).map { trackGenres ->
                 tracks.map { Track.fromDb(it, trackArtists.get(it.id, ArrayList()), trackGenres.get(it.id, ArrayList())) }
             }
         }
@@ -133,7 +133,7 @@ abstract class TrackDao {
     protected abstract fun findDbTrackGenresById(id: Int): LiveData<List<DbTrackGenre>>
 
     protected open fun findTrackArtistsByTrackIdWhereTrackIds(ids: List<Int>): LiveData<SparseArray<MutableList<TrackArtist>>> =
-        map(findAllTrackArtistsWhereTrackIds(ids)) {
+        findAllTrackArtistsWhereTrackIds(ids).map {
             val map = SparseArray<MutableList<TrackArtist>>()
             for (ta in it) {
                 val l = map.get(ta.trackId, ArrayList())
@@ -172,7 +172,7 @@ abstract class TrackDao {
     }
 
     protected open fun findTrackGenresByTrackIdWhereTrackIds(ids: List<Int>): LiveData<SparseArray<MutableList<Int>>> =
-        map(findAllTrackGenresWhereTrackIds(ids)) {
+        findAllTrackGenresWhereTrackIds(ids).map {
             val map = SparseArray<MutableList<Int>>()
             for (tg in it) {
                 val l = map.get(tg.trackId, ArrayList())

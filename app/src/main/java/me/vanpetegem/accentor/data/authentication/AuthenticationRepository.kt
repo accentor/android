@@ -1,7 +1,7 @@
 package me.vanpetegem.accentor.data.authentication
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.Transformations
+import androidx.lifecycle.map
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.withContext
@@ -12,12 +12,10 @@ import me.vanpetegem.accentor.util.Result
 class AuthenticationRepository @Inject constructor(
     private val prefsSource: AuthenticationDataSource
 ) {
-    val authData: LiveData<AuthenticationData> = prefsSource.authData
-    val server: LiveData<String> = prefsSource.server
+    val authData: LiveData<AuthenticationData?> = prefsSource.authData
+    val server: LiveData<String?> = prefsSource.server
 
-    val isLoggedIn: LiveData<Boolean> = Transformations.map(authData) {
-        it != null
-    }
+    val isLoggedIn: LiveData<Boolean> = authData.map { it != null }
 
     suspend fun logout() {
         // Ignore bad data/errors for logout: if an error happens, it isn't that bad

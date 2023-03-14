@@ -2,8 +2,8 @@ package me.vanpetegem.accentor.data.albums
 
 import android.util.SparseArray
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.Transformations.map
-import androidx.lifecycle.Transformations.switchMap
+import androidx.lifecycle.map
+import androidx.lifecycle.switchMap
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
@@ -16,17 +16,17 @@ import java.time.format.DateTimeFormatter
 
 @Dao
 abstract class AlbumDao {
-    open fun getAll(): LiveData<List<Album>> = switchMap(getAllDbAlbums()) { albums ->
-        switchMap(albumArtistsByAlbumId()) { albumArtists ->
-            map(albumLabelsByAlbumId()) { albumLabels ->
+    open fun getAll(): LiveData<List<Album>> = getAllDbAlbums().switchMap { albums ->
+        albumArtistsByAlbumId().switchMap { albumArtists ->
+            albumLabelsByAlbumId().map { albumLabels ->
                 albums.map { a -> Album.fromDb(a, albumLabels.get(a.id, ArrayList()), albumArtists.get(a.id, ArrayList())) }
             }
         }
     }
 
-    open fun getAllByPlayed(): LiveData<List<Album>> = switchMap(getAllDbAlbumsByPlayed()) { albums ->
-        switchMap(albumArtistsByAlbumId()) { albumArtists ->
-            map(albumLabelsByAlbumId()) { albumLabels ->
+    open fun getAllByPlayed(): LiveData<List<Album>> = getAllDbAlbumsByPlayed().switchMap { albums ->
+        albumArtistsByAlbumId().switchMap { albumArtists ->
+            albumLabelsByAlbumId().map { albumLabels ->
                 albums.map { a -> Album.fromDb(a, albumLabels.get(a.id, ArrayList()), albumArtists.get(a.id, ArrayList())) }
             }
         }
@@ -41,17 +41,17 @@ abstract class AlbumDao {
         return ids.map { Album.fromDb(albumsByIds.get(it), albumLabels.get(it, ArrayList()), albumArtists.get(it, ArrayList())) }
     }
 
-    open fun findByIds(ids: List<Int>): LiveData<List<Album>> = switchMap(findDbAlbumsByIds(ids)) { albums ->
-        switchMap(albumArtistsByAlbumIdWhereAlbumIds(ids)) { albumArtists ->
-            map(albumLabelsByAlbumIdWhereAlbumIds(ids)) { albumLabels ->
+    open fun findByIds(ids: List<Int>): LiveData<List<Album>> = findDbAlbumsByIds(ids).switchMap { albums ->
+        albumArtistsByAlbumIdWhereAlbumIds(ids).switchMap { albumArtists ->
+            albumLabelsByAlbumIdWhereAlbumIds(ids).map { albumLabels ->
                 albums.map { a -> Album.fromDb(a, albumLabels.get(a.id, ArrayList()), albumArtists.get(a.id, ArrayList())) }
             }
         }
     }
 
-    open fun findById(id: Int): LiveData<Album?> = switchMap(findDbAlbumById(id)) { dbAlbum ->
-        switchMap(findDbAlbumArtistsById(id)) { albumArtists ->
-            map(findDbAlbumLabelsById(id)) { albumLabels ->
+    open fun findById(id: Int): LiveData<Album?> = findDbAlbumById(id).switchMap { dbAlbum ->
+        findDbAlbumArtistsById(id).switchMap { albumArtists ->
+            findDbAlbumLabelsById(id).map { albumLabels ->
                 if (dbAlbum != null) {
                     Album.fromDb(
                         dbAlbum,
@@ -66,9 +66,9 @@ abstract class AlbumDao {
     }
 
     open fun findByDay(day: LocalDate): LiveData<List<Album>> =
-        switchMap(findDbAlbumsByDay(day.format(DateTimeFormatter.ISO_LOCAL_DATE).substring(4))) { albums ->
-            switchMap(albumArtistsByAlbumId()) { albumArtists ->
-                map(albumLabelsByAlbumId()) { albumLabels ->
+        findDbAlbumsByDay(day.format(DateTimeFormatter.ISO_LOCAL_DATE).substring(4)).switchMap { albums ->
+            albumArtistsByAlbumId().switchMap { albumArtists ->
+                albumLabelsByAlbumId().map { albumLabels ->
                     albums.map { a -> Album.fromDb(a, albumLabels.get(a.id, ArrayList()), albumArtists.get(a.id, ArrayList())) }
                 }
             }
@@ -125,7 +125,7 @@ abstract class AlbumDao {
     protected abstract fun findDbAlbumLabelsById(id: Int): LiveData<List<DbAlbumLabel>>
 
     protected open fun albumLabelsByAlbumId(): LiveData<SparseArray<MutableList<AlbumLabel>>> =
-        map(getAllAlbumLabels()) {
+        getAllAlbumLabels().map {
             val map = SparseArray<MutableList<AlbumLabel>>()
             for (al in it) {
                 val l = map.get(al.albumId, ArrayList())
@@ -136,7 +136,7 @@ abstract class AlbumDao {
         }
 
     protected open fun albumLabelsByAlbumIdWhereAlbumIds(ids: List<Int>): LiveData<SparseArray<MutableList<AlbumLabel>>> =
-        map(findAllAlbumLabelsWhereAlbumIds(ids)) {
+        findAllAlbumLabelsWhereAlbumIds(ids).map {
             val map = SparseArray<MutableList<AlbumLabel>>()
             for (al in it) {
                 val l = map.get(al.albumId, ArrayList())
@@ -158,7 +158,7 @@ abstract class AlbumDao {
     }
 
     protected open fun albumArtistsByAlbumId(): LiveData<SparseArray<MutableList<AlbumArtist>>> =
-        map(getAllAlbumArtists()) {
+        getAllAlbumArtists().map {
             val map = SparseArray<MutableList<AlbumArtist>>()
             for (aa in it) {
                 val l = map.get(aa.albumId, ArrayList())
@@ -169,7 +169,7 @@ abstract class AlbumDao {
         }
 
     protected open fun albumArtistsByAlbumIdWhereAlbumIds(ids: List<Int>): LiveData<SparseArray<MutableList<AlbumArtist>>> =
-        map(findAllAlbumArtistsWhereAlbumIds(ids)) {
+        findAllAlbumArtistsWhereAlbumIds(ids).map {
             val map = SparseArray<MutableList<AlbumArtist>>()
             for (aa in it) {
                 val l = map.get(aa.albumId, ArrayList())

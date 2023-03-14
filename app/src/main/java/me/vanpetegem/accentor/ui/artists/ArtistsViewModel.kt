@@ -4,8 +4,8 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations.map
-import androidx.lifecycle.Transformations.switchMap
+import androidx.lifecycle.map
+import androidx.lifecycle.switchMap
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.text.Normalizer
 import javax.inject.Inject
@@ -25,8 +25,8 @@ class ArtistsViewModel @Inject constructor(
     private val _query = MutableLiveData<String>("")
     val query: LiveData<String> = _query
 
-    val filteredArtists: LiveData<List<Artist>> = switchMap(allArtists) { artists ->
-        map(query) { query ->
+    val filteredArtists: LiveData<List<Artist>> = allArtists.switchMap { artists ->
+        query.map { query ->
             if (query.equals("")) {
                 artists
             } else {

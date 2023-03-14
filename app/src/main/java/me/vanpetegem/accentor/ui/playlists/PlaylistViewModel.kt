@@ -4,7 +4,7 @@ import android.app.Application
 import android.util.SparseArray
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.Transformations.map
+import androidx.lifecycle.map
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import me.vanpetegem.accentor.data.albums.Album
@@ -31,9 +31,9 @@ class PlaylistViewModel @Inject constructor(
     val allAlbumsById: LiveData<SparseArray<Album>> = albumRepository.allAlbumsById
     val allArtistsById: LiveData<SparseArray<Artist>> = artistRepository.allArtistsById
 
-    fun getPlaylist(id: Int): LiveData<Playlist> = map(playlistRepository.allPlaylistsById) { playlists -> playlists[id] }
+    fun getPlaylist(id: Int): LiveData<Playlist> = playlistRepository.allPlaylistsById.map { playlists -> playlists[id] }
 
-    fun getTracksForPlaylist(playlist: Playlist): LiveData<SparseArray<Track>> = map(trackRepository.findByIds(playlist.itemIds)) {
+    fun getTracksForPlaylist(playlist: Playlist): LiveData<SparseArray<Track>> = trackRepository.findByIds(playlist.itemIds).map {
         val map = SparseArray<Track>()
         it.forEach { t -> map.put(t.id, t) }
         map

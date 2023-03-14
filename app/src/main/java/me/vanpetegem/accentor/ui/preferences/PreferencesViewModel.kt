@@ -3,8 +3,8 @@ package me.vanpetegem.accentor.ui.preferences
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.Transformations.map
-import androidx.lifecycle.Transformations.switchMap
+import androidx.lifecycle.map
+import androidx.lifecycle.switchMap
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.time.Instant
 import javax.inject.Inject
@@ -23,16 +23,16 @@ class PreferencesViewModel @Inject constructor(
     private val authenticationRepository: AuthenticationRepository,
     private val codecConversionRepository: CodecConversionRepository
 ) : AndroidViewModel(application) {
-    private val conversionId: LiveData<Int> = preferencesDataSource.conversionId
+    private val conversionId: LiveData<Int?> = preferencesDataSource.conversionId
 
     val currentUser: LiveData<User?> = userRepository.currentUser
-    val server: LiveData<String> = authenticationRepository.server
-    val imageCacheSize: LiveData<Long> = preferencesDataSource.imageCacheSize
-    val musicCacheSize: LiveData<Long> = preferencesDataSource.musicCacheSize
-    val lastSyncFinished: LiveData<Instant> = preferencesDataSource.lastSyncFinished
-    val conversion: LiveData<CodecConversion> = switchMap(codecConversionRepository.allCodecConversionsById) { ccsMap ->
-        switchMap(codecConversionRepository.allCodecConversions) { ccs ->
-            map(conversionId) { it?.let { ccsMap[it] } ?: ccs.firstOrNull() }
+    val server: LiveData<String?> = authenticationRepository.server
+    val imageCacheSize: LiveData<Long?> = preferencesDataSource.imageCacheSize
+    val musicCacheSize: LiveData<Long?> = preferencesDataSource.musicCacheSize
+    val lastSyncFinished: LiveData<Instant?> = preferencesDataSource.lastSyncFinished
+    val conversion: LiveData<CodecConversion?> = codecConversionRepository.allCodecConversionsById.switchMap { ccsMap ->
+        codecConversionRepository.allCodecConversions.switchMap { ccs ->
+            conversionId.map { it?.let { ccsMap[it] } ?: ccs.firstOrNull() }
         }
     }
     val possibleConversions = codecConversionRepository.allCodecConversions
