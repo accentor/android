@@ -2,7 +2,7 @@ package me.vanpetegem.accentor.data.artists
 
 import android.util.SparseArray
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.Transformations.map
+import androidx.lifecycle.map
 import dagger.Reusable
 import java.time.Instant
 import javax.inject.Inject
@@ -16,18 +16,18 @@ class ArtistRepository @Inject constructor(
     private val authenticationRepository: AuthenticationRepository
 ) {
     val allArtists: LiveData<List<Artist>> = artistDao.getAll()
-    val allArtistsById: LiveData<SparseArray<Artist>> = map(allArtists) {
+    val allArtistsById: LiveData<SparseArray<Artist>> = allArtists.map {
         val map = SparseArray<Artist>()
         it.forEach { a -> map.put(a.id, a) }
         map
     }
-    val artistsByAdded: LiveData<List<Artist>> = map(allArtists) {
+    val artistsByAdded: LiveData<List<Artist>> = allArtists.map {
         val copy = it.toMutableList()
         copy.sortWith({ a1, a2 -> a2.createdAt.compareTo(a1.createdAt) })
         copy
     }
     val artistsByPlayed: LiveData<List<Artist>> = artistDao.getAllByPlayed()
-    val randomArtists: LiveData<List<Artist>> = map(allArtists) {
+    val randomArtists: LiveData<List<Artist>> = allArtists.map {
         val copy = it.toMutableList()
         copy.shuffle()
         copy

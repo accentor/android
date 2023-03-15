@@ -26,12 +26,12 @@ class AuthenticationDataSource @Inject constructor(@ApplicationContext context: 
 
     private val serverData = sharedPreferences.stringLiveData(SERVER_KEY)
 
-    val authData: LiveData<AuthenticationData>
-    val server: LiveData<String> = serverData
+    val authData: LiveData<AuthenticationData?>
+    val server: LiveData<String?> = serverData
 
     init {
-        authData = MediatorLiveData<AuthenticationData>().apply {
-            val observer: Observer<Any> = Observer {
+        authData = MediatorLiveData<AuthenticationData?>().apply {
+            val observer: Observer<Any?> = Observer {
                 val id: Int = idData.value.let {
                     if (it != null) {
                         it

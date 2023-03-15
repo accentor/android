@@ -4,8 +4,8 @@ import android.app.Application
 import android.content.ComponentName
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations.map
-import androidx.lifecycle.Transformations.switchMap
+import androidx.lifecycle.map
+import androidx.lifecycle.switchMap
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.Player
@@ -50,15 +50,15 @@ class MediaSessionConnection @Inject constructor(
 
     private val currentTrackId = MutableLiveData<Int>().apply { postValue(null) }
     val currentTrack: LiveData<Track?> =
-        switchMap(currentTrackId) { id ->
-            switchMap(_queue) { queue ->
+        currentTrackId.switchMap { id ->
+            _queue.switchMap { queue ->
                 if (queue.size > 0) id?.let { trackRepository.findById(id) } else null
             }
         }
     val currentAlbum: LiveData<Album?> =
-        switchMap(currentTrack) { t -> t?.let { albumRepository.findById(t.albumId) } }
+        currentTrack.switchMap { t -> t?.let { albumRepository.findById(t.albumId) } }
     private val _currentPosition = MutableLiveData<Long>()
-    val currentPosition: LiveData<Int> = map(_currentPosition) { (it / 1000).toInt() }
+    val currentPosition: LiveData<Int> = _currentPosition.map { (it / 1000).toInt() }
 
     private val _playing = MutableLiveData<Boolean>().apply { postValue(false) }
     val playing: LiveData<Boolean> = _playing
@@ -74,12 +74,12 @@ class MediaSessionConnection @Inject constructor(
 
     private val _queue = MutableLiveData<List<MediaItem>>().apply { postValue(ArrayList()) }
     private val _queueIds: LiveData<List<Int>> =
-        map(_queue) { it.map { item -> item.mediaId.toInt() } }
+        _queue.map { it.map { item -> item.mediaId.toInt() } }
     val queue: LiveData<List<Triple<Boolean, Track?, Album?>>> =
-        switchMap(_queueIds) { q ->
-            switchMap(queuePosition) { qPos ->
-                switchMap(trackRepository.findByIds(q)) { tracks ->
-                    map(albumRepository.findByIds(tracks.map { it.albumId })) { albums ->
+        _queueIds.switchMap { q ->
+            queuePosition.switchMap { qPos ->
+                trackRepository.findByIds(q).switchMap { tracks ->
+                    albumRepository.findByIds(tracks.map { it.albumId }).map { albums ->
                         q.mapIndexed { pos, id ->
                             val track = tracks.find { it.id == id }
                             val album = albums.find { it.id == track?.albumId }
@@ -91,11 +91,11 @@ class MediaSessionConnection @Inject constructor(
         }
 
     val _queuePosition: MutableLiveData<Int> = MutableLiveData<Int>().apply { postValue(0) }
-    val queueLength: LiveData<Int> = map(_queue) { it.size }
+    val queueLength: LiveData<Int> = _queue.map { it.size }
     val queuePosition: LiveData<Int> = _queuePosition
 
     val queuePosStr: LiveData<String> =
-        switchMap(_queue) { q -> map(queuePosition) { "$it/${q.size}" } }
+        _queue.switchMap { q -> queuePosition.map { "$it/${q.size}" } }
 
     fun setupController() {
         mediaController = mediaControllerFuture.get()

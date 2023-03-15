@@ -1,7 +1,7 @@
 package me.vanpetegem.accentor.data.codecconversions
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.Transformations.map
+import androidx.lifecycle.map
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Transaction
@@ -10,7 +10,7 @@ import java.time.Instant
 
 @Dao
 abstract class CodecConversionDao {
-    open fun getAll(): LiveData<List<CodecConversion>> = map(getAllDbCodecConversions()) { us ->
+    open fun getAll(): LiveData<List<CodecConversion>> = getAllDbCodecConversions().map { us ->
         us.map { CodecConversion.fromDb(it) }
     }
 

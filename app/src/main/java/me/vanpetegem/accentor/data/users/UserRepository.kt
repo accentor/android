@@ -2,8 +2,8 @@ package me.vanpetegem.accentor.data.users
 
 import android.util.SparseArray
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.Transformations.map
-import androidx.lifecycle.Transformations.switchMap
+import androidx.lifecycle.map
+import androidx.lifecycle.switchMap
 import java.time.Instant
 import javax.inject.Inject
 import me.vanpetegem.accentor.api.user.index
@@ -15,15 +15,15 @@ class UserRepository @Inject constructor(
     private val authenticationRepository: AuthenticationRepository
 ) {
     val allUsers: LiveData<List<User>> = userDao.getAll()
-    val allUsersById: LiveData<SparseArray<User>> = map(allUsers) {
+    val allUsersById: LiveData<SparseArray<User>> = allUsers.map {
         val map = SparseArray<User>()
         it.forEach { u -> map.put(u.id, u) }
         map
     }
 
-    val currentUser: LiveData<User?> = switchMap(authenticationRepository.authData) { authData ->
+    val currentUser: LiveData<User?> = authenticationRepository.authData.switchMap { authData ->
         authData ?: return@switchMap null
-        map(allUsersById) { it[authData.userId] }
+        allUsersById.map { it[authData.userId] }
     }
 
     suspend fun refresh(handler: suspend (Result<Unit>) -> Unit) {

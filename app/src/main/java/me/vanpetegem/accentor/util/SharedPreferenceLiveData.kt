@@ -28,7 +28,7 @@ abstract class SharedPreferenceLiveData<T>(
 }
 
 class SharedPreferenceIntLiveData(sharedPrefs: SharedPreferences, key: String, private val default: Int?) :
-    SharedPreferenceLiveData<Int>(sharedPrefs, key) {
+    SharedPreferenceLiveData<Int?>(sharedPrefs, key) {
     init {
         value = this.getValueFromPreferences(key)
     }
@@ -38,7 +38,7 @@ class SharedPreferenceIntLiveData(sharedPrefs: SharedPreferences, key: String, p
 }
 
 class SharedPreferenceStringLiveData(sharedPrefs: SharedPreferences, key: String, private val default: String?) :
-    SharedPreferenceLiveData<String>(sharedPrefs, key) {
+    SharedPreferenceLiveData<String?>(sharedPrefs, key) {
     init {
         value = this.getValueFromPreferences(key)
     }
@@ -48,7 +48,7 @@ class SharedPreferenceStringLiveData(sharedPrefs: SharedPreferences, key: String
 }
 
 class SharedPreferenceBooleanLiveData(sharedPrefs: SharedPreferences, key: String, private val default: Boolean?) :
-    SharedPreferenceLiveData<Boolean>(sharedPrefs, key) {
+    SharedPreferenceLiveData<Boolean?>(sharedPrefs, key) {
     init {
         value = this.getValueFromPreferences(key)
     }
@@ -58,7 +58,7 @@ class SharedPreferenceBooleanLiveData(sharedPrefs: SharedPreferences, key: Strin
 }
 
 class SharedPreferenceFloatLiveData(sharedPrefs: SharedPreferences, key: String, private val default: Float?) :
-    SharedPreferenceLiveData<Float>(sharedPrefs, key) {
+    SharedPreferenceLiveData<Float?>(sharedPrefs, key) {
     init {
         value = this.getValueFromPreferences(key)
     }
@@ -68,7 +68,7 @@ class SharedPreferenceFloatLiveData(sharedPrefs: SharedPreferences, key: String,
 }
 
 class SharedPreferenceLongLiveData(sharedPrefs: SharedPreferences, key: String, private val default: Long?) :
-    SharedPreferenceLiveData<Long>(sharedPrefs, key) {
+    SharedPreferenceLiveData<Long?>(sharedPrefs, key) {
     init {
         value = this.getValueFromPreferences(key)
     }
@@ -78,22 +78,22 @@ class SharedPreferenceLongLiveData(sharedPrefs: SharedPreferences, key: String, 
     }
 }
 
-fun SharedPreferences.intLiveData(key: String, default: Int? = null): SharedPreferenceLiveData<Int> {
+fun SharedPreferences.intLiveData(key: String, default: Int? = null): SharedPreferenceLiveData<Int?> {
     return SharedPreferenceIntLiveData(this, key, default)
 }
 
-fun SharedPreferences.stringLiveData(key: String, default: String? = null): SharedPreferenceLiveData<String> {
+fun SharedPreferences.stringLiveData(key: String, default: String? = null): SharedPreferenceLiveData<String?> {
     return SharedPreferenceStringLiveData(this, key, default)
 }
 
-fun SharedPreferences.booleanLiveData(key: String, default: Boolean? = null): SharedPreferenceLiveData<Boolean> {
+fun SharedPreferences.booleanLiveData(key: String, default: Boolean? = null): SharedPreferenceLiveData<Boolean?> {
     return SharedPreferenceBooleanLiveData(this, key, default)
 }
 
-fun SharedPreferences.floatLiveData(key: String, default: Float? = null): SharedPreferenceLiveData<Float> {
+fun SharedPreferences.floatLiveData(key: String, default: Float? = null): SharedPreferenceLiveData<Float?> {
     return SharedPreferenceFloatLiveData(this, key, default)
 }
 
-fun SharedPreferences.longLiveData(key: String, default: Long? = null): SharedPreferenceLiveData<Long> {
+fun SharedPreferences.longLiveData(key: String, default: Long? = null): SharedPreferenceLiveData<Long?> {
     return SharedPreferenceLongLiveData(this, key, default)
 }

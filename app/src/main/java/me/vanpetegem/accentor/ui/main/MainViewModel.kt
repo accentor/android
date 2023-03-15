@@ -4,7 +4,7 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations.map
+import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.time.Instant
@@ -40,7 +40,7 @@ class MainViewModel @Inject constructor(
     private val preferencesDataSource: PreferencesDataSource
 ) : AndroidViewModel(application) {
     private val refreshing = MutableLiveData<Int>(0)
-    val isRefreshing: LiveData<Boolean> = map(refreshing) { if (it != null) it > 0 else false }
+    val isRefreshing: LiveData<Boolean> = refreshing.map { if (it != null) it > 0 else false }
     private var errorSinceLastRefresh: Boolean = false
 
     private val _latestError = MutableLiveData<Event<String>?>(null)

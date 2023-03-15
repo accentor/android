@@ -2,7 +2,7 @@ package me.vanpetegem.accentor.data.playlists
 
 import android.util.SparseArray
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.Transformations.map
+import androidx.lifecycle.map
 import dagger.Reusable
 import java.time.Instant
 import javax.inject.Inject
@@ -16,7 +16,7 @@ class PlaylistRepository @Inject constructor(
     private val authenticationRepository: AuthenticationRepository
 ) {
     val allPlaylists: LiveData<List<Playlist>> = playlistDao.getAll()
-    val allPlaylistsById: LiveData<SparseArray<Playlist>> = map(allPlaylists) {
+    val allPlaylistsById: LiveData<SparseArray<Playlist>> = allPlaylists.map {
         val map = SparseArray<Playlist>()
         it.forEach { p -> map.put(p.id, p) }
         map

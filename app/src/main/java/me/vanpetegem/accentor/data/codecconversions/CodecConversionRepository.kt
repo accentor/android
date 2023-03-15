@@ -2,7 +2,7 @@ package me.vanpetegem.accentor.data.codecconversions
 
 import android.util.SparseArray
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.Transformations.map
+import androidx.lifecycle.map
 import java.time.Instant
 import javax.inject.Inject
 import me.vanpetegem.accentor.api.codecconversion.index
@@ -14,7 +14,7 @@ class CodecConversionRepository @Inject constructor(
     private val authenticationRepository: AuthenticationRepository
 ) {
     val allCodecConversions: LiveData<List<CodecConversion>> = codecConversionDao.getAll()
-    val allCodecConversionsById: LiveData<SparseArray<CodecConversion>> = map(allCodecConversions) {
+    val allCodecConversionsById: LiveData<SparseArray<CodecConversion>> = allCodecConversions.map {
         val map = SparseArray<CodecConversion>()
         it.forEach { u -> map.put(u.id, u) }
         map

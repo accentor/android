@@ -1,7 +1,7 @@
 package me.vanpetegem.accentor.data.users
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.Transformations.map
+import androidx.lifecycle.map
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Transaction
@@ -10,7 +10,7 @@ import java.time.Instant
 
 @Dao
 abstract class UserDao {
-    open fun getAll(): LiveData<List<User>> = map(getAllDbUsers()) { us ->
+    open fun getAll(): LiveData<List<User>> = getAllDbUsers().map { us ->
         us.map { User.fromDb(it) }
     }
 
