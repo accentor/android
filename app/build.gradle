@@ -35,14 +35,14 @@ android {
         }
     }
     compileOptions {
-        targetCompatibility "1.8"
-        sourceCompatibility "1.8"
+        targetCompatibility "17"
+        sourceCompatibility "17"
     }
     composeOptions {
         kotlinCompilerExtensionVersion "1.4.4"
     }
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "17"
         freeCompilerArgs += [
             "-opt-in=androidx.compose.material.ExperimentalMaterialApi",
             "-opt-in=androidx.compose.material3.ExperimentalMaterial3Api",

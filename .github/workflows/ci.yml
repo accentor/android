@@ -22,7 +22,7 @@ jobs:
     - uses: actions/setup-java@v3
       with:
         distribution: 'adopt'
-        java-version: 11
+        java-version: 17
     - name: Setup Android problem matchers
       uses: jonasb/android-problem-matchers-action@v1
     - name: Test
@@ -40,7 +40,7 @@ jobs:
     - uses: actions/setup-java@v3
       with:
         distribution: 'adopt'
-        java-version: 11
+        java-version: 17
     - name: Setup Android problem matchers
       uses: jonasb/android-problem-matchers-action@v1
     - name: Lint
@@ -57,7 +57,7 @@ jobs:
           ${{ runner.os }}-gradle-
     - uses: actions/setup-java@v3
       with:
-        java-version: 11
+        java-version: 17
         distribution: 'adopt'
     - name: Setup Android problem matchers
       uses: jonasb/android-problem-matchers-action@v1
