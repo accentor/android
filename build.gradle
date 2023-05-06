@@ -8,7 +8,7 @@ buildscript {
         glide_version = '4.12.0'
         hilt_version = '2.45'
         kotlin_version = '1.8.10'
-        kotlinx_version = '1.6.4'
+        kotlinx_version = '1.7.0'
         lifecycle_version = '2.6.1'
         media3_version = '1.0.1'
         room_version = '2.5.1'
