@@ -14,7 +14,7 @@
     <string name="home">Home</string>
     <string name="open_menu">Open menu</string>
     <string name="open_drawer">Open drawer</string>
-    <string name="close_drawer">Close drawer</string>
+    <string name="close_app_drawer">Close drawer</string>
     <string name="navigation_icon">Navigation icon</string>
     <string name="artist_image">Image showing artist</string>
     <string name="album_image">Image showing album</string>

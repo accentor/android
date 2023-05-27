@@ -261,7 +261,7 @@ fun BaseToolbar(
         navigationIcon = {
             if (drawerState.isOpen) {
                 IconButton(onClick = { scope.launch { drawerState.close() } }) {
-                    Icon(Icons.Filled.Menu, contentDescription = stringResource(R.string.close_drawer))
+                    Icon(Icons.Filled.Menu, contentDescription = stringResource(R.string.close_app_drawer))
                 }
             } else {
                 IconButton(onClick = { scope.launch { drawerState.open() } }) {
@@ -324,8 +324,10 @@ fun SearchToolbar(value: String, update: (String) -> Unit, exit: () -> Unit) {
                         color = MaterialTheme.colorScheme.contentColorFor(MaterialTheme.colorScheme.primaryContainer).copy(ContentAlpha.medium)
                     )
                 },
-                colors = TextFieldDefaults.textFieldColors(
-                    containerColor = Color.Transparent,
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = Color.Transparent,
+                    unfocusedContainerColor = Color.Transparent,
+                    disabledContainerColor = Color.Transparent,
                     cursorColor = LocalContentColor.current.copy(LocalContentAlpha.current),
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent
