@@ -11,7 +11,7 @@ buildscript {
         kotlinx_version = '1.7.1'
         lifecycle_version = '2.6.1'
         media3_version = '1.0.2'
-        room_version = '2.5.1'
+        room_version = '2.5.2'
     }
     repositories {
         google()
