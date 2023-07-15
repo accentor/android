@@ -21,7 +21,7 @@ jobs:
           ${{ runner.os }}-gradle-
     - uses: actions/setup-java@v3
       with:
-        distribution: 'adopt'
+        distribution: 'temurin'
         java-version: '17'
     - name: Setup Android problem matchers
       uses: jonasb/android-problem-matchers-action@v1
@@ -39,7 +39,7 @@ jobs:
           ${{ runner.os }}-gradle-
     - uses: actions/setup-java@v3
       with:
-        distribution: 'adopt'
+        distribution: 'temurin'
         java-version: '17'
     - name: Setup Android problem matchers
       uses: jonasb/android-problem-matchers-action@v1
@@ -57,7 +57,7 @@ jobs:
           ${{ runner.os }}-gradle-
     - uses: actions/setup-java@v3
       with:
-        distribution: 'adopt'
+        distribution: 'temurin'
         java-version: '17'
     - name: Setup Android problem matchers
       uses: jonasb/android-problem-matchers-action@v1
