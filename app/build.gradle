@@ -39,7 +39,7 @@ android {
         sourceCompatibility "17"
     }
     composeOptions {
-        kotlinCompilerExtensionVersion "1.4.7"
+        kotlinCompilerExtensionVersion "1.4.8"
     }
     kotlinOptions {
         jvmTarget = "17"
