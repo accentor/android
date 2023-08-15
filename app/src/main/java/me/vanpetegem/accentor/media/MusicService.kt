@@ -71,7 +71,7 @@ class MusicService : MediaSessionService() {
     }
     private val cache: SimpleCache by lazy {
         SimpleCache(
-            File(this@MusicService.application.cacheDir, "audio"),
+            File(this@MusicService.application.dataDir, "audio"),
             LeastRecentlyUsedCacheEvictor(preferencesDataSource.musicCacheSize.value!!),
             StandaloneDatabaseProvider(this@MusicService.application)
         )
