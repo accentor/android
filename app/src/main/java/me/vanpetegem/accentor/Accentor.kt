@@ -37,7 +37,10 @@ class Accentor : Application(), ImageLoaderFactory {
     override fun newImageLoader(): ImageLoader =
         ImageLoader.Builder(applicationContext)
             .diskCache {
-                DiskCache.Builder().directory(File(cacheDir, "coil_image_cache")).build()
+                DiskCache.Builder()
+                    .directory(File(dataDir, "coil_image_cache"))
+                    .maxSizeBytes(preferences.imageCacheSize.value!!)
+                    .build()
             }
             .components {
                 if (Build.VERSION.SDK_INT >= 28) {
