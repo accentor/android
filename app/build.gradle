@@ -9,8 +9,8 @@ plugins {
 
 android {
     namespace 'me.vanpetegem.accentor'
-    compileSdkVersion 33
-    buildToolsVersion "33.0.1"
+    compileSdkVersion 34
+    buildToolsVersion "34.0.0"
     defaultConfig {
         applicationId "me.vanpetegem.accentor"
         minSdkVersion 26
@@ -38,7 +38,7 @@ android {
         sourceCompatibility "17"
     }
     composeOptions {
-        kotlinCompilerExtensionVersion "1.4.8"
+        kotlinCompilerExtensionVersion "1.5.1"
     }
     kotlinOptions {
         jvmTarget = "17"
@@ -86,7 +86,7 @@ dependencies {
     implementation 'androidx.core:core-ktx:1.10.1'
 
     // AndroidX navigation
-    implementation "androidx.navigation:navigation-compose:2.6.0"
+    implementation "androidx.navigation:navigation-compose:2.7.0"
 
     // AndroidX Room
     implementation "androidx.room:room-runtime:$room_version"
