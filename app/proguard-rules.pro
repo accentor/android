@@ -13,6 +13,7 @@
 #}
 
 -keep class me.vanpetegem.accentor.data.** { <fields>; }
+-keep class me.vanpetegem.accentor.api.** { <fields>; }
 
 -keep class * extends com.google.gson.TypeAdapter
 -keep class * implements com.google.gson.TypeAdapterFactory
