@@ -79,11 +79,11 @@ internal object DatabaseModule {
             "accentor_database"
         )
             .addMigrations(object : Migration(2, 3) {
-                override fun migrate(database: SupportSQLiteDatabase) {
-                    database.beginTransaction()
+                override fun migrate(db: SupportSQLiteDatabase) {
+                    db.beginTransaction()
                     try {
-                        database.execSQL("ALTER TABLE `album_artists` RENAME TO `album_artists_old`")
-                        database.execSQL(
+                        db.execSQL("ALTER TABLE `album_artists` RENAME TO `album_artists_old`")
+                        db.execSQL(
                             """
                             CREATE TABLE `album_artists` (
                                 `album_id` INTEGER NOT NULL,
@@ -94,41 +94,41 @@ internal object DatabaseModule {
                                 PRIMARY KEY(`album_id`, `artist_id`, `name`))
                             """
                         )
-                        database.execSQL(
+                        db.execSQL(
                             """
                             INSERT INTO `album_artists` (`album_id`, `artist_id`, `name`, `order`, `separator`)
                                 SELECT `album_id`, `artist_id`, `name`, `order`, `join` AS `separator` FROM `album_artists_old`
                             """
                         )
-                        database.execSQL("DROP TABLE `album_artists_old`")
-                        database.setTransactionSuccessful()
+                        db.execSQL("DROP TABLE `album_artists_old`")
+                        db.setTransactionSuccessful()
                     } finally {
-                        database.endTransaction()
+                        db.endTransaction()
                     }
                 }
             })
             .addMigrations(object : Migration(3, 4) {
-                override fun migrate(database: SupportSQLiteDatabase) {
-                    database.beginTransaction()
+                override fun migrate(db: SupportSQLiteDatabase) {
+                    db.beginTransaction()
                     try {
-                        database.execSQL("ALTER TABLE `albums` ADD COLUMN `image_500` TEXT")
-                        database.execSQL("ALTER TABLE `albums` ADD COLUMN `image_250` TEXT")
-                        database.execSQL("ALTER TABLE `albums` ADD COLUMN `image_100` TEXT")
-                        database.execSQL("ALTER TABLE `artists` ADD COLUMN `image_500` TEXT")
-                        database.execSQL("ALTER TABLE `artists` ADD COLUMN `image_250` TEXT")
-                        database.execSQL("ALTER TABLE `artists` ADD COLUMN `image_100` TEXT")
-                        database.setTransactionSuccessful()
+                        db.execSQL("ALTER TABLE `albums` ADD COLUMN `image_500` TEXT")
+                        db.execSQL("ALTER TABLE `albums` ADD COLUMN `image_250` TEXT")
+                        db.execSQL("ALTER TABLE `albums` ADD COLUMN `image_100` TEXT")
+                        db.execSQL("ALTER TABLE `artists` ADD COLUMN `image_500` TEXT")
+                        db.execSQL("ALTER TABLE `artists` ADD COLUMN `image_250` TEXT")
+                        db.execSQL("ALTER TABLE `artists` ADD COLUMN `image_100` TEXT")
+                        db.setTransactionSuccessful()
                     } finally {
-                        database.endTransaction()
+                        db.endTransaction()
                     }
                 }
             })
             .addMigrations(object : Migration(4, 5) {
-                override fun migrate(database: SupportSQLiteDatabase) {
-                    database.beginTransaction()
+                override fun migrate(db: SupportSQLiteDatabase) {
+                    db.beginTransaction()
                     try {
-                        database.execSQL("ALTER TABLE `album_labels` RENAME TO `album_labels_old`")
-                        database.execSQL(
+                        db.execSQL("ALTER TABLE `album_labels` RENAME TO `album_labels_old`")
+                        db.execSQL(
                             """
                             CREATE TABLE `album_labels` (
                                 `album_id` INTEGER NOT NULL,
@@ -138,49 +138,49 @@ internal object DatabaseModule {
                             )
                             """
                         )
-                        database.execSQL(
+                        db.execSQL(
                             """
                             INSERT INTO `album_labels` (`album_id`, `label_id`, `catalogue_number`)
                                 SELECT `album_id`, `label_id`, `catalogue_number` FROM `album_labels_old`
                             """
                         )
-                        database.execSQL("DROP TABLE `album_labels_old`")
-                        database.setTransactionSuccessful()
+                        db.execSQL("DROP TABLE `album_labels_old`")
+                        db.setTransactionSuccessful()
                     } finally {
-                        database.endTransaction()
+                        db.endTransaction()
                     }
                 }
             })
             .addMigrations(object : Migration(5, 6) {
-                override fun migrate(database: SupportSQLiteDatabase) {
-                    database.beginTransaction()
+                override fun migrate(db: SupportSQLiteDatabase) {
+                    db.beginTransaction()
                     try {
                         // The UPDATE statements aren't correct;
                         // they don't strip diacritics. However,
                         // the correct data will be loaded from the
                         // server at some point, so it's not that
                         // bad.
-                        database.execSQL("ALTER TABLE `albums` ADD COLUMN `normalized_title` TEXT NOT NULL DEFAULT ''")
-                        database.execSQL("UPDATE `albums` SET `normalized_title` = LOWER(`title`)")
-                        database.execSQL("ALTER TABLE `artists` ADD COLUMN `normalized_name` TEXT NOT NULL DEFAULT ''")
-                        database.execSQL("UPDATE `artists` SET `normalized_name` = LOWER(`name`)")
-                        database.execSQL("ALTER TABLE `tracks` ADD COLUMN `normalized_title` TEXT NOT NULL DEFAULT ''")
-                        database.execSQL("UPDATE `tracks` SET `normalized_title` = LOWER(`title`)")
-                        database.execSQL("ALTER TABLE `album_artists` ADD COLUMN `normalized_name` TEXT NOT NULL DEFAULT ''")
-                        database.execSQL("UPDATE `album_artists` SET `normalized_name` = LOWER(`name`)")
-                        database.execSQL("ALTER TABLE `track_artists` ADD COLUMN `normalized_name` TEXT NOT NULL DEFAULT ''")
-                        database.execSQL("UPDATE `track_artists` SET `normalized_name` = LOWER(`name`)")
-                        database.setTransactionSuccessful()
+                        db.execSQL("ALTER TABLE `albums` ADD COLUMN `normalized_title` TEXT NOT NULL DEFAULT ''")
+                        db.execSQL("UPDATE `albums` SET `normalized_title` = LOWER(`title`)")
+                        db.execSQL("ALTER TABLE `artists` ADD COLUMN `normalized_name` TEXT NOT NULL DEFAULT ''")
+                        db.execSQL("UPDATE `artists` SET `normalized_name` = LOWER(`name`)")
+                        db.execSQL("ALTER TABLE `tracks` ADD COLUMN `normalized_title` TEXT NOT NULL DEFAULT ''")
+                        db.execSQL("UPDATE `tracks` SET `normalized_title` = LOWER(`title`)")
+                        db.execSQL("ALTER TABLE `album_artists` ADD COLUMN `normalized_name` TEXT NOT NULL DEFAULT ''")
+                        db.execSQL("UPDATE `album_artists` SET `normalized_name` = LOWER(`name`)")
+                        db.execSQL("ALTER TABLE `track_artists` ADD COLUMN `normalized_name` TEXT NOT NULL DEFAULT ''")
+                        db.execSQL("UPDATE `track_artists` SET `normalized_name` = LOWER(`name`)")
+                        db.setTransactionSuccessful()
                     } finally {
-                        database.endTransaction()
+                        db.endTransaction()
                     }
                 }
             })
             .addMigrations(object : Migration(6, 7) {
-                override fun migrate(database: SupportSQLiteDatabase) {
-                    database.beginTransaction()
+                override fun migrate(db: SupportSQLiteDatabase) {
+                    db.beginTransaction()
                     try {
-                        database.execSQL(
+                        db.execSQL(
                             """
                             CREATE TABLE IF NOT EXISTS `codec_conversions` (
                                 `id` INTEGER NOT NULL,
@@ -191,17 +191,17 @@ internal object DatabaseModule {
                             )
                             """
                         )
-                        database.setTransactionSuccessful()
+                        db.setTransactionSuccessful()
                     } finally {
-                        database.endTransaction()
+                        db.endTransaction()
                     }
                 }
             })
             .addMigrations(object : Migration(7, 8) {
-                override fun migrate(database: SupportSQLiteDatabase) {
-                    database.beginTransaction()
+                override fun migrate(db: SupportSQLiteDatabase) {
+                    db.beginTransaction()
                     try {
-                        database.execSQL(
+                        db.execSQL(
                             """
                             CREATE TABLE IF NOT EXISTS `unreported_plays` (
                                 `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -210,17 +210,17 @@ internal object DatabaseModule {
                             )
                             """
                         )
-                        database.setTransactionSuccessful()
+                        db.setTransactionSuccessful()
                     } finally {
-                        database.endTransaction()
+                        db.endTransaction()
                     }
                 }
             })
             .addMigrations(object : Migration(8, 9) {
-                override fun migrate(database: SupportSQLiteDatabase) {
-                    database.beginTransaction()
+                override fun migrate(db: SupportSQLiteDatabase) {
+                    db.beginTransaction()
                     try {
-                        database.execSQL(
+                        db.execSQL(
                             """
                             CREATE TABLE IF NOT EXISTS `plays` (
                                 `id` INTEGER NOT NULL,
@@ -231,45 +231,45 @@ internal object DatabaseModule {
                             )
                             """
                         )
-                        database.setTransactionSuccessful()
+                        db.setTransactionSuccessful()
                     } finally {
-                        database.endTransaction()
+                        db.endTransaction()
                     }
                 }
             })
             .addMigrations(object : Migration(9, 10) {
-                override fun migrate(database: SupportSQLiteDatabase) {
-                    database.beginTransaction()
+                override fun migrate(db: SupportSQLiteDatabase) {
+                    db.beginTransaction()
                     try {
                         val now = Instant.now()
-                        database.execSQL("ALTER TABLE `albums` ADD COLUMN `fetched_at` TEXT NOT NULL DEFAULT '$now'")
-                        database.execSQL("ALTER TABLE `artists` ADD COLUMN `fetched_at` TEXT NOT NULL DEFAULT '$now'")
-                        database.execSQL("ALTER TABLE `codec_conversions` ADD COLUMN `fetched_at` TEXT NOT NULL DEFAULT '$now'")
-                        database.execSQL("ALTER TABLE `plays` ADD COLUMN `fetched_at` TEXT NOT NULL DEFAULT '$now'")
-                        database.execSQL("ALTER TABLE `tracks` ADD COLUMN `fetched_at` TEXT NOT NULL DEFAULT '$now'")
-                        database.execSQL("ALTER TABLE `users` ADD COLUMN `fetched_at` TEXT NOT NULL DEFAULT '$now'")
-                        database.setTransactionSuccessful()
+                        db.execSQL("ALTER TABLE `albums` ADD COLUMN `fetched_at` TEXT NOT NULL DEFAULT '$now'")
+                        db.execSQL("ALTER TABLE `artists` ADD COLUMN `fetched_at` TEXT NOT NULL DEFAULT '$now'")
+                        db.execSQL("ALTER TABLE `codec_conversions` ADD COLUMN `fetched_at` TEXT NOT NULL DEFAULT '$now'")
+                        db.execSQL("ALTER TABLE `plays` ADD COLUMN `fetched_at` TEXT NOT NULL DEFAULT '$now'")
+                        db.execSQL("ALTER TABLE `tracks` ADD COLUMN `fetched_at` TEXT NOT NULL DEFAULT '$now'")
+                        db.execSQL("ALTER TABLE `users` ADD COLUMN `fetched_at` TEXT NOT NULL DEFAULT '$now'")
+                        db.setTransactionSuccessful()
                     } finally {
-                        database.endTransaction()
+                        db.endTransaction()
                     }
                 }
             })
             .addMigrations(object : Migration(10, 11) {
-                override fun migrate(database: SupportSQLiteDatabase) {
-                    database.beginTransaction()
+                override fun migrate(db: SupportSQLiteDatabase) {
+                    db.beginTransaction()
                     try {
-                        database.execSQL("ALTER TABLE `track_artists` ADD COLUMN `hidden` INTEGER NOT NULL DEFAULT 0")
-                        database.setTransactionSuccessful()
+                        db.execSQL("ALTER TABLE `track_artists` ADD COLUMN `hidden` INTEGER NOT NULL DEFAULT 0")
+                        db.setTransactionSuccessful()
                     } finally {
-                        database.endTransaction()
+                        db.endTransaction()
                     }
                 }
             })
             .addMigrations(object : Migration(11, 12) {
-                override fun migrate(database: SupportSQLiteDatabase) {
-                    database.beginTransaction()
+                override fun migrate(db: SupportSQLiteDatabase) {
+                    db.beginTransaction()
                     try {
-                        database.execSQL(
+                        db.execSQL(
                             """
                             CREATE TABLE IF NOT EXISTS `playlists` (
                                 `id` INTEGER NOT NULL,
@@ -285,7 +285,7 @@ internal object DatabaseModule {
                             )
                             """
                         )
-                        database.execSQL(
+                        db.execSQL(
                             """
                             CREATE TABLE IF NOT EXISTS `playlist_items` (
                                 `playlist_id` INTEGER NOT NULL,
@@ -295,9 +295,9 @@ internal object DatabaseModule {
                             )
                             """
                         )
-                        database.setTransactionSuccessful()
+                        db.setTransactionSuccessful()
                     } finally {
-                        database.endTransaction()
+                        db.endTransaction()
                     }
                 }
             })
