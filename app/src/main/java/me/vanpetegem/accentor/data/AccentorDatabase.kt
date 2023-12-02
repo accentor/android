@@ -95,20 +95,20 @@ internal object DatabaseModule {
                             db.execSQL("ALTER TABLE `album_artists` RENAME TO `album_artists_old`")
                             db.execSQL(
                                 """
-                            CREATE TABLE `album_artists` (
-                                `album_id` INTEGER NOT NULL,
-                                `artist_id` INTEGER NOT NULL,
-                                `name` TEXT NOT NULL,
-                                `order` INTEGER NOT NULL, `
-                                separator` TEXT,
-                                PRIMARY KEY(`album_id`, `artist_id`, `name`))
-                            """,
+                                CREATE TABLE `album_artists` (
+                                    `album_id` INTEGER NOT NULL,
+                                    `artist_id` INTEGER NOT NULL,
+                                    `name` TEXT NOT NULL,
+                                    `order` INTEGER NOT NULL, `
+                                    separator` TEXT,
+                                    PRIMARY KEY(`album_id`, `artist_id`, `name`))
+                                """,
                             )
                             db.execSQL(
                                 """
-                            INSERT INTO `album_artists` (`album_id`, `artist_id`, `name`, `order`, `separator`)
-                                SELECT `album_id`, `artist_id`, `name`, `order`, `join` AS `separator` FROM `album_artists_old`
-                            """,
+                                INSERT INTO `album_artists` (`album_id`, `artist_id`, `name`, `order`, `separator`)
+                                    SELECT `album_id`, `artist_id`, `name`, `order`, `join` AS `separator` FROM `album_artists_old`
+                                """,
                             )
                             db.execSQL("DROP TABLE `album_artists_old`")
                             db.setTransactionSuccessful()
@@ -144,19 +144,19 @@ internal object DatabaseModule {
                             db.execSQL("ALTER TABLE `album_labels` RENAME TO `album_labels_old`")
                             db.execSQL(
                                 """
-                            CREATE TABLE `album_labels` (
-                                `album_id` INTEGER NOT NULL,
-                                `label_id` INTEGER NOT NULL,
-                                `catalogue_number` TEXT,
-                                PRIMARY KEY(`album_id`, `label_id`)
-                            )
-                            """,
+                                CREATE TABLE `album_labels` (
+                                    `album_id` INTEGER NOT NULL,
+                                    `label_id` INTEGER NOT NULL,
+                                    `catalogue_number` TEXT,
+                                    PRIMARY KEY(`album_id`, `label_id`)
+                                )
+                                """,
                             )
                             db.execSQL(
                                 """
-                            INSERT INTO `album_labels` (`album_id`, `label_id`, `catalogue_number`)
-                                SELECT `album_id`, `label_id`, `catalogue_number` FROM `album_labels_old`
-                            """,
+                                INSERT INTO `album_labels` (`album_id`, `label_id`, `catalogue_number`)
+                                    SELECT `album_id`, `label_id`, `catalogue_number` FROM `album_labels_old`
+                                """,
                             )
                             db.execSQL("DROP TABLE `album_labels_old`")
                             db.setTransactionSuccessful()
@@ -200,14 +200,14 @@ internal object DatabaseModule {
                         try {
                             db.execSQL(
                                 """
-                            CREATE TABLE IF NOT EXISTS `codec_conversions` (
-                                `id` INTEGER NOT NULL,
-                                `name` TEXT NOT NULL,
-                                `ffmpeg_params` TEXT NOT NULL,
-                                `resulting_codec_id` INTEGER NOT NULL,
-                                PRIMARY KEY(`id`)
-                            )
-                            """,
+                                CREATE TABLE IF NOT EXISTS `codec_conversions` (
+                                    `id` INTEGER NOT NULL,
+                                    `name` TEXT NOT NULL,
+                                    `ffmpeg_params` TEXT NOT NULL,
+                                    `resulting_codec_id` INTEGER NOT NULL,
+                                    PRIMARY KEY(`id`)
+                                )
+                                """,
                             )
                             db.setTransactionSuccessful()
                         } finally {
@@ -223,12 +223,12 @@ internal object DatabaseModule {
                         try {
                             db.execSQL(
                                 """
-                            CREATE TABLE IF NOT EXISTS `unreported_plays` (
-                                `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-                                `track_id` INTEGER NOT NULL,
-                                `played_at` TEXT NOT NULL
-                            )
-                            """,
+                                CREATE TABLE IF NOT EXISTS `unreported_plays` (
+                                    `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                                    `track_id` INTEGER NOT NULL,
+                                    `played_at` TEXT NOT NULL
+                                )
+                                """,
                             )
                             db.setTransactionSuccessful()
                         } finally {
@@ -244,14 +244,14 @@ internal object DatabaseModule {
                         try {
                             db.execSQL(
                                 """
-                            CREATE TABLE IF NOT EXISTS `plays` (
-                                `id` INTEGER NOT NULL,
-                                `played_at` TEXT NOT NULL,
-                                `track_id` INTEGER NOT NULL,
-                                `user_id` INTEGER NOT NULL,
-                                PRIMARY KEY(`id`)
-                            )
-                            """,
+                                CREATE TABLE IF NOT EXISTS `plays` (
+                                    `id` INTEGER NOT NULL,
+                                    `played_at` TEXT NOT NULL,
+                                    `track_id` INTEGER NOT NULL,
+                                    `user_id` INTEGER NOT NULL,
+                                    PRIMARY KEY(`id`)
+                                )
+                                """,
                             )
                             db.setTransactionSuccessful()
                         } finally {
@@ -299,29 +299,29 @@ internal object DatabaseModule {
                         try {
                             db.execSQL(
                                 """
-                            CREATE TABLE IF NOT EXISTS `playlists` (
-                                `id` INTEGER NOT NULL,
-                                `name` TEXT NOT NULL,
-                                `description` TEXT,
-                                `user_id` INTEGER NOT NULL,
-                                `playlist_type` INTEGER NOT NULL,
-                                `created_at` TEXT NOT NULL,
-                                `updated_at` TEXT NOT NULL,
-                                `access` INTEGER NOT NULL,
-                                `fetched_at` TEXT NOT NULL,
-                                PRIMARY KEY(`id`)
-                            )
-                            """,
+                                CREATE TABLE IF NOT EXISTS `playlists` (
+                                    `id` INTEGER NOT NULL,
+                                    `name` TEXT NOT NULL,
+                                    `description` TEXT,
+                                    `user_id` INTEGER NOT NULL,
+                                    `playlist_type` INTEGER NOT NULL,
+                                    `created_at` TEXT NOT NULL,
+                                    `updated_at` TEXT NOT NULL,
+                                    `access` INTEGER NOT NULL,
+                                    `fetched_at` TEXT NOT NULL,
+                                    PRIMARY KEY(`id`)
+                                )
+                                """,
                             )
                             db.execSQL(
                                 """
-                            CREATE TABLE IF NOT EXISTS `playlist_items` (
-                                `playlist_id` INTEGER NOT NULL,
-                                `item_id` INTEGER NOT NULL,
-                                `order` INTEGER NOT NULL,
-                                PRIMARY KEY(`playlist_id`, `item_id`)
-                            )
-                            """,
+                                CREATE TABLE IF NOT EXISTS `playlist_items` (
+                                    `playlist_id` INTEGER NOT NULL,
+                                    `item_id` INTEGER NOT NULL,
+                                    `order` INTEGER NOT NULL,
+                                    PRIMARY KEY(`playlist_id`, `item_id`)
+                                )
+                                """,
                             )
                             db.setTransactionSuccessful()
                         } finally {
