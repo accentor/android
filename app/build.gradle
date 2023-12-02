@@ -119,7 +119,7 @@ dependencies {
     implementation("io.coil-kt:coil-gif:$coil_version")
 
     // AndroidX media3
-    implementation "androidx.media:media:1.6.0" // For notification mediastyle
+    implementation "androidx.media:media:1.7.0" // For notification mediastyle
     implementation "androidx.media3:media3-common:$media3_version"
     implementation "androidx.media3:media3-database:$media3_version"
     implementation "androidx.media3:media3-datasource:$media3_version"
