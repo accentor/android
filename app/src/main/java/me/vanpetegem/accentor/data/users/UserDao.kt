@@ -10,9 +10,10 @@ import java.time.Instant
 
 @Dao
 abstract class UserDao {
-    open fun getAll(): LiveData<List<User>> = getAllDbUsers().map { us ->
-        us.map { User.fromDb(it) }
-    }
+    open fun getAll(): LiveData<List<User>> =
+        getAllDbUsers().map { us ->
+            us.map { User.fromDb(it) }
+        }
 
     @Transaction
     open fun upsertAll(users: List<User>) {

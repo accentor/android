@@ -25,7 +25,7 @@ data class DbPlaylist(
     @ColumnInfo(name = "access")
     val access: Access,
     @ColumnInfo(name = "fetched_at")
-    val fetchedAt: Instant
+    val fetchedAt: Instant,
 )
 
 @Entity(tableName = "playlist_items", primaryKeys = ["playlist_id", "item_id"])
@@ -35,5 +35,5 @@ data class DbPlaylistItem(
     @ColumnInfo(name = "item_id")
     val itemId: Int,
     @ColumnInfo(name = "order")
-    val order: Int
+    val order: Int,
 )

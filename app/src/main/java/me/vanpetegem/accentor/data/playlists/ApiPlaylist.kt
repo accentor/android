@@ -11,5 +11,5 @@ data class ApiPlaylist(
     val createdAt: Instant,
     val updatedAt: Instant,
     val itemIds: List<Int>,
-    val access: Access
+    val access: Access,
 )

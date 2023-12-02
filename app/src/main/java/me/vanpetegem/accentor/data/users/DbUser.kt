@@ -15,5 +15,5 @@ data class DbUser(
     @ColumnInfo(name = "permission")
     val permission: Permission,
     @ColumnInfo(name = "fetched_at")
-    val fetchedAt: Instant
+    val fetchedAt: Instant,
 )

@@ -11,9 +11,9 @@ import coil.disk.DiskCache
 import com.github.kittinunf.fuel.core.FuelManager
 import com.google.android.material.color.DynamicColors
 import dagger.hilt.android.HiltAndroidApp
+import me.vanpetegem.accentor.data.preferences.PreferencesDataSource
 import java.io.File
 import javax.inject.Inject
-import me.vanpetegem.accentor.data.preferences.PreferencesDataSource
 
 @HiltAndroidApp
 class Accentor : Application(), ImageLoaderFactory {
@@ -21,14 +21,15 @@ class Accentor : Application(), ImageLoaderFactory {
 
     override fun onCreate() {
         super.onCreate()
-        version = if (Build.VERSION.SDK_INT >= 33) {
-            applicationContext.packageManager.getPackageInfo(
-                packageName,
-                PackageManager.PackageInfoFlags.of(0)
-            ).versionName
-        } else {
-            applicationContext.packageManager.getPackageInfo(packageName, 0).versionName
-        }
+        version =
+            if (Build.VERSION.SDK_INT >= 33) {
+                applicationContext.packageManager.getPackageInfo(
+                    packageName,
+                    PackageManager.PackageInfoFlags.of(0),
+                ).versionName
+            } else {
+                applicationContext.packageManager.getPackageInfo(packageName, 0).versionName
+            }
         userAgent = "Accentor/$version"
         FuelManager.instance.baseHeaders = mapOf("User-Agent" to userAgent)
         DynamicColors.applyToActivitiesIfAvailable(this)

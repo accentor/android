@@ -1,4 +1,14 @@
-[*.{kt,kts}]
-indent_size=4
-insert_final_newline=true
-max_line_length=160
+root = true
+
+[*]
+end_of_line = lf
+charset = utf-8
+insert_final_newline = true
+indent_size = 4
+indent_style = space
+trim_trailing_whitespace = true
+max_line_length = 160
+
+[*.kt]
+ktlint_standard_function-naming = disabled
+ktlint_standard_property-naming = disabled

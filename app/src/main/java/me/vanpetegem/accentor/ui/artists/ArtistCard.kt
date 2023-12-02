@@ -20,9 +20,12 @@ import me.vanpetegem.accentor.R
 import me.vanpetegem.accentor.data.artists.Artist
 
 @Composable
-public fun ArtistCard(navController: NavController, artist: Artist) {
+public fun ArtistCard(
+    navController: NavController,
+    artist: Artist,
+) {
     Card(
-        modifier = Modifier.padding(8.dp).clickable { navController.navigate("artists/${artist.id}") }
+        modifier = Modifier.padding(8.dp).clickable { navController.navigate("artists/${artist.id}") },
     ) {
         Column {
             AsyncImage(
@@ -31,13 +34,13 @@ public fun ArtistCard(navController: NavController, artist: Artist) {
                 placeholder = painterResource(R.drawable.ic_artist),
                 contentDescription = stringResource(R.string.artist_image),
                 modifier = Modifier.fillMaxWidth().aspectRatio(1f),
-                contentScale = ContentScale.Crop
+                contentScale = ContentScale.Crop,
             )
             Text(
                 artist.name,
                 maxLines = 1,
                 modifier = Modifier.padding(4.dp),
-                style = MaterialTheme.typography.titleMedium
+                style = MaterialTheme.typography.titleMedium,
             )
         }
     }

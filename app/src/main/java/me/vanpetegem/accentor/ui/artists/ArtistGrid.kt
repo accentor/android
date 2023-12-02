@@ -18,7 +18,10 @@ import me.vanpetegem.accentor.ui.main.SearchToolbar
 import me.vanpetegem.accentor.ui.util.FastScrollableGrid
 
 @Composable
-fun ArtistGrid(navController: NavController, artistsViewModel: ArtistsViewModel = hiltViewModel()) {
+fun ArtistGrid(
+    navController: NavController,
+    artistsViewModel: ArtistsViewModel = hiltViewModel(),
+) {
     val artists by artistsViewModel.filteredArtists.observeAsState()
     if (artists != null) {
         FastScrollableGrid(artists!!, { it.firstCharacter().uppercase() }) { artist -> ArtistCard(navController, artist) }
@@ -26,7 +29,11 @@ fun ArtistGrid(navController: NavController, artistsViewModel: ArtistsViewModel 
 }
 
 @Composable
-fun ArtistToolbar(drawerState: DrawerState, mainViewModel: MainViewModel, artistsViewModel: ArtistsViewModel = hiltViewModel()) {
+fun ArtistToolbar(
+    drawerState: DrawerState,
+    mainViewModel: MainViewModel,
+    artistsViewModel: ArtistsViewModel = hiltViewModel(),
+) {
     val searching by artistsViewModel.searching.observeAsState()
     if (searching ?: false) {
         val query by artistsViewModel.query.observeAsState()
@@ -42,7 +49,7 @@ fun ArtistToolbar(drawerState: DrawerState, mainViewModel: MainViewModel, artist
                 IconButton(onClick = { artistsViewModel.setSearching(true) }) {
                     Icon(Icons.Filled.Search, contentDescription = stringResource(R.string.search))
                 }
-            }
+            },
         )
     }
 }

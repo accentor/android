@@ -7,7 +7,10 @@ import me.vanpetegem.accentor.data.tracks.ApiTrack
 import me.vanpetegem.accentor.util.Result
 import me.vanpetegem.accentor.util.responseObject
 
-fun index(server: String, authenticationData: AuthenticationData): Sequence<Result<List<ApiTrack>>> {
+fun index(
+    server: String,
+    authenticationData: AuthenticationData,
+): Sequence<Result<List<ApiTrack>>> {
     var page = 1
 
     fun doFetch(): Result<List<ApiTrack>>? {
@@ -26,7 +29,7 @@ fun index(server: String, authenticationData: AuthenticationData): Sequence<Resu
                             Result.Success(a)
                         }
                     },
-                    { e: Throwable -> Result.Error(Exception("Error getting tracks", e)) }
+                    { e: Throwable -> Result.Error(Exception("Error getting tracks", e)) },
                 )
         }
     }

@@ -35,7 +35,11 @@ import me.vanpetegem.accentor.ui.main.SearchToolbar
 import me.vanpetegem.accentor.ui.player.PlayerViewModel
 
 @Composable
-fun PlaylistList(navController: NavController, playerViewModel: PlayerViewModel, playlistsViewModel: PlaylistsViewModel = hiltViewModel()) {
+fun PlaylistList(
+    navController: NavController,
+    playerViewModel: PlayerViewModel,
+    playlistsViewModel: PlaylistsViewModel = hiltViewModel(),
+) {
     val playlists by playlistsViewModel.filteredPlaylists.observeAsState()
     val users by playlistsViewModel.allUsersById.observeAsState()
     val state = rememberLazyListState()
@@ -47,7 +51,11 @@ fun PlaylistList(navController: NavController, playerViewModel: PlayerViewModel,
 }
 
 @Composable
-fun PlaylistToolbar(drawerState: DrawerState, mainViewModel: MainViewModel, playlistsViewModel: PlaylistsViewModel = hiltViewModel()) {
+fun PlaylistToolbar(
+    drawerState: DrawerState,
+    mainViewModel: MainViewModel,
+    playlistsViewModel: PlaylistsViewModel = hiltViewModel(),
+) {
     val searching by playlistsViewModel.searching.observeAsState()
     if (searching ?: false) {
         val query by playlistsViewModel.query.observeAsState()
@@ -63,37 +71,44 @@ fun PlaylistToolbar(drawerState: DrawerState, mainViewModel: MainViewModel, play
                 IconButton(onClick = { playlistsViewModel.setSearching(true) }) {
                     Icon(Icons.Filled.Search, contentDescription = stringResource(R.string.search))
                 }
-            }
+            },
         )
     }
 }
 
 @Composable
-fun PlaylistListItem(navController: NavController, playerViewModel: PlayerViewModel, index: Int, playlist: Playlist, user: User?) {
+fun PlaylistListItem(
+    navController: NavController,
+    playerViewModel: PlayerViewModel,
+    index: Int,
+    playlist: Playlist,
+    user: User?,
+) {
     if (index != 0) {
         Divider()
     }
-    val itemInfo = pluralStringResource(
-        when (playlist.playlistType) {
-            PlaylistType.ALBUM -> R.plurals.playlist_albums
-            PlaylistType.ARTIST -> R.plurals.playlist_artists
-            PlaylistType.TRACK -> R.plurals.playlist_tracks
-        },
-        playlist.itemIds.size,
-        playlist.itemIds.size
-    )
+    val itemInfo =
+        pluralStringResource(
+            when (playlist.playlistType) {
+                PlaylistType.ALBUM -> R.plurals.playlist_albums
+                PlaylistType.ARTIST -> R.plurals.playlist_artists
+                PlaylistType.TRACK -> R.plurals.playlist_tracks
+            },
+            playlist.itemIds.size,
+            playlist.itemIds.size,
+        )
     Row(
-        modifier = Modifier.padding(8.dp).clickable { navController.navigate("playlists/${playlist.id}") }
+        modifier = Modifier.padding(8.dp).clickable { navController.navigate("playlists/${playlist.id}") },
     ) {
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 playlist.name,
-                style = MaterialTheme.typography.titleMedium
+                style = MaterialTheme.typography.titleMedium,
             )
             Text(
                 (user?.name ?: "") + " · " + itemInfo,
                 style = MaterialTheme.typography.titleSmall,
-                color = LocalContentColor.current.copy(alpha = ContentAlpha.medium)
+                color = LocalContentColor.current.copy(alpha = ContentAlpha.medium),
             )
         }
     }

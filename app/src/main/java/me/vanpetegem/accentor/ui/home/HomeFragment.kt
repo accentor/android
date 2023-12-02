@@ -23,7 +23,11 @@ import me.vanpetegem.accentor.ui.player.PlayerViewModel
 import me.vanpetegem.accentor.ui.util.Timer
 
 @Composable
-fun Home(navController: NavController, playerViewModel: PlayerViewModel, homeViewModel: HomeViewModel = hiltViewModel()) {
+fun Home(
+    navController: NavController,
+    playerViewModel: PlayerViewModel,
+    homeViewModel: HomeViewModel = hiltViewModel(),
+) {
     LazyColumn(modifier = Modifier.fillMaxSize()) {
         item {
             val albums by homeViewModel.recentlyReleasedAlbums.observeAsState()

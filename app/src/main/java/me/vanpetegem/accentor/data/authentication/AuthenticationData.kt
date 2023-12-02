@@ -4,7 +4,7 @@ data class AuthenticationData(
     val id: Int,
     val userId: Int,
     val deviceId: String,
-    val secret: String
+    val secret: String,
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

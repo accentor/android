@@ -16,5 +16,5 @@ data class ApiTrack(
     val codecId: Int?,
     val length: Int?,
     val bitrate: Int?,
-    val locationId: Int?
+    val locationId: Int?,
 )

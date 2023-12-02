@@ -7,7 +7,10 @@ import me.vanpetegem.accentor.data.users.ApiUser
 import me.vanpetegem.accentor.util.Result
 import me.vanpetegem.accentor.util.responseObject
 
-fun index(server: String, authenticationData: AuthenticationData): Sequence<Result<List<ApiUser>>> {
+fun index(
+    server: String,
+    authenticationData: AuthenticationData,
+): Sequence<Result<List<ApiUser>>> {
     var page = 1
 
     fun doFetch(): Result<List<ApiUser>>? {
@@ -26,7 +29,7 @@ fun index(server: String, authenticationData: AuthenticationData): Sequence<Resu
                             Result.Success(u)
                         }
                     },
-                    { e: Throwable -> Result.Error(Exception("Error getting users", e)) }
+                    { e: Throwable -> Result.Error(Exception("Error getting users", e)) },
                 )
         }
     }

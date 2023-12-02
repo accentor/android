@@ -7,7 +7,10 @@ import me.vanpetegem.accentor.data.codecconversions.ApiCodecConversion
 import me.vanpetegem.accentor.util.Result
 import me.vanpetegem.accentor.util.responseObject
 
-fun index(server: String, authenticationData: AuthenticationData): Sequence<Result<List<ApiCodecConversion>>> {
+fun index(
+    server: String,
+    authenticationData: AuthenticationData,
+): Sequence<Result<List<ApiCodecConversion>>> {
     var page = 1
 
     fun doFetch(): Result<List<ApiCodecConversion>>? {
@@ -26,7 +29,7 @@ fun index(server: String, authenticationData: AuthenticationData): Sequence<Resu
                             Result.Success(c)
                         }
                     },
-                    { e: Throwable -> Result.Error(Exception("Error getting codec conversions", e)) }
+                    { e: Throwable -> Result.Error(Exception("Error getting codec conversions", e)) },
                 )
         }
     }

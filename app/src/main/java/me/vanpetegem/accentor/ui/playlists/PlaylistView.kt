@@ -50,7 +50,7 @@ fun PlaylistView(
     id: Int,
     navController: NavController,
     playerViewModel: PlayerViewModel,
-    playlistViewModel: PlaylistViewModel = hiltViewModel()
+    playlistViewModel: PlaylistViewModel = hiltViewModel(),
 ) {
     val scope = rememberCoroutineScope()
     val users by playlistViewModel.allUsersById.observeAsState()
@@ -58,25 +58,26 @@ fun PlaylistView(
     if (playlistState != null) {
         val playlist = playlistState!!
         val user = users!!.get(playlist.userId)
-        val itemInfo = pluralStringResource(
-            when (playlist.playlistType) {
-                PlaylistType.ALBUM -> R.plurals.playlist_albums
-                PlaylistType.ARTIST -> R.plurals.playlist_artists
-                PlaylistType.TRACK -> R.plurals.playlist_tracks
-            },
-            playlist.itemIds.size,
-            playlist.itemIds.size
-        )
-        Column() {
+        val itemInfo =
+            pluralStringResource(
+                when (playlist.playlistType) {
+                    PlaylistType.ALBUM -> R.plurals.playlist_albums
+                    PlaylistType.ARTIST -> R.plurals.playlist_artists
+                    PlaylistType.TRACK -> R.plurals.playlist_tracks
+                },
+                playlist.itemIds.size,
+                playlist.itemIds.size,
+            )
+        Column {
             Column(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
                 Text(
                     playlist.name,
-                    style = MaterialTheme.typography.headlineLarge
+                    style = MaterialTheme.typography.headlineLarge,
                 )
                 Text(
                     (user?.name ?: "") + " · " + itemInfo,
                     style = MaterialTheme.typography.headlineMedium,
-                    color = LocalContentColor.current.copy(alpha = ContentAlpha.medium)
+                    color = LocalContentColor.current.copy(alpha = ContentAlpha.medium),
                 )
                 Row(modifier = Modifier.padding(8.dp)) {
                     IconButton(onClick = { scope.launch(IO) { playerViewModel.play(playlist) } }) {
@@ -101,7 +102,7 @@ fun PlaylistAlbumContent(
     navController: NavController,
     playerViewModel: PlayerViewModel,
     playlistViewModel: PlaylistViewModel,
-    playlist: Playlist
+    playlist: Playlist,
 ) {
     val albums by playlistViewModel.allAlbumsById.observeAsState()
     var boxSize by remember { mutableStateOf(IntSize.Zero) }
@@ -111,7 +112,7 @@ fun PlaylistAlbumContent(
         LazyVerticalGrid(
             columns = if (cardsPerRow >= 2) GridCells.Adaptive(minSize = 192.dp) else GridCells.Fixed(2),
             state = gridState,
-            modifier = Modifier.onGloballyPositioned { boxSize = it.size }
+            modifier = Modifier.onGloballyPositioned { boxSize = it.size },
         ) {
             items(playlist.itemIds.size) { i ->
                 val album = albums!![playlist.itemIds[i]]
@@ -129,7 +130,7 @@ fun PlaylistAlbumContent(
 fun PlaylistArtistContent(
     navController: NavController,
     playlistViewModel: PlaylistViewModel,
-    playlist: Playlist
+    playlist: Playlist,
 ) {
     val artists by playlistViewModel.allArtistsById.observeAsState()
     var boxSize by remember { mutableStateOf(IntSize.Zero) }
@@ -139,7 +140,7 @@ fun PlaylistArtistContent(
         LazyVerticalGrid(
             columns = if (cardsPerRow >= 2) GridCells.Adaptive(minSize = 192.dp) else GridCells.Fixed(2),
             state = gridState,
-            modifier = Modifier.onGloballyPositioned { boxSize = it.size }
+            modifier = Modifier.onGloballyPositioned { boxSize = it.size },
         ) {
             items(playlist.itemIds.size) { i ->
                 val artist = artists!![playlist.itemIds[i]]
@@ -158,11 +159,11 @@ fun PlaylistTrackContent(
     navController: NavController,
     playerViewModel: PlayerViewModel,
     playlistViewModel: PlaylistViewModel,
-    playlist: Playlist
+    playlist: Playlist,
 ) {
     val tracks by playlistViewModel.getTracksForPlaylist(playlist).observeAsState()
     if (tracks != null) {
-        LazyColumn() {
+        LazyColumn {
             items(playlist.itemIds.size) { i ->
                 val track = tracks!![playlist.itemIds[i]]
                 if (track != null) {

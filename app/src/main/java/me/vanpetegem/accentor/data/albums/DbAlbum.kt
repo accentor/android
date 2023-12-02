@@ -38,12 +38,12 @@ data class DbAlbum(
     @ColumnInfo(name = "image_type")
     val imageType: String?,
     @ColumnInfo(name = "fetched_at")
-    val fetchedAt: Instant
+    val fetchedAt: Instant,
 )
 
 @Entity(
     tableName = "album_artists",
-    primaryKeys = ["album_id", "artist_id", "name"]
+    primaryKeys = ["album_id", "artist_id", "name"],
 )
 data class DbAlbumArtist(
     @ColumnInfo(name = "album_id")
@@ -57,12 +57,12 @@ data class DbAlbumArtist(
     @ColumnInfo(name = "order")
     val order: Int,
     @ColumnInfo(name = "separator")
-    val separator: String?
+    val separator: String?,
 )
 
 @Entity(
     tableName = "album_labels",
-    primaryKeys = ["album_id", "label_id"]
+    primaryKeys = ["album_id", "label_id"],
 )
 data class DbAlbumLabel(
     @ColumnInfo(name = "album_id")
@@ -70,5 +70,5 @@ data class DbAlbumLabel(
     @ColumnInfo(name = "label_id")
     val labelId: Int,
     @ColumnInfo(name = "catalogue_number")
-    val catalogueNumber: String?
+    val catalogueNumber: String?,
 )

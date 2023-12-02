@@ -31,7 +31,12 @@ import me.vanpetegem.accentor.ui.player.PlayerViewModel
 import me.vanpetegem.accentor.ui.tracks.TrackRow
 
 @Composable
-fun ArtistView(id: Int, navController: NavController, playerViewModel: PlayerViewModel, artistViewModel: ArtistViewModel = hiltViewModel()) {
+fun ArtistView(
+    id: Int,
+    navController: NavController,
+    playerViewModel: PlayerViewModel,
+    artistViewModel: ArtistViewModel = hiltViewModel(),
+) {
     val artistState by artistViewModel.getArtist(id).observeAsState()
     if (artistState != null) {
         val artist = artistState!!
@@ -46,7 +51,7 @@ fun ArtistView(id: Int, navController: NavController, playerViewModel: PlayerVie
                         fallback = painterResource(R.drawable.ic_artist),
                         contentDescription = stringResource(R.string.artist_image),
                         contentScale = ContentScale.Crop,
-                        modifier = Modifier.width(80.dp).aspectRatio(1f).clip(CircleShape)
+                        modifier = Modifier.width(80.dp).aspectRatio(1f).clip(CircleShape),
                     )
                     Text(artist.name, style = MaterialTheme.typography.headlineLarge, modifier = Modifier.padding(start = 8.dp))
                 }

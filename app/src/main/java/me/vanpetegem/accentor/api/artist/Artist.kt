@@ -7,7 +7,10 @@ import me.vanpetegem.accentor.data.authentication.AuthenticationData
 import me.vanpetegem.accentor.util.Result
 import me.vanpetegem.accentor.util.responseObject
 
-fun index(server: String, authenticationData: AuthenticationData): Sequence<Result<List<ApiArtist>>> {
+fun index(
+    server: String,
+    authenticationData: AuthenticationData,
+): Sequence<Result<List<ApiArtist>>> {
     var page = 1
 
     fun doFetch(): Result<List<ApiArtist>>? {
@@ -26,7 +29,7 @@ fun index(server: String, authenticationData: AuthenticationData): Sequence<Resu
                             Result.Success(a)
                         }
                     },
-                    { e: Throwable -> Result.Error(Exception("Error getting artists", e)) }
+                    { e: Throwable -> Result.Error(Exception("Error getting artists", e)) },
                 )
         }
     }

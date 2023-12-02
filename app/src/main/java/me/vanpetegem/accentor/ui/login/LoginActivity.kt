@@ -68,7 +68,7 @@ class LoginActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            AccentorTheme() {
+            AccentorTheme {
                 Content()
             }
         }
@@ -80,7 +80,11 @@ fun Content(loginViewModel: LoginViewModel = viewModel()) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
-    suspend fun tryLogin(server: String, username: String, password: String) {
+    suspend fun tryLogin(
+        server: String,
+        username: String,
+        password: String,
+    ) {
         val result: LoginResult = loginViewModel.login(server, username, password)
         withContext(Main) {
             if (result.error != null) {
@@ -99,7 +103,7 @@ fun Content(loginViewModel: LoginViewModel = viewModel()) {
         content = { innerPadding ->
             Column(
                 Modifier.fillMaxSize().padding(innerPadding).verticalScroll(rememberScrollState()),
-                horizontalAlignment = Alignment.CenterHorizontally
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 var server by rememberSaveable { mutableStateOf("https://") }
                 var username by rememberSaveable { mutableStateOf("") }
@@ -112,21 +116,23 @@ fun Content(loginViewModel: LoginViewModel = viewModel()) {
                         server = value
                         loginViewModel.loginDataChanged(server, username, password)
                     },
-                    modifier = Modifier.semantics {
-                        if (formState?.serverError != null) {
-                            error(context.getString(formState!!.serverError!!))
-                        }
-                    }.fillMaxWidth().padding(top = 16.dp, start = 16.dp, end = 16.dp),
+                    modifier =
+                        Modifier.semantics {
+                            if (formState?.serverError != null) {
+                                error(context.getString(formState!!.serverError!!))
+                            }
+                        }.fillMaxWidth().padding(top = 16.dp, start = 16.dp, end = 16.dp),
                     label = { Text(stringResource(R.string.prompt_server)) },
                     isError = !(formState?.serverError == null),
                     singleLine = true,
-                    keyboardOptions = KeyboardOptions(
-                        autoCorrect = false,
-                        capitalization = KeyboardCapitalization.None,
-                        imeAction = ImeAction.Next,
-                        keyboardType = KeyboardType.Uri
-                    ),
-                    keyboardActions = KeyboardActions(onNext = { usernameFocusRequester.requestFocus() })
+                    keyboardOptions =
+                        KeyboardOptions(
+                            autoCorrect = false,
+                            capitalization = KeyboardCapitalization.None,
+                            imeAction = ImeAction.Next,
+                            keyboardType = KeyboardType.Uri,
+                        ),
+                    keyboardActions = KeyboardActions(onNext = { usernameFocusRequester.requestFocus() }),
                 )
                 val passwordFocusRequester = remember { FocusRequester() }
                 OutlinedTextField(
@@ -136,17 +142,19 @@ fun Content(loginViewModel: LoginViewModel = viewModel()) {
                         loginViewModel.loginDataChanged(server, username, password)
                     },
                     label = { Text(stringResource(R.string.prompt_username)) },
-                    modifier = Modifier.autofill(LocalAutofill.current, LocalAutofillTree.current, listOf(AutofillType.Username)) {
-                        username = it
-                        loginViewModel.loginDataChanged(server, username, password)
-                    }.fillMaxWidth().padding(start = 16.dp, end = 16.dp).focusRequester(usernameFocusRequester),
-                    keyboardOptions = KeyboardOptions(
-                        autoCorrect = false,
-                        capitalization = KeyboardCapitalization.None,
-                        imeAction = ImeAction.Next
-                    ),
+                    modifier =
+                        Modifier.autofill(LocalAutofill.current, LocalAutofillTree.current, listOf(AutofillType.Username)) {
+                            username = it
+                            loginViewModel.loginDataChanged(server, username, password)
+                        }.fillMaxWidth().padding(start = 16.dp, end = 16.dp).focusRequester(usernameFocusRequester),
+                    keyboardOptions =
+                        KeyboardOptions(
+                            autoCorrect = false,
+                            capitalization = KeyboardCapitalization.None,
+                            imeAction = ImeAction.Next,
+                        ),
                     keyboardActions = KeyboardActions(onNext = { passwordFocusRequester.requestFocus() }),
-                    singleLine = true
+                    singleLine = true,
                 )
                 val keyboardController = LocalSoftwareKeyboardController.current
                 val loading by loginViewModel.loading.observeAsState()
@@ -158,21 +166,24 @@ fun Content(loginViewModel: LoginViewModel = viewModel()) {
                     },
                     label = { Text(stringResource(R.string.prompt_password)) },
                     singleLine = true,
-                    modifier = Modifier.autofill(LocalAutofill.current, LocalAutofillTree.current, listOf(AutofillType.Password)) {
-                        password = it
-                        loginViewModel.loginDataChanged(server, username, password)
-                    }.fillMaxWidth().padding(start = 16.dp, end = 16.dp).focusRequester(passwordFocusRequester),
+                    modifier =
+                        Modifier.autofill(LocalAutofill.current, LocalAutofillTree.current, listOf(AutofillType.Password)) {
+                            password = it
+                            loginViewModel.loginDataChanged(server, username, password)
+                        }.fillMaxWidth().padding(start = 16.dp, end = 16.dp).focusRequester(passwordFocusRequester),
                     visualTransformation = PasswordVisualTransformation(),
-                    keyboardOptions = KeyboardOptions(
-                        autoCorrect = false,
-                        capitalization = KeyboardCapitalization.None,
-                        keyboardType = KeyboardType.Password,
-                        imeAction = ImeAction.Done
-                    ),
-                    keyboardActions = KeyboardActions {
-                        keyboardController?.hide()
-                        scope.launch(IO) { tryLogin(server, username, password) }
-                    }
+                    keyboardOptions =
+                        KeyboardOptions(
+                            autoCorrect = false,
+                            capitalization = KeyboardCapitalization.None,
+                            keyboardType = KeyboardType.Password,
+                            imeAction = ImeAction.Done,
+                        ),
+                    keyboardActions =
+                        KeyboardActions {
+                            keyboardController?.hide()
+                            scope.launch(IO) { tryLogin(server, username, password) }
+                        },
                 )
                 Button(
                     onClick = {
@@ -180,7 +191,7 @@ fun Content(loginViewModel: LoginViewModel = viewModel()) {
                         scope.launch(IO) { tryLogin(server, username, password) }
                     },
                     enabled = formState?.isDataValid ?: false,
-                    modifier = Modifier.padding(bottom = 16.dp, start = 16.dp, end = 16.dp, top = 8.dp)
+                    modifier = Modifier.padding(bottom = 16.dp, start = 16.dp, end = 16.dp, top = 8.dp),
                 ) {
                     Text(stringResource(R.string.sign_in), style = MaterialTheme.typography.labelLarge)
                 }
@@ -188,7 +199,7 @@ fun Content(loginViewModel: LoginViewModel = viewModel()) {
                     CircularProgressIndicator()
                 }
             }
-        }
+        },
     )
 }
 
@@ -196,7 +207,7 @@ fun Modifier.autofill(
     autofill: Autofill?,
     autofillTree: AutofillTree,
     autofillTypes: List<AutofillType>,
-    onFill: ((String) -> Unit)
+    onFill: ((String) -> Unit),
 ): Modifier {
     val node = AutofillNode(onFill = onFill, autofillTypes = autofillTypes)
     autofillTree += node

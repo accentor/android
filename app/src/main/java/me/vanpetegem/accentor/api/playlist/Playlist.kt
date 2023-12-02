@@ -7,7 +7,10 @@ import me.vanpetegem.accentor.data.playlists.ApiPlaylist
 import me.vanpetegem.accentor.util.Result
 import me.vanpetegem.accentor.util.responseObject
 
-fun index(server: String, authenticationData: AuthenticationData): Sequence<Result<List<ApiPlaylist>>> {
+fun index(
+    server: String,
+    authenticationData: AuthenticationData,
+): Sequence<Result<List<ApiPlaylist>>> {
     var page = 1
 
     fun doFetch(): Result<List<ApiPlaylist>>? {
@@ -26,7 +29,7 @@ fun index(server: String, authenticationData: AuthenticationData): Sequence<Resu
                             Result.Success(a)
                         }
                     },
-                    { e: Throwable -> Result.Error(Exception("Error getting playlists", e)) }
+                    { e: Throwable -> Result.Error(Exception("Error getting playlists", e)) },
                 )
         }
     }

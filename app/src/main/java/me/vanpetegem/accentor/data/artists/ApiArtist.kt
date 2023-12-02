@@ -13,5 +13,5 @@ data class ApiArtist(
     val image500: String?,
     val image250: String?,
     val image100: String?,
-    val imageType: String?
+    val imageType: String?,
 )

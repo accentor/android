@@ -11,14 +11,15 @@ import java.time.Instant
 
 @Dao
 abstract class ArtistDao {
+    open fun getAll(): LiveData<List<Artist>> =
+        getAllDbArtists().map { list ->
+            list.map { Artist.fromDb(it) }
+        }
 
-    open fun getAll(): LiveData<List<Artist>> = getAllDbArtists().map { list ->
-        list.map { Artist.fromDb(it) }
-    }
-
-    open fun getAllByPlayed(): LiveData<List<Artist>> = getAllDbArtistsByPlayed().map { list ->
-        list.map { Artist.fromDb(it) }
-    }
+    open fun getAllByPlayed(): LiveData<List<Artist>> =
+        getAllDbArtistsByPlayed().map { list ->
+            list.map { Artist.fromDb(it) }
+        }
 
     @Transaction
     open fun upsertAll(artists: List<Artist>) {
@@ -36,8 +37,8 @@ abstract class ArtistDao {
                     artist.image250,
                     artist.image100,
                     artist.imageType,
-                    artist.fetchedAt
-                )
+                    artist.fetchedAt,
+                ),
             )
         }
     }
@@ -53,7 +54,7 @@ abstract class ArtistDao {
                    track_artists INNER JOIN tracks ON track_artists.track_id = tracks.id INNER JOIN plays ON tracks.id = plays.track_id
                    WHERE track_artists.hidden = 0 GROUP BY track_artists.artist_id
            ) p ON p.artist_id = artists.id ORDER BY p.played_at DESC, normalized_name ASC, id ASC
-        """
+        """,
     )
     protected abstract fun getAllDbArtistsByPlayed(): LiveData<List<DbArtist>>
 
