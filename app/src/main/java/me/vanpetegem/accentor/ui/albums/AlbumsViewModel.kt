@@ -7,34 +7,42 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.map
 import androidx.lifecycle.switchMap
 import dagger.hilt.android.lifecycle.HiltViewModel
-import java.text.Normalizer
-import javax.inject.Inject
 import me.vanpetegem.accentor.data.albums.Album
 import me.vanpetegem.accentor.data.albums.AlbumRepository
+import java.text.Normalizer
+import javax.inject.Inject
 
 @HiltViewModel
-class AlbumsViewModel @Inject constructor(
-    application: Application,
-    private val albumRepository: AlbumRepository
-) : AndroidViewModel(application) {
-    val allAlbums: LiveData<List<Album>> = albumRepository.allAlbums
+class AlbumsViewModel
+    @Inject
+    constructor(
+        application: Application,
+        private val albumRepository: AlbumRepository,
+    ) : AndroidViewModel(application) {
+        val allAlbums: LiveData<List<Album>> = albumRepository.allAlbums
 
-    private val _searching = MutableLiveData<Boolean>(false)
-    val searching: LiveData<Boolean> = _searching
+        private val _searching = MutableLiveData<Boolean>(false)
+        val searching: LiveData<Boolean> = _searching
 
-    private val _query = MutableLiveData<String>("")
-    val query: LiveData<String> = _query
+        private val _query = MutableLiveData<String>("")
+        val query: LiveData<String> = _query
 
-    val filteredAlbums: LiveData<List<Album>> = allAlbums.switchMap { albums ->
-        query.map { query ->
-            if (query.equals("")) {
-                albums
-            } else {
-                albums.filter { a -> a.normalizedTitle.contains(Normalizer.normalize(query, Normalizer.Form.NFKD), ignoreCase = true) }
+        val filteredAlbums: LiveData<List<Album>> =
+            allAlbums.switchMap { albums ->
+                query.map { query ->
+                    if (query.equals("")) {
+                        albums
+                    } else {
+                        albums.filter { a -> a.normalizedTitle.contains(Normalizer.normalize(query, Normalizer.Form.NFKD), ignoreCase = true) }
+                    }
+                }
             }
+
+        fun setSearching(value: Boolean) {
+            _searching.value = value
+        }
+
+        fun setQuery(value: String) {
+            _query.value = value
         }
     }
-
-    fun setSearching(value: Boolean) { _searching.value = value }
-    fun setQuery(value: String) { _query.value = value }
-}

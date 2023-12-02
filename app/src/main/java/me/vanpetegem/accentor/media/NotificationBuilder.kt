@@ -34,7 +34,7 @@ class NotificationBuilder(private val context: Context, private val scope: Corou
     fun buildNotification(
         session: MediaSession,
         actionFactory: MediaNotification.ActionFactory,
-        onNotificationChangedCallback: MediaNotification.Provider.Callback
+        onNotificationChangedCallback: MediaNotification.Provider.Callback,
     ): MediaNotification {
         if (shouldCreateNowPlayingChannel()) {
             createNowPlayingChannel()
@@ -45,34 +45,39 @@ class NotificationBuilder(private val context: Context, private val scope: Corou
 
         val builder = NotificationCompat.Builder(context, NOW_PLAYING_CHANNEL)
 
-        val previousAction = actionFactory.createMediaAction(
-            session,
-            IconCompat.createWithResource(context, R.drawable.ic_previous),
-            context.getString(R.string.previous),
-            Player.COMMAND_SEEK_TO_PREVIOUS_MEDIA_ITEM
-        )
-        val pauseAction = actionFactory.createMediaAction(
-            session,
-            IconCompat.createWithResource(context, R.drawable.ic_pause),
-            context.getString(R.string.pause),
-            Player.COMMAND_PLAY_PAUSE
-        )
-        val playAction = actionFactory.createMediaAction(
-            session,
-            IconCompat.createWithResource(context, R.drawable.ic_play),
-            context.getString(R.string.play),
-            Player.COMMAND_PLAY_PAUSE
-        )
-        val nextAction = actionFactory.createMediaAction(
-            session,
-            IconCompat.createWithResource(context, R.drawable.ic_next),
-            context.getString(R.string.next),
-            Player.COMMAND_SEEK_TO_NEXT_MEDIA_ITEM
-        )
-        val stopPendingIntent = actionFactory.createMediaActionPendingIntent(
-            session,
-            Player.COMMAND_STOP.toLong()
-        )
+        val previousAction =
+            actionFactory.createMediaAction(
+                session,
+                IconCompat.createWithResource(context, R.drawable.ic_previous),
+                context.getString(R.string.previous),
+                Player.COMMAND_SEEK_TO_PREVIOUS_MEDIA_ITEM,
+            )
+        val pauseAction =
+            actionFactory.createMediaAction(
+                session,
+                IconCompat.createWithResource(context, R.drawable.ic_pause),
+                context.getString(R.string.pause),
+                Player.COMMAND_PLAY_PAUSE,
+            )
+        val playAction =
+            actionFactory.createMediaAction(
+                session,
+                IconCompat.createWithResource(context, R.drawable.ic_play),
+                context.getString(R.string.play),
+                Player.COMMAND_PLAY_PAUSE,
+            )
+        val nextAction =
+            actionFactory.createMediaAction(
+                session,
+                IconCompat.createWithResource(context, R.drawable.ic_next),
+                context.getString(R.string.next),
+                Player.COMMAND_SEEK_TO_NEXT_MEDIA_ITEM,
+            )
+        val stopPendingIntent =
+            actionFactory.createMediaActionPendingIntent(
+                session,
+                Player.COMMAND_STOP.toLong(),
+            )
 
         builder.addAction(previousAction)
         if (player.isPlaying) {
@@ -109,25 +114,25 @@ class NotificationBuilder(private val context: Context, private val scope: Corou
 
         return MediaNotification(
             NOW_PLAYING_NOTIFICATION,
-            builder.build()
+            builder.build(),
         )
     }
 
     private fun shouldCreateNowPlayingChannel() = !nowPlayingChannelExists()
 
-    private fun nowPlayingChannelExists() =
-        platformNotificationManager.getNotificationChannel(NOW_PLAYING_CHANNEL) != null
+    private fun nowPlayingChannelExists() = platformNotificationManager.getNotificationChannel(NOW_PLAYING_CHANNEL) != null
 
     private fun createNowPlayingChannel() {
-        val notificationChannel = NotificationChannel(
-            NOW_PLAYING_CHANNEL,
-            context.getString(R.string.now_playing),
-            NotificationManager.IMPORTANCE_LOW
-        )
-            .apply {
-                description = context.getString(R.string.notification_channel_description)
-                setShowBadge(false)
-            }
+        val notificationChannel =
+            NotificationChannel(
+                NOW_PLAYING_CHANNEL,
+                context.getString(R.string.now_playing),
+                NotificationManager.IMPORTANCE_LOW,
+            )
+                .apply {
+                    description = context.getString(R.string.notification_channel_description)
+                    setShowBadge(false)
+                }
 
         platformNotificationManager.createNotificationChannel(notificationChannel)
     }

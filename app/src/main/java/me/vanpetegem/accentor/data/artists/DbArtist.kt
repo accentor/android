@@ -31,5 +31,5 @@ data class DbArtist(
     @ColumnInfo(name = "image_type")
     val imageType: String?,
     @ColumnInfo(name = "fetched_at")
-    val fetchedAt: Instant
+    val fetchedAt: Instant,
 )

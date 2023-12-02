@@ -10,9 +10,10 @@ import java.time.Instant
 
 @Dao
 abstract class CodecConversionDao {
-    open fun getAll(): LiveData<List<CodecConversion>> = getAllDbCodecConversions().map { us ->
-        us.map { CodecConversion.fromDb(it) }
-    }
+    open fun getAll(): LiveData<List<CodecConversion>> =
+        getAllDbCodecConversions().map { us ->
+            us.map { CodecConversion.fromDb(it) }
+        }
 
     @Transaction
     open fun upsertAll(codecconversions: List<CodecConversion>) {

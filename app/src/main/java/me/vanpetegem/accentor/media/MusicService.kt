@@ -26,9 +26,6 @@ import androidx.media3.session.MediaSessionService
 import com.google.common.collect.ImmutableList
 import com.google.common.util.concurrent.ListenableFuture
 import dagger.hilt.android.AndroidEntryPoint
-import java.io.File
-import java.time.Instant
-import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.guava.future
@@ -42,6 +39,9 @@ import me.vanpetegem.accentor.data.preferences.PreferencesDataSource
 import me.vanpetegem.accentor.data.tracks.TrackRepository
 import me.vanpetegem.accentor.ui.main.MainActivity
 import me.vanpetegem.accentor.userAgent
+import java.io.File
+import java.time.Instant
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MusicService : MediaSessionService() {
@@ -61,10 +61,11 @@ class MusicService : MediaSessionService() {
 
     private lateinit var mediaSession: MediaSession
 
-    private val accentorAudioAttributes = AudioAttributes.Builder()
-        .setContentType(C.AUDIO_CONTENT_TYPE_MUSIC)
-        .setUsage(C.USAGE_MEDIA)
-        .build()
+    private val accentorAudioAttributes =
+        AudioAttributes.Builder()
+            .setContentType(C.AUDIO_CONTENT_TYPE_MUSIC)
+            .setUsage(C.USAGE_MEDIA)
+            .build()
 
     private val baseDataSourceFactory by lazy {
         DefaultDataSource.Factory(this@MusicService.application, DefaultHttpDataSource.Factory().setUserAgent(userAgent))
@@ -73,7 +74,7 @@ class MusicService : MediaSessionService() {
         SimpleCache(
             File(this@MusicService.application.dataDir, "audio"),
             LeastRecentlyUsedCacheEvictor(preferencesDataSource.musicCacheSize.value!!),
-            StandaloneDatabaseProvider(this@MusicService.application)
+            StandaloneDatabaseProvider(this@MusicService.application),
         )
     }
 
@@ -86,43 +87,52 @@ class MusicService : MediaSessionService() {
                             return CacheDataSource(
                                 cache,
                                 baseDataSourceFactory.createDataSource(),
-                                (CacheDataSource.FLAG_BLOCK_ON_CACHE or CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR)
+                                (CacheDataSource.FLAG_BLOCK_ON_CACHE or CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR),
                             )
                         }
                     },
-                    DefaultExtractorsFactory().setConstantBitrateSeekingEnabled(true)
-                )
+                    DefaultExtractorsFactory().setConstantBitrateSeekingEnabled(true),
+                ),
             )
             .setWakeMode(C.WAKE_MODE_NETWORK)
             .setHandleAudioBecomingNoisy(true)
             .setAudioAttributes(accentorAudioAttributes, true)
             .build().apply {
-                addListener(object : Player.Listener {
-                    private var trackId: Int? = null
+                addListener(
+                    object : Player.Listener {
+                        private var trackId: Int? = null
 
-                    override fun onMediaItemTransition(item: MediaItem?, reason: Int) {
-                        trackId = item?.mediaId?.toInt()
-                    }
-
-                    override fun onPositionDiscontinuity(old: Player.PositionInfo, new: Player.PositionInfo, reason: Int) {
-                        if (trackId != null && reason == Player.DISCONTINUITY_REASON_AUTO_TRANSITION) {
-                            reportPlay()
+                        override fun onMediaItemTransition(
+                            item: MediaItem?,
+                            reason: Int,
+                        ) {
+                            trackId = item?.mediaId?.toInt()
                         }
-                    }
 
-                    override fun onPlaybackStateChanged(state: Int) {
-                        if (trackId != null && state == Player.STATE_ENDED) {
-                            reportPlay()
-                            player.pause()
-                            player.seekTo(0, 0)
+                        override fun onPositionDiscontinuity(
+                            old: Player.PositionInfo,
+                            new: Player.PositionInfo,
+                            reason: Int,
+                        ) {
+                            if (trackId != null && reason == Player.DISCONTINUITY_REASON_AUTO_TRANSITION) {
+                                reportPlay()
+                            }
                         }
-                    }
 
-                    private fun reportPlay() {
-                        val savedTrackId = trackId!!
-                        mainScope.launch(IO) { playRepository.reportPlay(savedTrackId, Instant.now()) }
-                    }
-                })
+                        override fun onPlaybackStateChanged(state: Int) {
+                            if (trackId != null && state == Player.STATE_ENDED) {
+                                reportPlay()
+                                player.pause()
+                                player.seekTo(0, 0)
+                            }
+                        }
+
+                        private fun reportPlay() {
+                            val savedTrackId = trackId!!
+                            mainScope.launch(IO) { playRepository.reportPlay(savedTrackId, Instant.now()) }
+                        }
+                    },
+                )
             }
     }
 
@@ -132,32 +142,40 @@ class MusicService : MediaSessionService() {
         val openIntent = Intent(this, MainActivity::class.java)
         val pendingIntent = PendingIntent.getActivity(this, 0, openIntent, PendingIntent.FLAG_IMMUTABLE)
 
-        mediaSession = MediaSession.Builder(baseContext, player)
-            .setSessionActivity(pendingIntent)
-            .setCallback(object : MediaSession.Callback {
-                override fun onAddMediaItems(
-                    session: MediaSession,
-                    controller: MediaSession.ControllerInfo,
-                    mediaItems: List<MediaItem>
-                ): ListenableFuture<List<MediaItem>> {
-                    return mainScope.future(IO) { convertTracks(mediaItems) }
-                }
-            })
-            .build()
+        mediaSession =
+            MediaSession.Builder(baseContext, player)
+                .setSessionActivity(pendingIntent)
+                .setCallback(
+                    object : MediaSession.Callback {
+                        override fun onAddMediaItems(
+                            session: MediaSession,
+                            controller: MediaSession.ControllerInfo,
+                            mediaItems: List<MediaItem>,
+                        ): ListenableFuture<List<MediaItem>> {
+                            return mainScope.future(IO) { convertTracks(mediaItems) }
+                        }
+                    },
+                )
+                .build()
 
         val notificationBuilder = NotificationBuilder(this, mainScope)
-        setMediaNotificationProvider(object : MediaNotification.Provider {
-            override fun createNotification(
-                session: MediaSession,
-                customLayout: ImmutableList<CommandButton>,
-                actionFactory: MediaNotification.ActionFactory,
-                onNotificationChangedCallback: MediaNotification.Provider.Callback
-            ): MediaNotification =
-                notificationBuilder.buildNotification(session, actionFactory, onNotificationChangedCallback)
+        setMediaNotificationProvider(
+            object : MediaNotification.Provider {
+                override fun createNotification(
+                    session: MediaSession,
+                    customLayout: ImmutableList<CommandButton>,
+                    actionFactory: MediaNotification.ActionFactory,
+                    onNotificationChangedCallback: MediaNotification.Provider.Callback,
+                ): MediaNotification = notificationBuilder.buildNotification(session, actionFactory, onNotificationChangedCallback)
 
-            // Ignore, there are none.
-            override fun handleCustomCommand(session: MediaSession, action: String, extras: Bundle): Boolean = false
-        })
+                // Ignore, there are none.
+                override fun handleCustomCommand(
+                    session: MediaSession,
+                    action: String,
+                    extras: Bundle,
+                ): Boolean = false
+            },
+        )
     }
 
     override fun onGetSession(info: MediaSession.ControllerInfo): MediaSession? = mediaSession
@@ -176,22 +194,24 @@ class MusicService : MediaSessionService() {
         val firstConversion by lazy { codecConversionRepository.getFirst() }
         val conversion = conversionId?.let { codecConversionRepository.getById(conversionId) } ?: firstConversion
         val conversionParam = conversion?.let { "&codec_conversion_id=${it.id}" } ?: ""
-        val mediaUri = "${authenticationDataSource.getServer()}/api/tracks/${track.id}/audio" +
-            "?secret=${authenticationDataSource.getSecret()}" +
-            "&device_id=${authenticationDataSource.getDeviceId()}" +
-            conversionParam
+        val mediaUri =
+            "${authenticationDataSource.getServer()}/api/tracks/${track.id}/audio" +
+                "?secret=${authenticationDataSource.getSecret()}" +
+                "&device_id=${authenticationDataSource.getDeviceId()}" +
+                conversionParam
 
-        val metadata = MediaMetadata.Builder()
-            .setTitle(track.title)
-            .setArtist(track.stringifyTrackArtists())
-            .setAlbumTitle(album.title)
-            .setAlbumArtist(album.stringifyAlbumArtists().let { if (it.isEmpty()) application.getString(R.string.various_artists) else it })
-            .setArtworkUri(album.image500?.let { Uri.parse(it) })
-            .setTrackNumber(track.number)
-            .setReleaseYear(album.release.year)
-            .setReleaseMonth(album.release.monthValue)
-            .setReleaseDay(album.release.dayOfMonth)
-            .build()
+        val metadata =
+            MediaMetadata.Builder()
+                .setTitle(track.title)
+                .setArtist(track.stringifyTrackArtists())
+                .setAlbumTitle(album.title)
+                .setAlbumArtist(album.stringifyAlbumArtists().let { if (it.isEmpty()) application.getString(R.string.various_artists) else it })
+                .setArtworkUri(album.image500?.let { Uri.parse(it) })
+                .setTrackNumber(track.number)
+                .setReleaseYear(album.release.year)
+                .setReleaseMonth(album.release.monthValue)
+                .setReleaseDay(album.release.dayOfMonth)
+                .build()
 
         return MediaItem.Builder()
             .setMediaId(track.id.toString())

@@ -9,13 +9,12 @@ import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Upsert
-import java.time.Instant
 import me.vanpetegem.accentor.data.albums.Album
 import me.vanpetegem.accentor.data.artists.Artist
+import java.time.Instant
 
 @Dao
 abstract class TrackDao {
-
     @Transaction
     open fun getByAlbum(album: Album): List<Track> {
         val tracks = getDbTracksByAlbumId(album.id)
@@ -34,36 +33,39 @@ abstract class TrackDao {
         return ids.map { Track.fromDb(tracksByIds.get(it), trackArtists.get(it, ArrayList()), trackGenres.get(it, ArrayList())) }
     }
 
-    open fun findByIds(ids: List<Int>): LiveData<List<Track>> = findDbTracksByIds(ids).switchMap { tracks ->
-        findTrackArtistsByTrackIdWhereTrackIds(ids).switchMap { trackArtists ->
-            findTrackGenresByTrackIdWhereTrackIds(ids).map { trackGenres ->
-                tracks.map { t -> Track.fromDb(t, trackArtists.get(t.id, ArrayList()), trackGenres.get(t.id, ArrayList())) }
-            }
-        }
-    }
-
-    open fun findById(id: Int): LiveData<Track?> = findDbTrackById(id).switchMap { dbTrack ->
-        findDbTrackArtistsById(id).switchMap { trackArtists ->
-            findDbTrackGenresById(id).map { trackGenres ->
-                dbTrack?.let {
-                    Track.fromDb(
-                        it,
-                        trackArtists.map { TrackArtist(it.artistId, it.name, it.normalizedName, it.role, it.order, it.hidden) },
-                        trackGenres.map { it.genreId }
-                    )
+    open fun findByIds(ids: List<Int>): LiveData<List<Track>> =
+        findDbTracksByIds(ids).switchMap { tracks ->
+            findTrackArtistsByTrackIdWhereTrackIds(ids).switchMap { trackArtists ->
+                findTrackGenresByTrackIdWhereTrackIds(ids).map { trackGenres ->
+                    tracks.map { t -> Track.fromDb(t, trackArtists.get(t.id, ArrayList()), trackGenres.get(t.id, ArrayList())) }
                 }
             }
         }
-    }
 
-    open fun findByArtist(artist: Artist): LiveData<List<Track>> = findDbTracksByArtistId(artist.id).switchMap { tracks ->
-        val ids = tracks.map { it.id }
-        findTrackArtistsByTrackIdWhereTrackIds(ids).switchMap { trackArtists ->
-            findTrackGenresByTrackIdWhereTrackIds(ids).map { trackGenres ->
-                tracks.map { Track.fromDb(it, trackArtists.get(it.id, ArrayList()), trackGenres.get(it.id, ArrayList())) }
+    open fun findById(id: Int): LiveData<Track?> =
+        findDbTrackById(id).switchMap { dbTrack ->
+            findDbTrackArtistsById(id).switchMap { trackArtists ->
+                findDbTrackGenresById(id).map { trackGenres ->
+                    dbTrack?.let {
+                        Track.fromDb(
+                            it,
+                            trackArtists.map { TrackArtist(it.artistId, it.name, it.normalizedName, it.role, it.order, it.hidden) },
+                            trackGenres.map { it.genreId },
+                        )
+                    }
+                }
             }
         }
-    }
+
+    open fun findByArtist(artist: Artist): LiveData<List<Track>> =
+        findDbTracksByArtistId(artist.id).switchMap { tracks ->
+            val ids = tracks.map { it.id }
+            findTrackArtistsByTrackIdWhereTrackIds(ids).switchMap { trackArtists ->
+                findTrackGenresByTrackIdWhereTrackIds(ids).map { trackGenres ->
+                    tracks.map { Track.fromDb(it, trackArtists.get(it.id, ArrayList()), trackGenres.get(it.id, ArrayList())) }
+                }
+            }
+        }
 
     open fun getByArtistId(id: Int): List<Track> {
         val tracks = getDbTracksByArtistId(id)
@@ -73,14 +75,15 @@ abstract class TrackDao {
         return tracks.map { Track.fromDb(it, trackArtists.get(it.id, ArrayList()), trackGenres.get(it.id, ArrayList())) }
     }
 
-    open fun findByAlbum(album: Album): LiveData<List<Track>> = findDbTracksByAlbumId(album.id).switchMap { tracks ->
-        val ids = tracks.map { it.id }
-        findTrackArtistsByTrackIdWhereTrackIds(ids).switchMap { trackArtists ->
-            findTrackGenresByTrackIdWhereTrackIds(ids).map { trackGenres ->
-                tracks.map { Track.fromDb(it, trackArtists.get(it.id, ArrayList()), trackGenres.get(it.id, ArrayList())) }
+    open fun findByAlbum(album: Album): LiveData<List<Track>> =
+        findDbTracksByAlbumId(album.id).switchMap { tracks ->
+            val ids = tracks.map { it.id }
+            findTrackArtistsByTrackIdWhereTrackIds(ids).switchMap { trackArtists ->
+                findTrackGenresByTrackIdWhereTrackIds(ids).map { trackGenres ->
+                    tracks.map { Track.fromDb(it, trackArtists.get(it.id, ArrayList()), trackGenres.get(it.id, ArrayList())) }
+                }
             }
         }
-    }
 
     @Transaction
     open fun getTrackById(id: Int): Track? {
@@ -92,7 +95,7 @@ abstract class TrackDao {
         return Track.fromDb(
             dbTrack,
             trackArtists.map { TrackArtist(it.artistId, it.name, it.normalizedName, it.role, it.order, it.hidden) },
-            trackGenres.map { it.genreId }
+            trackGenres.map { it.genreId },
         )
     }
 
@@ -144,8 +147,8 @@ abstract class TrackDao {
                         ta.normalizedName,
                         ta.role,
                         ta.order,
-                        ta.hidden
-                    )
+                        ta.hidden,
+                    ),
                 )
                 map.put(ta.trackId, l)
             }
@@ -163,8 +166,8 @@ abstract class TrackDao {
                     ta.normalizedName,
                     ta.role,
                     ta.order,
-                    ta.hidden
-                )
+                    ta.hidden,
+                ),
             )
             map.put(ta.trackId, l)
         }
@@ -209,8 +212,8 @@ abstract class TrackDao {
                     track.length,
                     track.bitrate,
                     track.locationId,
-                    track.fetchedAt
-                )
+                    track.fetchedAt,
+                ),
             )
             deleteTrackArtistsById(track.id)
             for (ta in track.trackArtists) {
@@ -222,8 +225,8 @@ abstract class TrackDao {
                         ta.normalizedName,
                         ta.role,
                         ta.order,
-                        ta.hidden
-                    )
+                        ta.hidden,
+                    ),
                 )
             }
             deleteTrackGenresById(track.id)

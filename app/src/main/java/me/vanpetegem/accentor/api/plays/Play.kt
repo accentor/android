@@ -2,18 +2,24 @@ package me.vanpetegem.accentor.api.plays
 
 import com.github.kittinunf.fuel.httpGet
 import com.github.kittinunf.fuel.httpPost
-import java.time.Instant
 import me.vanpetegem.accentor.api.util.retry
 import me.vanpetegem.accentor.data.authentication.AuthenticationData
 import me.vanpetegem.accentor.data.plays.ApiPlay
 import me.vanpetegem.accentor.util.Result
 import me.vanpetegem.accentor.util.jsonBody
 import me.vanpetegem.accentor.util.responseObject
+import java.time.Instant
 
 data class Arguments(val play: PlayArguments)
+
 data class PlayArguments(val trackId: Int, val playedAt: Instant)
 
-fun create(server: String, authenticationData: AuthenticationData, trackId: Int, playedAt: Instant): Result<ApiPlay> {
+fun create(
+    server: String,
+    authenticationData: AuthenticationData,
+    trackId: Int,
+    playedAt: Instant,
+): Result<ApiPlay> {
     return "$server/api/plays".httpPost()
         .set("Accept", "application/json")
         .set("X-Secret", authenticationData.secret)
@@ -22,11 +28,14 @@ fun create(server: String, authenticationData: AuthenticationData, trackId: Int,
         .responseObject<ApiPlay>().third
         .fold(
             { play: ApiPlay -> Result.Success(play) },
-            { e: Throwable -> Result.Error(Exception("Error creating play", e)) }
+            { e: Throwable -> Result.Error(Exception("Error creating play", e)) },
         )
 }
 
-fun index(server: String, authenticationData: AuthenticationData): Sequence<Result<List<ApiPlay>>> {
+fun index(
+    server: String,
+    authenticationData: AuthenticationData,
+): Sequence<Result<List<ApiPlay>>> {
     var page = 1
 
     fun doFetch(): Result<List<ApiPlay>>? {
@@ -45,7 +54,7 @@ fun index(server: String, authenticationData: AuthenticationData): Sequence<Resu
                             Result.Success(p)
                         }
                     },
-                    { e: Throwable -> Result.Error(Exception("Error getting plays", e)) }
+                    { e: Throwable -> Result.Error(Exception("Error getting plays", e)) },
                 )
         }
     }

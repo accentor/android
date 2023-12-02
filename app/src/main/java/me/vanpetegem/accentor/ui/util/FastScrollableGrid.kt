@@ -45,14 +45,14 @@ fun ScrollBar(
     state: LazyGridState,
     width: Dp = 8.dp,
     minimumHeight: Dp = 48.dp,
-    getSectionName: ((Int) -> String)
+    getSectionName: ((Int) -> String),
 ) {
     var dragging by remember { mutableStateOf(false) }
     val targetAlpha = if (state.isScrollInProgress || dragging) 1f else 0f
     val duration = if (state.isScrollInProgress || dragging) 150 else 500
     val alpha by animateFloatAsState(
         targetValue = targetAlpha,
-        animationSpec = tween(duration)
+        animationSpec = tween(duration),
     )
     val color = MaterialTheme.colorScheme.secondary
     val coroutineScope = rememberCoroutineScope()
@@ -77,7 +77,7 @@ fun ScrollBar(
             Surface(
                 modifier = Modifier.height(minimumHeight).width(minimumHeight).offset(-width * 2, topDistance),
                 shape = RoundedCornerShape(50, 50, 0, 50),
-                color = color
+                color = color,
             ) {
                 Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
                     Text(sectionName, style = MaterialTheme.typography.titleLarge)
@@ -86,18 +86,20 @@ fun ScrollBar(
         }
 
         Canvas(
-            modifier = Modifier.fillMaxHeight().width(width * 2).draggable(
-                orientation = Orientation.Vertical,
-                state = rememberDraggableState { delta ->
-                    val percentage = delta / boxHeight
-                    val newPosition = maxOf(0f, currentPosition + percentage * totalHeight)
-                    val newIndex = (newPosition / itemHeight).toInt()
-                    val newOffset = (newPosition - (newIndex * itemHeight)).toInt()
-                    coroutineScope.launch { state.scrollToItem(newIndex, newOffset) }
-                },
-                onDragStarted = { _ -> dragging = true },
-                onDragStopped = { _ -> dragging = false }
-            )
+            modifier =
+                Modifier.fillMaxHeight().width(width * 2).draggable(
+                    orientation = Orientation.Vertical,
+                    state =
+                        rememberDraggableState { delta ->
+                            val percentage = delta / boxHeight
+                            val newPosition = maxOf(0f, currentPosition + percentage * totalHeight)
+                            val newIndex = (newPosition / itemHeight).toInt()
+                            val newOffset = (newPosition - (newIndex * itemHeight)).toInt()
+                            coroutineScope.launch { state.scrollToItem(newIndex, newOffset) }
+                        },
+                    onDragStarted = { _ -> dragging = true },
+                    onDragStopped = { _ -> dragging = false },
+                ),
         ) {
             val scrollbarHeight = maxOf(boxHeight * (boxHeight.toFloat() / totalHeight), minimumHeight.toPx())
             val scrollbarDiff = maxOf(0f, scrollbarHeight - boxHeight * (boxHeight.toFloat() / totalHeight))
@@ -109,14 +111,18 @@ fun ScrollBar(
                 cornerRadius = CornerRadius(width.toPx() / 2, width.toPx() / 2),
                 topLeft = Offset(if (layoutDirection == LayoutDirection.Ltr) width.toPx() else 0.0f, scrollbarOffsetY),
                 size = Size(width.toPx(), scrollbarHeight),
-                alpha = alpha
+                alpha = alpha,
             )
         }
     }
 }
 
 @Composable
-fun <T> FastScrollableGrid(gridItems: List<T>, getSectionName: (T) -> String, itemView: @Composable (T) -> Unit) {
+fun <T> FastScrollableGrid(
+    gridItems: List<T>,
+    getSectionName: (T) -> String,
+    itemView: @Composable (T) -> Unit,
+) {
     val gridState = rememberLazyGridState()
     var boxSize by remember { mutableStateOf(IntSize.Zero) }
     val cardsPerRow: Int = with(LocalDensity.current) { boxSize.width / 192.dp.toPx().toInt() }
@@ -124,7 +130,7 @@ fun <T> FastScrollableGrid(gridItems: List<T>, getSectionName: (T) -> String, it
         LazyVerticalGrid(
             columns = if (cardsPerRow >= 2) GridCells.Adaptive(minSize = 192.dp) else GridCells.Fixed(2),
             state = gridState,
-            modifier = Modifier.onGloballyPositioned { boxSize = it.size }
+            modifier = Modifier.onGloballyPositioned { boxSize = it.size },
         ) {
             items(gridItems.size) { i -> itemView(gridItems[i]) }
         }

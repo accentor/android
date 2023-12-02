@@ -10,7 +10,10 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
-fun Timer(delayTime: Long = 100L, onTick: suspend () -> Unit) {
+fun Timer(
+    delayTime: Long = 100L,
+    onTick: suspend () -> Unit,
+) {
     val scope = rememberCoroutineScope()
     DisposableEffect(onTick) {
         var running = true

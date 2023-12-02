@@ -48,7 +48,11 @@ import me.vanpetegem.accentor.data.tracks.Track
 import me.vanpetegem.accentor.util.formatTrackLength
 
 @Composable
-fun Queue(navController: NavController, closePlayer: (() -> Unit), playerViewModel: PlayerViewModel = viewModel()) {
+fun Queue(
+    navController: NavController,
+    closePlayer: (() -> Unit),
+    playerViewModel: PlayerViewModel = viewModel(),
+) {
     val queue by playerViewModel.queue.observeAsState()
     val queuePosition by playerViewModel.queuePosition.observeAsState()
     val state = rememberLazyListState((queuePosition ?: 1) - 1)
@@ -65,41 +69,43 @@ fun QueueItem(
     navController: NavController,
     index: Int,
     item: Triple<Boolean, Track?, Album?>,
-    closePlayer: (() -> Unit)
+    closePlayer: (() -> Unit),
 ) {
     if (index != 0) {
         Divider()
     }
     val scope = rememberCoroutineScope()
-    val dismissState = rememberDismissState {
-        if (it == DismissValue.DismissedToEnd || it == DismissValue.DismissedToStart) {
-            scope.launch(IO) { playerViewModel.removeFromQueue(index) }
-            true
-        } else {
-            false
+    val dismissState =
+        rememberDismissState {
+            if (it == DismissValue.DismissedToEnd || it == DismissValue.DismissedToStart) {
+                scope.launch(IO) { playerViewModel.removeFromQueue(index) }
+                true
+            } else {
+                false
+            }
         }
-    }
     SwipeToDismiss(
         state = dismissState,
-        background = { Surface() {} },
+        background = { Surface {} },
         dismissContent = {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .padding(8.dp)
-                    .clickable {
-                        scope.launch(IO) {
-                            playerViewModel.skipTo(index)
-                            playerViewModel.play()
-                        }
-                    }
+                modifier =
+                    Modifier
+                        .padding(8.dp)
+                        .clickable {
+                            scope.launch(IO) {
+                                playerViewModel.skipTo(index)
+                                playerViewModel.play()
+                            }
+                        },
             ) {
                 val track = item.second
                 if (item.first) {
                     Icon(
                         painterResource(R.drawable.ic_play),
                         contentDescription = stringResource(R.string.now_playing),
-                        modifier = Modifier.padding(end = 8.dp)
+                        modifier = Modifier.padding(end = 8.dp),
                     )
                 }
                 if (track != null) {
@@ -108,21 +114,21 @@ fun QueueItem(
                             track.title,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
-                            style = MaterialTheme.typography.titleMedium
+                            style = MaterialTheme.typography.titleMedium,
                         )
                         Text(
                             track.stringifyTrackArtists(),
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                             style = MaterialTheme.typography.titleSmall,
-                            color = LocalContentColor.current.copy(alpha = ContentAlpha.medium)
+                            color = LocalContentColor.current.copy(alpha = ContentAlpha.medium),
                         )
                     }
                     Text(
                         track.length.formatTrackLength(),
                         maxLines = 1,
                         style = MaterialTheme.typography.bodyMedium,
-                        color = LocalContentColor.current.copy(alpha = ContentAlpha.medium)
+                        color = LocalContentColor.current.copy(alpha = ContentAlpha.medium),
                     )
                     Box(modifier = Modifier.height(40.dp).aspectRatio(1f).wrapContentSize(Alignment.TopStart)) {
                         var expanded by remember { mutableStateOf(false) }
@@ -136,7 +142,7 @@ fun QueueItem(
                                     navController.navigate("albums/${track.albumId}")
                                     closePlayer()
                                 },
-                                text = { Text(stringResource(R.string.go_to_album)) }
+                                text = { Text(stringResource(R.string.go_to_album)) },
                             )
                             for (ta in track.trackArtists.sortedBy { ta -> ta.order }) {
                                 DropdownMenuItem(
@@ -145,13 +151,13 @@ fun QueueItem(
                                         navController.navigate("artists/${ta.artistId}")
                                         closePlayer()
                                     },
-                                    text = { Text(stringResource(R.string.go_to, ta.name)) }
+                                    text = { Text(stringResource(R.string.go_to, ta.name)) },
                                 )
                             }
                         }
                     }
                 }
             }
-        }
+        },
     )
 }

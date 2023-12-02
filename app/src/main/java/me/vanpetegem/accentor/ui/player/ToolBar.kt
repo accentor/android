@@ -39,7 +39,7 @@ import me.vanpetegem.accentor.R
 fun ToolBar(
     showQueueButton: Boolean,
     playerViewModel: PlayerViewModel = viewModel(),
-    closePlayer: (() -> Unit)
+    closePlayer: (() -> Unit),
 ) {
     val scope = rememberCoroutineScope()
     val queuePosStr by playerViewModel.queuePosStr.observeAsState()
@@ -53,13 +53,13 @@ fun ToolBar(
                     stringResource(R.string.now_playing),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    style = MaterialTheme.typography.titleLarge
+                    style = MaterialTheme.typography.titleLarge,
                 )
                 Text(
                     queuePosStr ?: "0/0",
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    style = MaterialTheme.typography.titleMedium
+                    style = MaterialTheme.typography.titleMedium,
                 )
             }
             if (showQueueButton) {
@@ -78,7 +78,7 @@ fun ToolBar(
                             expanded = false
                             scope.launch(IO) { playerViewModel.clearQueue() }
                         },
-                        text = { Text(stringResource(R.string.clear_queue)) }
+                        text = { Text(stringResource(R.string.clear_queue)) },
                     )
                 }
             }

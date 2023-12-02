@@ -13,12 +13,12 @@ import java.time.Instant
 
 @Dao
 abstract class PlaylistDao {
-
-    open fun getAll(): LiveData<List<Playlist>> = getAllDbPlaylists().switchMap { playlists ->
-        playlistItemsByPlaylistId().map { playlistItems ->
-            playlists.map { p -> Playlist.fromDb(p, playlistItems.get(p.id, ArrayList())) }
+    open fun getAll(): LiveData<List<Playlist>> =
+        getAllDbPlaylists().switchMap { playlists ->
+            playlistItemsByPlaylistId().map { playlistItems ->
+                playlists.map { p -> Playlist.fromDb(p, playlistItems.get(p.id, ArrayList())) }
+            }
         }
-    }
 
     protected open fun playlistItemsByPlaylistId(): LiveData<SparseArray<MutableList<Int>>> =
         getAllPlaylistItems().map {
@@ -44,8 +44,8 @@ abstract class PlaylistDao {
                     playlist.createdAt,
                     playlist.updatedAt,
                     playlist.access,
-                    playlist.fetchedAt
-                )
+                    playlist.fetchedAt,
+                ),
             )
             deletePlaylistItemsById(playlist.id)
             for (i in 0 until playlist.itemIds.size) {

@@ -28,20 +28,20 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
 import me.vanpetegem.accentor.R
 import me.vanpetegem.accentor.ui.player.PlayerViewModel
 import me.vanpetegem.accentor.ui.tracks.TrackRow
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun AlbumView(
     id: Int,
     navController: NavController,
     playerViewModel: PlayerViewModel,
-    albumViewModel: AlbumViewModel = hiltViewModel()
+    albumViewModel: AlbumViewModel = hiltViewModel(),
 ) {
     val scope = rememberCoroutineScope()
     val albumState by albumViewModel.getAlbum(id).observeAsState()
@@ -56,7 +56,7 @@ fun AlbumView(
                         fallback = painterResource(R.drawable.ic_album),
                         placeholder = painterResource(R.drawable.ic_album),
                         contentDescription = stringResource(R.string.album_image),
-                        modifier = Modifier.width(128.dp).aspectRatio(1f)
+                        modifier = Modifier.width(128.dp).aspectRatio(1f),
                     )
                     Column {
                         Text(
@@ -64,7 +64,7 @@ fun AlbumView(
                             style = MaterialTheme.typography.titleLarge,
                             modifier = Modifier.padding(start = 8.dp),
                             maxLines = 2,
-                            overflow = TextOverflow.Ellipsis
+                            overflow = TextOverflow.Ellipsis,
                         )
                         Text(
                             album.stringifyAlbumArtists().let { if (it.isEmpty()) stringResource(R.string.various_artists) else it },
@@ -72,7 +72,7 @@ fun AlbumView(
                             color = LocalContentColor.current.copy(alpha = ContentAlpha.medium),
                             modifier = Modifier.padding(start = 8.dp),
                             maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
+                            overflow = TextOverflow.Ellipsis,
                         )
                         Text(
                             if (album.edition == null) album.release.format() else "${album.release.format()} (${album.edition.format()})",
@@ -80,7 +80,7 @@ fun AlbumView(
                             color = LocalContentColor.current.copy(alpha = ContentAlpha.medium),
                             modifier = Modifier.padding(start = 8.dp),
                             maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
+                            overflow = TextOverflow.Ellipsis,
                         )
                         Row(modifier = Modifier.padding(8.dp)) {
                             IconButton(onClick = { scope.launch(IO) { playerViewModel.play(album) } }) {
@@ -101,7 +101,12 @@ fun AlbumView(
 }
 
 @Composable
-fun AlbumViewDropdown(id: Int, navController: NavController, dismiss: (() -> Unit), albumViewModel: AlbumViewModel = hiltViewModel()) {
+fun AlbumViewDropdown(
+    id: Int,
+    navController: NavController,
+    dismiss: (() -> Unit),
+    albumViewModel: AlbumViewModel = hiltViewModel(),
+) {
     val albumState by albumViewModel.getAlbum(id).observeAsState()
     if (albumState != null) {
         val album = albumState!!
@@ -111,7 +116,7 @@ fun AlbumViewDropdown(id: Int, navController: NavController, dismiss: (() -> Uni
                     dismiss()
                     navController.navigate("artists/${aa.artistId}")
                 },
-                text = { Text(stringResource(R.string.go_to, aa.name)) }
+                text = { Text(stringResource(R.string.go_to, aa.name)) },
             )
         }
     }

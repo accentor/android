@@ -43,26 +43,26 @@ fun ControlBar(playerViewModel: PlayerViewModel = viewModel()) {
                 fallback = painterResource(R.drawable.ic_album),
                 contentDescription = stringResource(R.string.album_cover_of_current_track),
                 modifier = Modifier.fillMaxHeight().aspectRatio(1f).background(MaterialTheme.colorScheme.surface),
-                contentScale = ContentScale.Crop
+                contentScale = ContentScale.Crop,
             )
             Column(modifier = Modifier.padding(start = 8.dp).weight(1f)) {
                 Text(
                     currentTrack?.title ?: "",
                     style = MaterialTheme.typography.titleLarge,
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
                 )
                 Text(
                     currentTrack?.stringifyTrackArtists() ?: "",
                     maxLines = 1,
                     style = MaterialTheme.typography.titleMedium,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
                 )
             }
             IconButton(
                 onClick = {
                     scope.launch(IO) { playerViewModel.previous() }
-                }
+                },
             ) {
                 Icon(painterResource(R.drawable.ic_previous), contentDescription = stringResource(R.string.previous))
             }
@@ -70,7 +70,7 @@ fun ControlBar(playerViewModel: PlayerViewModel = viewModel()) {
                 IconButton(
                     onClick = {
                         scope.launch(IO) { playerViewModel.pause() }
-                    }
+                    },
                 ) {
                     Icon(painterResource(R.drawable.ic_pause), contentDescription = stringResource(R.string.pause))
                 }
@@ -78,7 +78,7 @@ fun ControlBar(playerViewModel: PlayerViewModel = viewModel()) {
                 IconButton(
                     onClick = {
                         scope.launch(IO) { playerViewModel.play() }
-                    }
+                    },
                 ) {
                     Icon(painterResource(R.drawable.ic_play), contentDescription = stringResource(R.string.play))
                 }
@@ -86,7 +86,7 @@ fun ControlBar(playerViewModel: PlayerViewModel = viewModel()) {
             IconButton(
                 onClick = {
                     scope.launch(IO) { playerViewModel.next() }
-                }
+                },
             ) {
                 Icon(painterResource(R.drawable.ic_next), contentDescription = stringResource(R.string.next))
             }

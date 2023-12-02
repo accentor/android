@@ -7,7 +7,7 @@ data class CodecConversion(
     val name: String,
     val ffmpegParams: String,
     val resultingCodecId: Int,
-    val fetchedAt: Instant
+    val fetchedAt: Instant,
 ) {
     companion object {
         fun fromDb(c: DbCodecConversion) =
@@ -16,16 +16,18 @@ data class CodecConversion(
                 c.name,
                 c.ffmpegParams,
                 c.resultingCodecId,
-                c.fetchedAt
+                c.fetchedAt,
             )
 
-        fun fromApi(c: ApiCodecConversion, fetchTime: Instant) =
-            CodecConversion(
-                c.id,
-                c.name,
-                c.ffmpegParams,
-                c.resultingCodecId,
-                fetchTime
-            )
+        fun fromApi(
+            c: ApiCodecConversion,
+            fetchTime: Instant,
+        ) = CodecConversion(
+            c.id,
+            c.name,
+            c.ffmpegParams,
+            c.resultingCodecId,
+            fetchTime,
+        )
     }
 }

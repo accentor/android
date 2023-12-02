@@ -6,7 +6,7 @@ data class User(
     val id: Int,
     val name: String,
     val permission: Permission,
-    val fetchedAt: Instant
+    val fetchedAt: Instant,
 ) {
     companion object {
         fun fromDb(u: DbUser) =
@@ -14,15 +14,17 @@ data class User(
                 u.id,
                 u.name,
                 u.permission,
-                u.fetchedAt
+                u.fetchedAt,
             )
 
-        fun fromApi(u: ApiUser, fetchTime: Instant) =
-            User(
-                u.id,
-                u.name,
-                u.permission,
-                fetchTime
-            )
+        fun fromApi(
+            u: ApiUser,
+            fetchTime: Instant,
+        ) = User(
+            u.id,
+            u.name,
+            u.permission,
+            fetchTime,
+        )
     }
 }

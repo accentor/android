@@ -20,10 +20,9 @@ data class Album(
     val imageType: String?,
     val albumLabels: List<AlbumLabel>,
     val albumArtists: List<AlbumArtist>,
-    val fetchedAt: Instant
+    val fetchedAt: Instant,
 ) {
-    fun stringifyAlbumArtists() =
-        albumArtists.sortedBy { aa -> aa.order }.fold("") { acc, aa -> acc + aa.name + (aa.separator ?: "") }
+    fun stringifyAlbumArtists() = albumArtists.sortedBy { aa -> aa.order }.fold("") { acc, aa -> acc + aa.name + (aa.separator ?: "") }
 
     fun firstCharacter() = String(intArrayOf(title.codePointAt(0)), 0, 1)
 
@@ -36,7 +35,11 @@ data class Album(
     }
 
     companion object {
-        fun fromDb(a: DbAlbum, labels: List<AlbumLabel>, artists: List<AlbumArtist>): Album =
+        fun fromDb(
+            a: DbAlbum,
+            labels: List<AlbumLabel>,
+            artists: List<AlbumArtist>,
+        ): Album =
             Album(
                 a.id,
                 a.title,
@@ -54,41 +57,60 @@ data class Album(
                 a.imageType,
                 labels,
                 artists,
-                a.fetchedAt
+                a.fetchedAt,
             )
 
-        fun fromApi(a: ApiAlbum, fetchTime: Instant) =
-            Album(
-                a.id,
-                a.title,
-                a.normalizedTitle,
-                a.release,
-                a.reviewComment,
-                a.edition,
-                a.editionDescription,
-                a.createdAt,
-                a.updatedAt,
-                a.image,
-                a.image500,
-                a.image250,
-                a.image100,
-                a.imageType,
-                a.albumLabels,
-                a.albumArtists,
-                fetchTime
-            )
+        fun fromApi(
+            a: ApiAlbum,
+            fetchTime: Instant,
+        ) = Album(
+            a.id,
+            a.title,
+            a.normalizedTitle,
+            a.release,
+            a.reviewComment,
+            a.edition,
+            a.editionDescription,
+            a.createdAt,
+            a.updatedAt,
+            a.image,
+            a.image500,
+            a.image250,
+            a.image100,
+            a.imageType,
+            a.albumLabels,
+            a.albumArtists,
+            fetchTime,
+        )
     }
 }
 
-fun compareAlbumEditions(a1: Album, a2: Album): Int {
-    if (a1.edition == null && a2.edition == null) { return 0 }
-    if (a1.edition == null) { return -1 }
-    if (a2.edition == null) { return 1 }
+fun compareAlbumEditions(
+    a1: Album,
+    a2: Album,
+): Int {
+    if (a1.edition == null && a2.edition == null) {
+        return 0
+    }
+    if (a1.edition == null) {
+        return -1
+    }
+    if (a2.edition == null) {
+        return 1
+    }
     val order = a1.edition.compareTo(a2.edition)
-    if (order != 0) { return order }
-    if (a1.editionDescription == null && a2.editionDescription == null) { return 0 }
-    if (a1.editionDescription == null) { return -1 }
-    if (a2.editionDescription == null) { return 1 }
+    if (order != 0) {
+        return order
+    }
+    if (a1.editionDescription == null && a2.editionDescription == null) {
+        return 0
+    }
+    if (a1.editionDescription == null) {
+        return -1
+    }
+    if (a2.editionDescription == null) {
+        return 1
+    }
     return a1.editionDescription.compareTo(a2.editionDescription)
 }
 
@@ -97,10 +119,10 @@ data class AlbumArtist(
     val name: String,
     val normalizedName: String,
     val order: Int,
-    val separator: String?
+    val separator: String?,
 )
 
 data class AlbumLabel(
     val labelId: Int,
-    val catalogueNumber: String?
+    val catalogueNumber: String?,
 )

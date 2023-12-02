@@ -95,7 +95,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            AccentorTheme() {
+            AccentorTheme {
                 Content()
             }
         }
@@ -103,7 +103,10 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Content(mainViewModel: MainViewModel = viewModel(), playerViewModel: PlayerViewModel = viewModel()) {
+fun Content(
+    mainViewModel: MainViewModel = viewModel(),
+    playerViewModel: PlayerViewModel = viewModel(),
+) {
     val navController = rememberNavController()
 
     val loginState by mainViewModel.loginState.observeAsState()
@@ -139,7 +142,7 @@ fun Content(mainViewModel: MainViewModel = viewModel(), playerViewModel: PlayerV
                     navController,
                     mainViewModel,
                     playerViewModel,
-                    toolbar = { ArtistToolbar(it, mainViewModel) }
+                    toolbar = { ArtistToolbar(it, mainViewModel) },
                 ) { ArtistGrid(navController) }
             }
             composable("artists/{artistId}", arguments = listOf(navArgument("artistId") { type = NavType.IntType })) { entry ->
@@ -150,7 +153,7 @@ fun Content(mainViewModel: MainViewModel = viewModel(), playerViewModel: PlayerV
                     navController,
                     mainViewModel,
                     playerViewModel,
-                    toolbar = { AlbumToolbar(it, mainViewModel) }
+                    toolbar = { AlbumToolbar(it, mainViewModel) },
                 ) { AlbumGrid(navController, playerViewModel) }
             }
             composable("albums/{albumId}", arguments = listOf(navArgument("albumId") { type = NavType.IntType })) { entry ->
@@ -164,9 +167,9 @@ fun Content(mainViewModel: MainViewModel = viewModel(), playerViewModel: PlayerV
                             mainViewModel,
                             extraDropdownItems = {
                                 AlbumViewDropdown(entry.arguments!!.getInt("albumId"), navController, it)
-                            }
+                            },
                         )
-                    }
+                    },
                 ) {
                     AlbumView(entry.arguments!!.getInt("albumId"), navController, playerViewModel)
                 }
@@ -176,7 +179,7 @@ fun Content(mainViewModel: MainViewModel = viewModel(), playerViewModel: PlayerV
                     navController,
                     mainViewModel,
                     playerViewModel,
-                    toolbar = { PlaylistToolbar(it, mainViewModel) }
+                    toolbar = { PlaylistToolbar(it, mainViewModel) },
                 ) { PlaylistList(navController, playerViewModel) }
             }
             composable("playlists/{playlistId}", arguments = listOf(navArgument("playlistId") { type = NavType.IntType })) { entry ->
@@ -194,7 +197,7 @@ fun Base(
     mainViewModel: MainViewModel = viewModel(),
     playerViewModel: PlayerViewModel = viewModel(),
     toolbar: @Composable ((DrawerState) -> Unit) = { drawerState -> BaseToolbar(drawerState, mainViewModel) },
-    mainContent: @Composable (() -> Unit)
+    mainContent: @Composable (() -> Unit),
 ) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -233,10 +236,10 @@ fun Base(
                 }
             }
         },
-        gesturesEnabled = !(isPlayerOpen ?: false)
+        gesturesEnabled = !(isPlayerOpen ?: false),
     ) {
         Scaffold(
-            topBar = { toolbar(drawerState) }
+            topBar = { toolbar(drawerState) },
         ) { contentPadding ->
             val isRefreshing by mainViewModel.isRefreshing.observeAsState()
             val state = rememberPullRefreshState(isRefreshing ?: false, { mainViewModel.refresh() })
@@ -253,7 +256,7 @@ fun BaseToolbar(
     drawerState: DrawerState,
     mainViewModel: MainViewModel = viewModel(),
     extraActions: @Composable (() -> Unit)? = null,
-    extraDropdownItems: @Composable ((() -> Unit) -> Unit)? = null
+    extraDropdownItems: @Composable ((() -> Unit) -> Unit)? = null,
 ) {
     val scope = rememberCoroutineScope()
     TopAppBar(
@@ -285,30 +288,34 @@ fun BaseToolbar(
                             mainViewModel.refresh()
                             expanded = false
                         },
-                        text = { Text(stringResource(R.string.action_refresh)) }
+                        text = { Text(stringResource(R.string.action_refresh)) },
                     )
                     DropdownMenuItem(
                         onClick = {
                             mainViewModel.logout()
                             expanded = false
                         },
-                        text = { Text(stringResource(R.string.action_sign_out)) }
+                        text = { Text(stringResource(R.string.action_sign_out)) },
                     )
                 }
             }
-        }
+        },
     )
 }
 
 @Composable
-fun SearchToolbar(value: String, update: (String) -> Unit, exit: () -> Unit) {
+fun SearchToolbar(
+    value: String,
+    update: (String) -> Unit,
+    exit: () -> Unit,
+) {
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusRequester = remember { FocusRequester() }
     TopAppBar(
         navigationIcon = {
             IconButton(
                 onClick = { exit() },
-                modifier = Modifier.padding(start = 8.dp)
+                modifier = Modifier.padding(start = 8.dp),
             ) {
                 Icon(Icons.Filled.ArrowBack, contentDescription = stringResource(R.string.stop_searching))
             }
@@ -321,26 +328,28 @@ fun SearchToolbar(value: String, update: (String) -> Unit, exit: () -> Unit) {
                 placeholder = {
                     Text(
                         stringResource(R.string.search),
-                        color = MaterialTheme.colorScheme.contentColorFor(MaterialTheme.colorScheme.primaryContainer).copy(ContentAlpha.medium)
+                        color = MaterialTheme.colorScheme.contentColorFor(MaterialTheme.colorScheme.primaryContainer).copy(ContentAlpha.medium),
                     )
                 },
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = Color.Transparent,
-                    unfocusedContainerColor = Color.Transparent,
-                    disabledContainerColor = Color.Transparent,
-                    cursorColor = LocalContentColor.current.copy(LocalContentAlpha.current),
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent
-                ),
+                colors =
+                    TextFieldDefaults.colors(
+                        focusedContainerColor = Color.Transparent,
+                        unfocusedContainerColor = Color.Transparent,
+                        disabledContainerColor = Color.Transparent,
+                        cursorColor = LocalContentColor.current.copy(LocalContentAlpha.current),
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent,
+                    ),
                 modifier = Modifier.fillMaxSize().focusRequester(focusRequester),
-                keyboardActions = KeyboardActions(
-                    onDone = {
-                        keyboardController?.hide()
-                        focusRequester.freeFocus()
-                    }
-                )
+                keyboardActions =
+                    KeyboardActions(
+                        onDone = {
+                            keyboardController?.hide()
+                            focusRequester.freeFocus()
+                        },
+                    ),
             )
-        }
+        },
     )
     LaunchedEffect(focusRequester) {
         focusRequester.requestFocus()
@@ -349,12 +358,17 @@ fun SearchToolbar(value: String, update: (String) -> Unit, exit: () -> Unit) {
 }
 
 @Composable
-fun DrawerRow(title: String, selected: Boolean, icon: Int, onClick: () -> Unit) {
+fun DrawerRow(
+    title: String,
+    selected: Boolean,
+    icon: Int,
+    onClick: () -> Unit,
+) {
     NavigationDrawerItem(
         label = { Text(title, modifier = Modifier.padding(16.dp, 8.dp)) },
         selected = selected,
         onClick = onClick,
         modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
-        icon = { Icon(painterResource(icon), contentDescription = stringResource(R.string.navigation_icon)) }
+        icon = { Icon(painterResource(icon), contentDescription = stringResource(R.string.navigation_icon)) },
     )
 }

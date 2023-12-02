@@ -40,16 +40,17 @@ import kotlinx.coroutines.launch
 fun PlayerOverlay(
     navController: NavController,
     playerViewModel: PlayerViewModel = viewModel(),
-    content: @Composable (() -> Unit)
+    content: @Composable (() -> Unit),
 ) {
     val scope = rememberCoroutineScope()
     var totalHeight by remember { mutableStateOf<Int?>(null) }
     var toolbarHeight by remember { mutableStateOf(0) }
     val height = ((totalHeight ?: 0) - toolbarHeight).toFloat()
-    val swipeableState = rememberSwipeableState(false) {
-        playerViewModel.setOpen(it)
-        true
-    }
+    val swipeableState =
+        rememberSwipeableState(false) {
+            playerViewModel.setOpen(it)
+            true
+        }
     val anchors = mapOf(0f to true, height to false)
     val showQueue by playerViewModel.showQueue.observeAsState()
     val queueLength by playerViewModel.queueLength.observeAsState()
@@ -75,24 +76,26 @@ fun PlayerOverlay(
                 }
             }
             Column(
-                modifier = Modifier
-                    .offset { IntOffset(0, swipeableState.offset.value.toInt()) }
-                    .fillMaxSize()
+                modifier =
+                    Modifier
+                        .offset { IntOffset(0, swipeableState.offset.value.toInt()) }
+                        .fillMaxSize(),
             ) {
                 Box(
-                    modifier = Modifier
-                        .swipeable(
-                            state = swipeableState,
-                            anchors = anchors,
-                            orientation = Orientation.Vertical,
-                            thresholds = { _, _ -> FixedThreshold(224.dp) }
-                        )
-                        .onSizeChanged { size -> toolbarHeight = size.height }
-                        .clickable {
-                            scope.launch {
-                                swipeableState.animateTo(!swipeableState.currentValue, SwipeableDefaults.AnimationSpec)
-                            }
-                        }
+                    modifier =
+                        Modifier
+                            .swipeable(
+                                state = swipeableState,
+                                anchors = anchors,
+                                orientation = Orientation.Vertical,
+                                thresholds = { _, _ -> FixedThreshold(224.dp) },
+                            )
+                            .onSizeChanged { size -> toolbarHeight = size.height }
+                            .clickable {
+                                scope.launch {
+                                    swipeableState.animateTo(!swipeableState.currentValue, SwipeableDefaults.AnimationSpec)
+                                }
+                            },
                 ) {
                     if (swipeableState.currentValue) {
                         ToolBar(!(isLandscape && !isMultiWindow), closePlayer = closePlayer)

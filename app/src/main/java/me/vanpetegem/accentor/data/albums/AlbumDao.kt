@@ -16,21 +16,23 @@ import java.time.format.DateTimeFormatter
 
 @Dao
 abstract class AlbumDao {
-    open fun getAll(): LiveData<List<Album>> = getAllDbAlbums().switchMap { albums ->
-        albumArtistsByAlbumId().switchMap { albumArtists ->
-            albumLabelsByAlbumId().map { albumLabels ->
-                albums.map { a -> Album.fromDb(a, albumLabels.get(a.id, ArrayList()), albumArtists.get(a.id, ArrayList())) }
+    open fun getAll(): LiveData<List<Album>> =
+        getAllDbAlbums().switchMap { albums ->
+            albumArtistsByAlbumId().switchMap { albumArtists ->
+                albumLabelsByAlbumId().map { albumLabels ->
+                    albums.map { a -> Album.fromDb(a, albumLabels.get(a.id, ArrayList()), albumArtists.get(a.id, ArrayList())) }
+                }
             }
         }
-    }
 
-    open fun getAllByPlayed(): LiveData<List<Album>> = getAllDbAlbumsByPlayed().switchMap { albums ->
-        albumArtistsByAlbumId().switchMap { albumArtists ->
-            albumLabelsByAlbumId().map { albumLabels ->
-                albums.map { a -> Album.fromDb(a, albumLabels.get(a.id, ArrayList()), albumArtists.get(a.id, ArrayList())) }
+    open fun getAllByPlayed(): LiveData<List<Album>> =
+        getAllDbAlbumsByPlayed().switchMap { albums ->
+            albumArtistsByAlbumId().switchMap { albumArtists ->
+                albumLabelsByAlbumId().map { albumLabels ->
+                    albums.map { a -> Album.fromDb(a, albumLabels.get(a.id, ArrayList()), albumArtists.get(a.id, ArrayList())) }
+                }
             }
         }
-    }
 
     open fun getByIds(ids: List<Int>): List<Album> {
         val albums = getDbAlbumsByIds(ids)
@@ -41,29 +43,31 @@ abstract class AlbumDao {
         return ids.map { Album.fromDb(albumsByIds.get(it), albumLabels.get(it, ArrayList()), albumArtists.get(it, ArrayList())) }
     }
 
-    open fun findByIds(ids: List<Int>): LiveData<List<Album>> = findDbAlbumsByIds(ids).switchMap { albums ->
-        albumArtistsByAlbumIdWhereAlbumIds(ids).switchMap { albumArtists ->
-            albumLabelsByAlbumIdWhereAlbumIds(ids).map { albumLabels ->
-                albums.map { a -> Album.fromDb(a, albumLabels.get(a.id, ArrayList()), albumArtists.get(a.id, ArrayList())) }
-            }
-        }
-    }
-
-    open fun findById(id: Int): LiveData<Album?> = findDbAlbumById(id).switchMap { dbAlbum ->
-        findDbAlbumArtistsById(id).switchMap { albumArtists ->
-            findDbAlbumLabelsById(id).map { albumLabels ->
-                if (dbAlbum != null) {
-                    Album.fromDb(
-                        dbAlbum,
-                        albumLabels.map { AlbumLabel(it.labelId, it.catalogueNumber) },
-                        albumArtists.map { AlbumArtist(it.artistId, it.name, it.normalizedName, it.order, it.separator) }
-                    )
-                } else {
-                    null
+    open fun findByIds(ids: List<Int>): LiveData<List<Album>> =
+        findDbAlbumsByIds(ids).switchMap { albums ->
+            albumArtistsByAlbumIdWhereAlbumIds(ids).switchMap { albumArtists ->
+                albumLabelsByAlbumIdWhereAlbumIds(ids).map { albumLabels ->
+                    albums.map { a -> Album.fromDb(a, albumLabels.get(a.id, ArrayList()), albumArtists.get(a.id, ArrayList())) }
                 }
             }
         }
-    }
+
+    open fun findById(id: Int): LiveData<Album?> =
+        findDbAlbumById(id).switchMap { dbAlbum ->
+            findDbAlbumArtistsById(id).switchMap { albumArtists ->
+                findDbAlbumLabelsById(id).map { albumLabels ->
+                    if (dbAlbum != null) {
+                        Album.fromDb(
+                            dbAlbum,
+                            albumLabels.map { AlbumLabel(it.labelId, it.catalogueNumber) },
+                            albumArtists.map { AlbumArtist(it.artistId, it.name, it.normalizedName, it.order, it.separator) },
+                        )
+                    } else {
+                        null
+                    }
+                }
+            }
+        }
 
     open fun findByDay(day: LocalDate): LiveData<List<Album>> =
         findDbAlbumsByDay(day.format(DateTimeFormatter.ISO_LOCAL_DATE).substring(4)).switchMap { albums ->
@@ -84,7 +88,7 @@ abstract class AlbumDao {
         return Album.fromDb(
             dbAlbum,
             albumLabels.map { AlbumLabel(it.labelId, it.catalogueNumber) },
-            albumArtists.map { AlbumArtist(it.artistId, it.name, it.normalizedName, it.order, it.separator) }
+            albumArtists.map { AlbumArtist(it.artistId, it.name, it.normalizedName, it.order, it.separator) },
         )
     }
 
@@ -108,7 +112,7 @@ abstract class AlbumDao {
                       edition ASC,
                       edition_description ASC,
                       id ASC
-        """
+        """,
     )
     protected abstract fun findDbAlbumsByDay(day: String): LiveData<List<DbAlbum>>
 
@@ -209,8 +213,8 @@ abstract class AlbumDao {
                     album.image250,
                     album.image100,
                     album.imageType,
-                    album.fetchedAt
-                )
+                    album.fetchedAt,
+                ),
             )
             deleteAlbumLabelsById(album.id)
             for (al: AlbumLabel in album.albumLabels) {
@@ -233,7 +237,7 @@ abstract class AlbumDao {
                SELECT tracks.album_id as album_id, MAX(plays.played_at) AS played_at FROM
                    tracks INNER JOIN plays ON tracks.id = plays.track_id GROUP BY tracks.album_id
            ) p ON p.album_id = albums.id ORDER BY p.played_at DESC
-        """
+        """,
     )
     protected abstract fun getAllDbAlbumsByPlayed(): LiveData<List<DbAlbum>>
 

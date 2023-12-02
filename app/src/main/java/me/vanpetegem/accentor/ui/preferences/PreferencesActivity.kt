@@ -49,7 +49,7 @@ class PreferencesActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            AccentorTheme() {
+            AccentorTheme {
                 Content()
             }
         }
@@ -67,9 +67,9 @@ fun Content(preferencesViewModel: PreferencesViewModel = viewModel()) {
                     IconButton(onClick = { (context as Activity).finish() }) {
                         Icon(Icons.Filled.ArrowBack, contentDescription = stringResource(R.string.close_preferences))
                     }
-                }
+                },
             )
-        }
+        },
     ) { innerPadding ->
         val currentUser by preferencesViewModel.currentUser.observeAsState()
         val server by preferencesViewModel.server.observeAsState()
@@ -78,9 +78,10 @@ fun Content(preferencesViewModel: PreferencesViewModel = viewModel()) {
         val musicCacheSize by preferencesViewModel.musicCacheSize.observeAsState()
         val conversion by preferencesViewModel.conversion.observeAsState()
         val possibleConversions by preferencesViewModel.possibleConversions.observeAsState()
-        val formattedTime = lastSyncFinished?.let {
-            DateUtils.formatDateTime(context, it.toEpochMilli(), DateUtils.FORMAT_SHOW_TIME or DateUtils.FORMAT_SHOW_DATE)
-        } ?: stringResource(R.string.not_finished_yet)
+        val formattedTime =
+            lastSyncFinished?.let {
+                DateUtils.formatDateTime(context, it.toEpochMilli(), DateUtils.FORMAT_SHOW_TIME or DateUtils.FORMAT_SHOW_DATE)
+            } ?: stringResource(R.string.not_finished_yet)
         Column(modifier = Modifier.padding(innerPadding)) {
             Setting(stringResource(R.string.logged_in_as, "${currentUser?.name}"), server!!)
             Setting(stringResource(R.string.last_sync_finished), formattedTime)
@@ -96,7 +97,7 @@ fun Content(preferencesViewModel: PreferencesViewModel = viewModel()) {
                 stringResource(R.string.change_music_cache_size),
                 musicCacheSizeValid,
                 { preferencesViewModel.setMusicCacheSize(newMusicCacheValue.toLong() * 1024L * 1024L) },
-                { musicCacheOpen = false }
+                { musicCacheOpen = false },
             ) {
                 Column {
                     Text(stringResource(R.string.music_cache_explanation), modifier = Modifier.padding(bottom = 16.dp))
@@ -115,7 +116,7 @@ fun Content(preferencesViewModel: PreferencesViewModel = viewModel()) {
                 stringResource(R.string.change_image_cache_size),
                 imageCacheSizeValid,
                 { preferencesViewModel.setImageCacheSize(newImageCacheValue.toLong() * 1024L * 1024L) },
-                { imageCacheOpen = false }
+                { imageCacheOpen = false },
             ) {
                 Column {
                     Text(stringResource(R.string.image_cache_explanation), modifier = Modifier.padding(bottom = 16.dp))
@@ -136,7 +137,7 @@ fun Content(preferencesViewModel: PreferencesViewModel = viewModel()) {
                                     preferencesViewModel.setConversionId(pConversion.id)
                                     conversionsExpanded = false
                                 },
-                                text = { Text(pConversion.name) }
+                                text = { Text(pConversion.name) },
                             )
                         }
                     }
@@ -154,12 +155,16 @@ fun Header(text: String) {
         text,
         color = MaterialTheme.colorScheme.secondary,
         style = MaterialTheme.typography.titleSmall,
-        modifier = Modifier.padding(start = 8.dp, top = 16.dp)
+        modifier = Modifier.padding(start = 8.dp, top = 16.dp),
     )
 }
 
 @Composable
-fun Setting(text: String, subtext: String? = null, onClick: (() -> Unit)? = null) {
+fun Setting(
+    text: String,
+    subtext: String? = null,
+    onClick: (() -> Unit)? = null,
+) {
     var modifier = Modifier.fillMaxWidth()
     if (onClick != null) {
         modifier = modifier.clickable(onClick = onClick)
@@ -171,7 +176,7 @@ fun Setting(text: String, subtext: String? = null, onClick: (() -> Unit)? = null
                 subtext,
                 modifier = Modifier.padding(bottom = 8.dp, start = 8.dp),
                 style = MaterialTheme.typography.bodyMedium,
-                color = LocalContentColor.current.copy(alpha = ContentAlpha.medium)
+                color = LocalContentColor.current.copy(alpha = ContentAlpha.medium),
             )
         }
     }
@@ -184,7 +189,7 @@ fun SettingDialog(
     canSave: Boolean,
     save: (() -> Unit),
     dismiss: (() -> Unit),
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
     if (opened) {
         AlertDialog(
@@ -195,8 +200,11 @@ fun SettingDialog(
                 TextButton(onClick = dismiss) { Text(stringResource(R.string.cancel)) }
             },
             confirmButton = {
-                TextButton(onClick = { save(); dismiss() }, enabled = canSave) { Text(stringResource(R.string.save)) }
-            }
+                TextButton(onClick = {
+                    save()
+                    dismiss()
+                }, enabled = canSave) { Text(stringResource(R.string.save)) }
+            },
         )
     }
 }

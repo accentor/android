@@ -19,7 +19,11 @@ import me.vanpetegem.accentor.ui.player.PlayerViewModel
 import me.vanpetegem.accentor.ui.util.FastScrollableGrid
 
 @Composable
-fun AlbumGrid(navController: NavController, playerViewModel: PlayerViewModel, albumsViewModel: AlbumsViewModel = hiltViewModel()) {
+fun AlbumGrid(
+    navController: NavController,
+    playerViewModel: PlayerViewModel,
+    albumsViewModel: AlbumsViewModel = hiltViewModel(),
+) {
     val albums by albumsViewModel.filteredAlbums.observeAsState()
     if (albums != null) {
         FastScrollableGrid(albums!!, { it.firstCharacter().uppercase() }) { album -> AlbumCard(album, navController, playerViewModel) }
@@ -27,7 +31,11 @@ fun AlbumGrid(navController: NavController, playerViewModel: PlayerViewModel, al
 }
 
 @Composable
-fun AlbumToolbar(drawerState: DrawerState, mainViewModel: MainViewModel, albumsViewModel: AlbumsViewModel = hiltViewModel()) {
+fun AlbumToolbar(
+    drawerState: DrawerState,
+    mainViewModel: MainViewModel,
+    albumsViewModel: AlbumsViewModel = hiltViewModel(),
+) {
     val searching by albumsViewModel.searching.observeAsState()
     if (searching ?: false) {
         val query by albumsViewModel.query.observeAsState()
@@ -43,7 +51,7 @@ fun AlbumToolbar(drawerState: DrawerState, mainViewModel: MainViewModel, albumsV
                 IconButton(onClick = { albumsViewModel.setSearching(true) }) {
                     Icon(Icons.Filled.Search, contentDescription = stringResource(R.string.search))
                 }
-            }
+            },
         )
     }
 }
