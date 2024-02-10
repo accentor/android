@@ -10,11 +10,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.DismissValue
-import androidx.compose.material.SwipeToDismiss
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.rememberDismissState
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
@@ -23,7 +20,10 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -76,90 +76,91 @@ fun QueueItem(
     }
     val scope = rememberCoroutineScope()
     val dismissState =
-        rememberDismissState {
-            if (it == DismissValue.DismissedToEnd || it == DismissValue.DismissedToStart) {
-                scope.launch(IO) { playerViewModel.removeFromQueue(index) }
-                true
-            } else {
-                false
-            }
-        }
-    SwipeToDismiss(
-        state = dismissState,
-        background = { Surface {} },
-        dismissContent = {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier =
-                    Modifier
-                        .padding(8.dp)
-                        .clickable {
-                            scope.launch(IO) {
-                                playerViewModel.skipTo(index)
-                                playerViewModel.play()
-                            }
-                        },
-            ) {
-                val track = item.second
-                if (item.first) {
-                    Icon(
-                        painterResource(R.drawable.ic_play),
-                        contentDescription = stringResource(R.string.now_playing),
-                        modifier = Modifier.padding(end = 8.dp),
-                    )
+        rememberSwipeToDismissBoxState(
+            confirmValueChange = {
+                if (it == SwipeToDismissBoxValue.EndToStart || it == SwipeToDismissBoxValue.StartToEnd) {
+                    scope.launch(IO) { playerViewModel.removeFromQueue(index) }
+                    true
+                } else {
+                    false
                 }
-                if (track != null) {
-                    Column(Modifier.weight(1f)) {
-                        Text(
-                            track.title,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            style = MaterialTheme.typography.titleMedium,
-                        )
-                        Text(
-                            track.stringifyTrackArtists(),
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            style = MaterialTheme.typography.titleSmall,
-                            fontWeight = FontWeight.Normal,
-                            color = LocalContentColor.current,
-                        )
-                    }
+            },
+        )
+    SwipeToDismissBox(
+        state = dismissState,
+        backgroundContent = { Surface {} },
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier =
+                Modifier
+                    .padding(8.dp)
+                    .clickable {
+                        scope.launch(IO) {
+                            playerViewModel.skipTo(index)
+                            playerViewModel.play()
+                        }
+                    },
+        ) {
+            val track = item.second
+            if (item.first) {
+                Icon(
+                    painterResource(R.drawable.ic_play),
+                    contentDescription = stringResource(R.string.now_playing),
+                    modifier = Modifier.padding(end = 8.dp),
+                )
+            }
+            if (track != null) {
+                Column(Modifier.weight(1f)) {
                     Text(
-                        track.length.formatTrackLength(),
+                        track.title,
                         maxLines = 1,
-                        style = MaterialTheme.typography.bodyMedium,
+                        overflow = TextOverflow.Ellipsis,
+                        style = MaterialTheme.typography.titleMedium,
+                    )
+                    Text(
+                        track.stringifyTrackArtists(),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.Normal,
                         color = LocalContentColor.current,
                     )
-                    Box(modifier = Modifier.height(40.dp).aspectRatio(1f).wrapContentSize(Alignment.TopStart)) {
-                        var expanded by remember { mutableStateOf(false) }
-                        IconButton(onClick = { expanded = true }) {
-                            Icon(Icons.Default.MoreVert, contentDescription = stringResource(R.string.open_menu))
-                        }
-                        DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+                }
+                Text(
+                    track.length.formatTrackLength(),
+                    maxLines = 1,
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Normal,
+                    color = LocalContentColor.current,
+                )
+                Box(modifier = Modifier.height(40.dp).aspectRatio(1f).wrapContentSize(Alignment.TopStart)) {
+                    var expanded by remember { mutableStateOf(false) }
+                    IconButton(onClick = { expanded = true }) {
+                        Icon(Icons.Default.MoreVert, contentDescription = stringResource(R.string.open_menu))
+                    }
+                    DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+                        DropdownMenuItem(
+                            onClick = {
+                                expanded = false
+                                navController.navigate("albums/${track.albumId}")
+                                closePlayer()
+                            },
+                            text = { Text(stringResource(R.string.go_to_album)) },
+                        )
+                        for (ta in track.trackArtists.sortedBy { ta -> ta.order }) {
                             DropdownMenuItem(
                                 onClick = {
                                     expanded = false
-                                    navController.navigate("albums/${track.albumId}")
+                                    navController.navigate("artists/${ta.artistId}")
                                     closePlayer()
                                 },
-                                text = { Text(stringResource(R.string.go_to_album)) },
+                                text = { Text(stringResource(R.string.go_to, ta.name)) },
                             )
-                            for (ta in track.trackArtists.sortedBy { ta -> ta.order }) {
-                                DropdownMenuItem(
-                                    onClick = {
-                                        expanded = false
-                                        navController.navigate("artists/${ta.artistId}")
-                                        closePlayer()
-                                    },
-                                    text = { Text(stringResource(R.string.go_to, ta.name)) },
-                                )
-                            }
                         }
                     }
                 }
             }
-        },
-    )
+        }
+    }
 }
