@@ -11,7 +11,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
-import androidx.compose.material.ContentAlpha
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -31,6 +30,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -77,7 +77,8 @@ fun PlaylistView(
                 Text(
                     (user?.name ?: "") + " · " + itemInfo,
                     style = MaterialTheme.typography.headlineMedium,
-                    color = LocalContentColor.current.copy(alpha = ContentAlpha.medium),
+                    color = LocalContentColor.current,
+                    fontWeight = FontWeight.Normal,
                 )
                 Row(modifier = Modifier.padding(8.dp)) {
                     IconButton(onClick = { scope.launch(IO) { playerViewModel.play(playlist) } }) {
