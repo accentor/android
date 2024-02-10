@@ -3,8 +3,13 @@ package me.vanpetegem.accentor.ui.player
 import android.app.Activity
 import android.content.res.Configuration
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.core.SpringSpec
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.AnchoredDraggableState
+import androidx.compose.foundation.gestures.DraggableAnchors
 import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.anchoredDraggable
+import androidx.compose.foundation.gestures.animateTo
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -13,13 +18,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.FixedThreshold
-import androidx.compose.material.SwipeableDefaults
-import androidx.compose.material.rememberSwipeableState
-import androidx.compose.material.swipeable
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -30,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -43,61 +44,80 @@ fun PlayerOverlay(
     content: @Composable (() -> Unit),
 ) {
     val scope = rememberCoroutineScope()
-    var totalHeight by remember { mutableStateOf<Int?>(null) }
+    val screenHeight = LocalConfiguration.current.screenHeightDp
+    var totalHeight by remember { mutableStateOf(screenHeight) }
     var toolbarHeight by remember { mutableStateOf(0) }
-    val height = ((totalHeight ?: 0) - toolbarHeight).toFloat()
-    val swipeableState =
-        rememberSwipeableState(false) {
-            playerViewModel.setOpen(it)
-            true
-        }
-    val anchors = mapOf(0f to true, height to false)
+    val height = (totalHeight - toolbarHeight).toFloat()
     val showQueue by playerViewModel.showQueue.observeAsState()
     val queueLength by playerViewModel.queueLength.observeAsState()
     val showPlayer = (queueLength ?: 0) > 0
     val isLandscape = (LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE)
     val isMultiWindow = (LocalContext.current as Activity).isInMultiWindowMode()
-    LaunchedEffect(queueLength) {
-        if (queueLength == 0) {
-            scope.launch { swipeableState.snapTo(false) }
+    val anchors =
+        DraggableAnchors {
+            true at 0f
+            false at height
         }
-    }
+    val velThreshold = with(LocalDensity.current) { 125.dp.toPx() }
+    val posThreshold = with(LocalDensity.current) { 224.dp.toPx() }
+    val anchoredDraggableState =
+        remember {
+            AnchoredDraggableState(
+                initialValue = false,
+                anchors = anchors,
+                positionalThreshold = { posThreshold },
+                velocityThreshold = { velThreshold },
+                animationSpec = SpringSpec<Float>(),
+            ) {
+                playerViewModel.setOpen(it)
+                true
+            }
+        }
+    val closePlayer: () -> Unit = { scope.launch { anchoredDraggableState.animateTo(false) } }
 
-    val closePlayer: () -> Unit = { scope.launch { swipeableState.animateTo(false, SwipeableDefaults.AnimationSpec) } }
-
-    Box(modifier = Modifier.onSizeChanged { size -> totalHeight = size.height }) {
+    Box(
+        modifier =
+            Modifier.onSizeChanged { size ->
+                totalHeight = size.height
+                anchoredDraggableState.updateAnchors(
+                    DraggableAnchors {
+                        true at 0f
+                        false at (size.height - toolbarHeight).toFloat()
+                    },
+                )
+            },
+    ) {
         Box(modifier = Modifier.fillMaxSize().padding(bottom = if (showPlayer) 56.dp else 0.dp)) {
             content()
         }
-        if (totalHeight != null && showPlayer) {
-            BackHandler(swipeableState.currentValue) {
-                scope.launch {
-                    swipeableState.animateTo(false, SwipeableDefaults.AnimationSpec)
-                }
-            }
+        if (showPlayer) {
+            BackHandler(anchoredDraggableState.currentValue, closePlayer)
             Column(
                 modifier =
                     Modifier
-                        .offset { IntOffset(0, swipeableState.offset.value.toInt()) }
+                        .offset { IntOffset(0, anchoredDraggableState.requireOffset().toInt()) }
                         .fillMaxSize(),
             ) {
                 Box(
                     modifier =
                         Modifier
-                            .swipeable(
-                                state = swipeableState,
-                                anchors = anchors,
-                                orientation = Orientation.Vertical,
-                                thresholds = { _, _ -> FixedThreshold(224.dp) },
-                            )
-                            .onSizeChanged { size -> toolbarHeight = size.height }
+                            .anchoredDraggable(state = anchoredDraggableState, orientation = Orientation.Vertical)
+                            .onSizeChanged { size ->
+                                toolbarHeight = size.height
+                                anchoredDraggableState.updateAnchors(
+                                    DraggableAnchors {
+                                        true at 0f
+                                        false at (totalHeight - size.height).toFloat()
+                                    },
+                                )
+                            }
                             .clickable {
                                 scope.launch {
-                                    swipeableState.animateTo(!swipeableState.currentValue, SwipeableDefaults.AnimationSpec)
+                                    anchoredDraggableState.animateTo(!anchoredDraggableState.currentValue)
                                 }
                             },
                 ) {
-                    if (swipeableState.currentValue) {
+                    if (anchoredDraggableState.currentValue) {
                         ToolBar(!(isLandscape && !isMultiWindow), closePlayer = closePlayer)
                     } else {
                         ControlBar()
