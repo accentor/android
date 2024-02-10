@@ -18,9 +18,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.pullrefresh.PullRefreshIndicator
-import androidx.compose.material.pullrefresh.pullRefresh
-import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.DismissibleDrawerSheet
 import androidx.compose.material3.DismissibleNavigationDrawer
 import androidx.compose.material3.DrawerState
@@ -40,6 +37,8 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.contentColorFor
+import androidx.compose.material3.pulltorefresh.PullToRefreshContainer
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -55,6 +54,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
@@ -241,10 +241,20 @@ fun Base(
             topBar = { toolbar(drawerState) },
         ) { contentPadding ->
             val isRefreshing by mainViewModel.isRefreshing.observeAsState()
-            val state = rememberPullRefreshState(isRefreshing ?: false, { mainViewModel.refresh() })
-            Box(modifier = Modifier.pullRefresh(state).padding(contentPadding)) {
+            val state = rememberPullToRefreshState()
+            if (state.isRefreshing) {
+                LaunchedEffect(true) {
+                    mainViewModel.refresh()
+                }
+            }
+            if (!(isRefreshing ?: false)) {
+                LaunchedEffect(true) {
+                    state.endRefresh()
+                }
+            }
+            Box(modifier = Modifier.nestedScroll(state.nestedScrollConnection).padding(contentPadding)) {
                 mainContent()
-                PullRefreshIndicator(isRefreshing ?: false, state, Modifier.align(Alignment.TopCenter))
+                PullToRefreshContainer(state = state, modifier = Modifier.align(Alignment.TopCenter))
             }
         }
     }
