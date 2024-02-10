@@ -16,7 +16,7 @@ import androidx.compose.material.SwipeToDismiss
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.rememberDismissState
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -72,7 +72,7 @@ fun QueueItem(
     closePlayer: (() -> Unit),
 ) {
     if (index != 0) {
-        Divider()
+        HorizontalDivider()
     }
     val scope = rememberCoroutineScope()
     val dismissState =

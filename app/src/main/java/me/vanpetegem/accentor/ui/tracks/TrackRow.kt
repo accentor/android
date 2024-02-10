@@ -12,7 +12,7 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -113,5 +113,5 @@ fun TrackRow(
             }
         }
     }
-    Divider()
+    HorizontalDivider()
 }

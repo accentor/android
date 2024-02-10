@@ -9,7 +9,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -85,7 +85,7 @@ fun PlaylistListItem(
     user: User?,
 ) {
     if (index != 0) {
-        Divider()
+        HorizontalDivider()
     }
     val itemInfo =
         pluralStringResource(

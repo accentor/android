@@ -15,7 +15,7 @@ import androidx.compose.material.ContentAlpha
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -104,7 +104,7 @@ fun Content(preferencesViewModel: PreferencesViewModel = viewModel()) {
                     OutlinedTextField(newMusicCacheValue, { newMusicCacheValue = it }, isError = !musicCacheSizeValid)
                 }
             }
-            Divider()
+            HorizontalDivider()
             var imageCacheOpen by remember { mutableStateOf(false) }
             var newImageCacheValue by remember { mutableStateOf("${imageCacheSize!! / 1024L / 1024L}") }
             val imageCacheSizeValid = (newImageCacheValue.toLongOrNull() ?: 0) > 100L
@@ -123,7 +123,7 @@ fun Content(preferencesViewModel: PreferencesViewModel = viewModel()) {
                     OutlinedTextField(newImageCacheValue, { newImageCacheValue = it }, isError = !imageCacheSizeValid)
                 }
             }
-            Divider()
+            HorizontalDivider()
             var conversionsExpanded by remember { mutableStateOf(false) }
             Box(modifier = Modifier.fillMaxWidth().wrapContentSize(Alignment.TopStart)) {
                 Setting(stringResource(R.string.codec_conversion), conversion?.name ?: stringResource(R.string.not_set)) {

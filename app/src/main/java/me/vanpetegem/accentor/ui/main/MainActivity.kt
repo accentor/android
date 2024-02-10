@@ -25,7 +25,7 @@ import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.DismissibleDrawerSheet
 import androidx.compose.material3.DismissibleNavigationDrawer
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.DropdownMenu
@@ -229,7 +229,7 @@ fun Base(
                     navController.navigate("playlists")
                     scope.launch { drawerState.close() }
                 }
-                Divider()
+                HorizontalDivider()
                 DrawerRow(stringResource(R.string.preferences), false, R.drawable.ic_menu_preferences) {
                     context.startActivity(Intent(context, PreferencesActivity::class.java))
                     scope.launch { drawerState.close() }
