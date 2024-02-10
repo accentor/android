@@ -14,22 +14,17 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.material.ContentAlpha
-import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.pullrefresh.PullRefreshIndicator
-import androidx.compose.material.pullrefresh.pullRefresh
-import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.DismissibleDrawerSheet
 import androidx.compose.material3.DismissibleNavigationDrawer
-import androidx.compose.material3.Divider
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
@@ -42,6 +37,8 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.contentColorFor
+import androidx.compose.material3.pulltorefresh.PullToRefreshContainer
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -57,10 +54,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -229,7 +228,7 @@ fun Base(
                     navController.navigate("playlists")
                     scope.launch { drawerState.close() }
                 }
-                Divider()
+                HorizontalDivider()
                 DrawerRow(stringResource(R.string.preferences), false, R.drawable.ic_menu_preferences) {
                     context.startActivity(Intent(context, PreferencesActivity::class.java))
                     scope.launch { drawerState.close() }
@@ -242,10 +241,20 @@ fun Base(
             topBar = { toolbar(drawerState) },
         ) { contentPadding ->
             val isRefreshing by mainViewModel.isRefreshing.observeAsState()
-            val state = rememberPullRefreshState(isRefreshing ?: false, { mainViewModel.refresh() })
-            Box(modifier = Modifier.pullRefresh(state).padding(contentPadding)) {
+            val state = rememberPullToRefreshState()
+            if (state.isRefreshing) {
+                LaunchedEffect(true) {
+                    mainViewModel.refresh()
+                }
+            }
+            if (!(isRefreshing ?: false)) {
+                LaunchedEffect(true) {
+                    state.endRefresh()
+                }
+            }
+            Box(modifier = Modifier.nestedScroll(state.nestedScrollConnection).padding(contentPadding)) {
                 mainContent()
-                PullRefreshIndicator(isRefreshing ?: false, state, Modifier.align(Alignment.TopCenter))
+                PullToRefreshContainer(state = state, modifier = Modifier.align(Alignment.TopCenter))
             }
         }
     }
@@ -317,7 +326,7 @@ fun SearchToolbar(
                 onClick = { exit() },
                 modifier = Modifier.padding(start = 8.dp),
             ) {
-                Icon(Icons.Filled.ArrowBack, contentDescription = stringResource(R.string.stop_searching))
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.stop_searching))
             }
         },
         title = {
@@ -328,7 +337,8 @@ fun SearchToolbar(
                 placeholder = {
                     Text(
                         stringResource(R.string.search),
-                        color = MaterialTheme.colorScheme.contentColorFor(MaterialTheme.colorScheme.primaryContainer).copy(ContentAlpha.medium),
+                        color = MaterialTheme.colorScheme.contentColorFor(MaterialTheme.colorScheme.primaryContainer),
+                        fontWeight = FontWeight.Normal,
                     )
                 },
                 colors =
@@ -336,7 +346,7 @@ fun SearchToolbar(
                         focusedContainerColor = Color.Transparent,
                         unfocusedContainerColor = Color.Transparent,
                         disabledContainerColor = Color.Transparent,
-                        cursorColor = LocalContentColor.current.copy(LocalContentAlpha.current),
+                        cursorColor = LocalContentColor.current,
                         focusedIndicatorColor = Color.Transparent,
                         unfocusedIndicatorColor = Color.Transparent,
                     ),

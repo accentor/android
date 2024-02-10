@@ -11,13 +11,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.material.ContentAlpha
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
@@ -37,6 +36,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -65,7 +65,7 @@ fun Content(preferencesViewModel: PreferencesViewModel = viewModel()) {
                 title = { Text(stringResource(R.string.preferences)) },
                 navigationIcon = {
                     IconButton(onClick = { (context as Activity).finish() }) {
-                        Icon(Icons.Filled.ArrowBack, contentDescription = stringResource(R.string.close_preferences))
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.close_preferences))
                     }
                 },
             )
@@ -104,7 +104,7 @@ fun Content(preferencesViewModel: PreferencesViewModel = viewModel()) {
                     OutlinedTextField(newMusicCacheValue, { newMusicCacheValue = it }, isError = !musicCacheSizeValid)
                 }
             }
-            Divider()
+            HorizontalDivider()
             var imageCacheOpen by remember { mutableStateOf(false) }
             var newImageCacheValue by remember { mutableStateOf("${imageCacheSize!! / 1024L / 1024L}") }
             val imageCacheSizeValid = (newImageCacheValue.toLongOrNull() ?: 0) > 100L
@@ -123,7 +123,7 @@ fun Content(preferencesViewModel: PreferencesViewModel = viewModel()) {
                     OutlinedTextField(newImageCacheValue, { newImageCacheValue = it }, isError = !imageCacheSizeValid)
                 }
             }
-            Divider()
+            HorizontalDivider()
             var conversionsExpanded by remember { mutableStateOf(false) }
             Box(modifier = Modifier.fillMaxWidth().wrapContentSize(Alignment.TopStart)) {
                 Setting(stringResource(R.string.codec_conversion), conversion?.name ?: stringResource(R.string.not_set)) {
@@ -176,7 +176,8 @@ fun Setting(
                 subtext,
                 modifier = Modifier.padding(bottom = 8.dp, start = 8.dp),
                 style = MaterialTheme.typography.bodyMedium,
-                color = LocalContentColor.current.copy(alpha = ContentAlpha.medium),
+                color = LocalContentColor.current,
+                fontWeight = FontWeight.Normal,
             )
         }
     }

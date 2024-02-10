@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -48,7 +47,7 @@ fun Controls(playerViewModel: PlayerViewModel = viewModel()) {
                             painterResource(R.drawable.ic_repeat_all),
                             contentDescription = stringResource(R.string.repeat_all),
                             modifier = Modifier.height(32.dp).aspectRatio(1f),
-                            tint = MaterialTheme.colorScheme.primary.copy(alpha = LocalContentAlpha.current),
+                            tint = MaterialTheme.colorScheme.primary,
                         )
                     }
                 }
@@ -58,7 +57,7 @@ fun Controls(playerViewModel: PlayerViewModel = viewModel()) {
                             painterResource(R.drawable.ic_repeat_one),
                             contentDescription = stringResource(R.string.repeat_one),
                             modifier = Modifier.height(32.dp).aspectRatio(1f),
-                            tint = MaterialTheme.colorScheme.primary.copy(alpha = LocalContentAlpha.current),
+                            tint = MaterialTheme.colorScheme.primary,
                         )
                     }
                 }
@@ -127,7 +126,7 @@ fun Controls(playerViewModel: PlayerViewModel = viewModel()) {
                         painterResource(R.drawable.ic_shuffle_all),
                         contentDescription = stringResource(R.string.shuffle_all),
                         modifier = Modifier.height(32.dp).aspectRatio(1f),
-                        tint = MaterialTheme.colorScheme.primary.copy(alpha = LocalContentAlpha.current),
+                        tint = MaterialTheme.colorScheme.primary,
                     )
                 }
             } else {

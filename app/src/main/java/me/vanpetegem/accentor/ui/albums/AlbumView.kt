@@ -7,11 +7,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.ContentAlpha
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -23,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -69,7 +68,7 @@ fun AlbumView(
                         Text(
                             album.stringifyAlbumArtists().let { if (it.isEmpty()) stringResource(R.string.various_artists) else it },
                             style = MaterialTheme.typography.titleMedium,
-                            color = LocalContentColor.current.copy(alpha = ContentAlpha.medium),
+                            fontWeight = FontWeight.Normal,
                             modifier = Modifier.padding(start = 8.dp),
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
@@ -77,7 +76,7 @@ fun AlbumView(
                         Text(
                             if (album.edition == null) album.release.format() else "${album.release.format()} (${album.edition.format()})",
                             style = MaterialTheme.typography.titleSmall,
-                            color = LocalContentColor.current.copy(alpha = ContentAlpha.medium),
+                            fontWeight = FontWeight.Normal,
                             modifier = Modifier.padding(start = 8.dp),
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
