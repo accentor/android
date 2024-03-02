@@ -22,7 +22,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
@@ -45,8 +45,8 @@ fun PlayerOverlay(
 ) {
     val scope = rememberCoroutineScope()
     val screenHeight = LocalConfiguration.current.screenHeightDp
-    var totalHeight by remember { mutableStateOf(screenHeight) }
-    var toolbarHeight by remember { mutableStateOf(0) }
+    var totalHeight by remember { mutableIntStateOf(screenHeight) }
+    var toolbarHeight by remember { mutableIntStateOf(0) }
     val height = (totalHeight - toolbarHeight).toFloat()
     val showQueue by playerViewModel.showQueue.observeAsState()
     val queueLength by playerViewModel.queueLength.observeAsState()
