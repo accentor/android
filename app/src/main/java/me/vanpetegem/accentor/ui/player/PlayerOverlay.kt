@@ -3,7 +3,8 @@ package me.vanpetegem.accentor.ui.player
 import android.app.Activity
 import android.content.res.Configuration
 import androidx.activity.compose.BackHandler
-import androidx.compose.animation.core.SpringSpec
+import androidx.compose.animation.core.exponentialDecay
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.AnchoredDraggableState
 import androidx.compose.foundation.gestures.DraggableAnchors
@@ -67,7 +68,8 @@ fun PlayerOverlay(
                 anchors = anchors,
                 positionalThreshold = { posThreshold },
                 velocityThreshold = { velThreshold },
-                animationSpec = SpringSpec<Float>(),
+                snapAnimationSpec = tween(),
+                decayAnimationSpec = exponentialDecay(),
             ) {
                 playerViewModel.setOpen(it)
                 true
