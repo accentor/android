@@ -127,7 +127,7 @@ fun Content(loginViewModel: LoginViewModel = viewModel()) {
                     singleLine = true,
                     keyboardOptions =
                         KeyboardOptions(
-                            autoCorrect = false,
+                            autoCorrectEnabled = false,
                             capitalization = KeyboardCapitalization.None,
                             imeAction = ImeAction.Next,
                             keyboardType = KeyboardType.Uri,
@@ -149,7 +149,7 @@ fun Content(loginViewModel: LoginViewModel = viewModel()) {
                         }.fillMaxWidth().padding(start = 16.dp, end = 16.dp).focusRequester(usernameFocusRequester),
                     keyboardOptions =
                         KeyboardOptions(
-                            autoCorrect = false,
+                            autoCorrectEnabled = false,
                             capitalization = KeyboardCapitalization.None,
                             imeAction = ImeAction.Next,
                         ),
@@ -174,7 +174,7 @@ fun Content(loginViewModel: LoginViewModel = viewModel()) {
                     visualTransformation = PasswordVisualTransformation(),
                     keyboardOptions =
                         KeyboardOptions(
-                            autoCorrect = false,
+                            autoCorrectEnabled = false,
                             capitalization = KeyboardCapitalization.None,
                             keyboardType = KeyboardType.Password,
                             imeAction = ImeAction.Done,
