@@ -3,6 +3,7 @@ plugins {
     id('com.google.devtools.ksp')
     id('kotlin-android')
     id('dagger.hilt.android.plugin')
+    id('org.jetbrains.kotlin.plugin.compose')
     id('org.jlleitschuh.gradle.ktlint')
 }
 
@@ -35,9 +36,6 @@ android {
     compileOptions {
         targetCompatibility "17"
         sourceCompatibility "17"
-    }
-    composeOptions {
-        kotlinCompilerExtensionVersion "1.5.15"
     }
     kotlinOptions {
         jvmTarget = "17"
