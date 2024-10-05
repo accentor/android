@@ -51,6 +51,7 @@ android {
     lintOptions {
         quiet true
         checkAllWarnings true
+        disable 'AndroidGradlePluginVersion'
         disable 'GradleDependency'
         disable 'InvalidPackage'
         disable 'ObsoleteLintCustomCheck'
