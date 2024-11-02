@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -79,7 +80,7 @@ fun PlayerOverlay(
 
     Box(
         modifier =
-            Modifier.onSizeChanged { size ->
+            Modifier.safeDrawingPadding().onSizeChanged { size ->
                 totalHeight = size.height
                 anchoredDraggableState.updateAnchors(
                     DraggableAnchors {
@@ -89,7 +90,7 @@ fun PlayerOverlay(
                 )
             },
     ) {
-        Box(modifier = Modifier.fillMaxSize().padding(bottom = if (showPlayer) 56.dp else 0.dp)) {
+        Box(modifier = Modifier.fillMaxSize().padding(bottom = if (showPlayer) 64.dp else 0.dp)) {
             content()
         }
         if (showPlayer) {
