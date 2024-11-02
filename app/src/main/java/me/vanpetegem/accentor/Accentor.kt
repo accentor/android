@@ -26,9 +26,9 @@ class Accentor : Application(), ImageLoaderFactory {
                 applicationContext.packageManager.getPackageInfo(
                     packageName,
                     PackageManager.PackageInfoFlags.of(0),
-                ).versionName
+                ).versionName!!
             } else {
-                applicationContext.packageManager.getPackageInfo(packageName, 0).versionName
+                applicationContext.packageManager.getPackageInfo(packageName, 0).versionName!!
             }
         userAgent = "Accentor/$version"
         FuelManager.instance.baseHeaders = mapOf("User-Agent" to userAgent)
