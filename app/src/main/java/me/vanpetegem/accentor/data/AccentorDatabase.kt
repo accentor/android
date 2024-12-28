@@ -330,6 +330,20 @@ internal object DatabaseModule {
                     }
                 },
             )
+            .addMigrations(
+                object : Migration(12, 13) {
+                    override fun migrate(db: SupportSQLiteDatabase) {
+                        db.beginTransaction()
+                        try {
+                            db.execSQL("CREATE INDEX plays_track_id_played_at ON plays (track_id, played_at)")
+                            db.execSQL("CREATE INDEX tracks_album_id ON tracks (album_id)")
+                            db.setTransactionSuccessful()
+                        } finally {
+                            db.endTransaction()
+                        }
+                    }
+                },
+            )
             .build()
     }
 

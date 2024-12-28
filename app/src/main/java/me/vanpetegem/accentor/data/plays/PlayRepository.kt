@@ -25,7 +25,7 @@ class PlayRepository
                         val fetchTime = Instant.now()
                         toUpsert.addAll(result.data.map { Play.fromApi(it, fetchTime) })
                         count += 1
-                        if (count >= 5) {
+                        if (count >= 10) {
                             playDao.upsertAll(toUpsert)
                             toUpsert.clear()
                             count = 0
