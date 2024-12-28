@@ -44,7 +44,7 @@ class TrackRepository
                         val fetchTime = Instant.now()
                         toUpsert.addAll(result.data.map { Track.fromApi(it, fetchTime) })
                         count += 1
-                        if (count >= 5) {
+                        if (count >= 10) {
                             trackDao.upsertAll(toUpsert)
                             toUpsert.clear()
                             count = 0
