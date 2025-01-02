@@ -126,29 +126,31 @@ fun PlayerOverlay(
                         ControlBar()
                     }
                 }
-                Surface(Modifier.fillMaxSize()) {
-                    if (isLandscape && !isMultiWindow) {
-                        Row(modifier = Modifier.fillMaxSize()) {
-                            Column(modifier = Modifier.fillMaxHeight().weight(0.4f)) {
+                if (anchoredDraggableState.currentValue) {
+                    Surface(Modifier.fillMaxSize()) {
+                        if (isLandscape && !isMultiWindow) {
+                            Row(modifier = Modifier.fillMaxSize()) {
+                                Column(modifier = Modifier.fillMaxHeight().weight(0.4f)) {
+                                    Box(modifier = Modifier.weight(1f)) {
+                                        CurrentTrackInfo()
+                                    }
+                                    Controls()
+                                }
+                                Box(modifier = Modifier.fillMaxHeight().weight(0.6f)) {
+                                    Queue(navController, closePlayer = closePlayer)
+                                }
+                            }
+                        } else {
+                            Column(modifier = Modifier.fillMaxSize()) {
                                 Box(modifier = Modifier.weight(1f)) {
-                                    CurrentTrackInfo()
+                                    if (showQueue ?: false) {
+                                        Queue(navController, closePlayer = closePlayer)
+                                    } else {
+                                        CurrentTrackInfo()
+                                    }
                                 }
                                 Controls()
                             }
-                            Box(modifier = Modifier.fillMaxHeight().weight(0.6f)) {
-                                Queue(navController, closePlayer = closePlayer)
-                            }
-                        }
-                    } else {
-                        Column(modifier = Modifier.fillMaxSize()) {
-                            Box(modifier = Modifier.weight(1f)) {
-                                if (showQueue ?: false) {
-                                    Queue(navController, closePlayer = closePlayer)
-                                } else {
-                                    CurrentTrackInfo()
-                                }
-                            }
-                            Controls()
                         }
                     }
                 }
