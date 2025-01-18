@@ -10,7 +10,7 @@ plugins {
 android {
     namespace 'me.vanpetegem.accentor'
     compileSdkVersion 35
-    buildToolsVersion "34.0.0"
+    buildToolsVersion "35.0.0"
     defaultConfig {
         applicationId "me.vanpetegem.accentor"
         minSdkVersion 26
@@ -51,7 +51,7 @@ android {
         checkAllWarnings true
         disable 'AndroidGradlePluginVersion'
         disable 'GradleDependency'
-        disable 'InvalidPackage'
+        disable 'NewerVersionAvailable'
         disable 'ObsoleteLintCustomCheck'
         disable 'OldTargetApi'
         disable 'SyntheticAccessor'
