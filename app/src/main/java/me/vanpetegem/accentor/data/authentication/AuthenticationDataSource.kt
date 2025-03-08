@@ -1,6 +1,7 @@
 package me.vanpetegem.accentor.data.authentication
 
 import android.content.Context
+import androidx.core.content.edit
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.Observer
@@ -89,23 +90,23 @@ class AuthenticationDataSource
 
         fun setAuthData(authData: AuthenticationData?) {
             if (authData == null) {
-                sharedPreferences.edit()
-                    .remove(ID_KEY)
-                    .remove(USER_ID_KEY)
-                    .remove(DEVICE_ID_KEY)
-                    .remove(SECRET_KEY)
-                    .apply()
+                sharedPreferences.edit {
+                    remove(ID_KEY)
+                    remove(USER_ID_KEY)
+                    remove(DEVICE_ID_KEY)
+                    remove(SECRET_KEY)
+                }
             } else {
-                sharedPreferences.edit()
-                    .putInt(ID_KEY, authData.id)
-                    .putInt(USER_ID_KEY, authData.userId)
-                    .putString(DEVICE_ID_KEY, authData.deviceId)
-                    .putString(SECRET_KEY, authData.secret)
-                    .apply()
+                sharedPreferences.edit {
+                    putInt(ID_KEY, authData.id)
+                    putInt(USER_ID_KEY, authData.userId)
+                    putString(DEVICE_ID_KEY, authData.deviceId)
+                    putString(SECRET_KEY, authData.secret)
+                }
             }
         }
 
-        fun setServer(server: String?) = sharedPreferences.edit().putString(SERVER_KEY, server).apply()
+        fun setServer(server: String?) = sharedPreferences.edit { putString(SERVER_KEY, server) }
 
         fun getServer(): String? = sharedPreferences.getString(SERVER_KEY, null)
 

@@ -1,6 +1,7 @@
 package me.vanpetegem.accentor.data.preferences
 
 import android.content.Context
+import androidx.core.content.edit
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.map
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -35,11 +36,11 @@ class PreferencesDataSource
                 it?.let { Instant.parse(it) }
             }
 
-        fun setConversionId(id: Int) = sharedPreferences.edit().putInt(CONVERSION_ID_KEY, id).apply()
+        fun setConversionId(id: Int) = sharedPreferences.edit { putInt(CONVERSION_ID_KEY, id) }
 
-        fun setImageCacheSize(size: Long) = sharedPreferences.edit().putLong(IMAGE_CACHE_SIZE_KEY, size).apply()
+        fun setImageCacheSize(size: Long) = sharedPreferences.edit { putLong(IMAGE_CACHE_SIZE_KEY, size) }
 
-        fun setMusicCacheSize(size: Long) = sharedPreferences.edit().putLong(MUSIC_CACHE_SIZE_KEY, size).apply()
+        fun setMusicCacheSize(size: Long) = sharedPreferences.edit { putLong(MUSIC_CACHE_SIZE_KEY, size) }
 
-        fun setLastSyncFinished(time: Instant) = sharedPreferences.edit().putString(LAST_SYNC_FINISHED, time.toString()).apply()
+        fun setLastSyncFinished(time: Instant) = sharedPreferences.edit { putString(LAST_SYNC_FINISHED, time.toString()) }
     }
