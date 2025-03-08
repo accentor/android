@@ -2,8 +2,8 @@ package me.vanpetegem.accentor.media
 
 import android.app.PendingIntent
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
+import androidx.core.net.toUri
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
@@ -206,7 +206,7 @@ class MusicService : MediaSessionService() {
                 .setArtist(track.stringifyTrackArtists())
                 .setAlbumTitle(album.title)
                 .setAlbumArtist(album.stringifyAlbumArtists().let { if (it.isEmpty()) application.getString(R.string.various_artists) else it })
-                .setArtworkUri(album.image500?.let { Uri.parse(it) })
+                .setArtworkUri(album.image500?.let { it.toUri() })
                 .setTrackNumber(track.number)
                 .setReleaseYear(album.release.year)
                 .setReleaseMonth(album.release.monthValue)
