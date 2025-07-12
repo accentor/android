@@ -13,13 +13,15 @@ fun index(
 ): Sequence<Result<List<ApiAlbum>>> {
     var page = 1
 
-    fun doFetch(): Result<List<ApiAlbum>>? {
-        return retry(5) {
-            "$server/api/albums".httpGet(listOf(Pair("page", page)))
+    fun doFetch(): Result<List<ApiAlbum>>? =
+        retry(5) {
+            "$server/api/albums"
+                .httpGet(listOf(Pair("page", page)))
                 .set("Accept", "application/json")
                 .set("X-Secret", authenticationData.secret)
                 .set("X-Device-Id", authenticationData.deviceId)
-                .responseObject<List<ApiAlbum>>().third
+                .responseObject<List<ApiAlbum>>()
+                .third
                 .fold(
                     { a: List<ApiAlbum> ->
                         if (a.isEmpty()) {
@@ -32,7 +34,6 @@ fun index(
                     { e: Throwable -> Result.Error(Exception("Error getting albums", e)) },
                 )
         }
-    }
 
     return generateSequence { doFetch() }
 }

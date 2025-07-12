@@ -13,13 +13,15 @@ fun index(
 ): Sequence<Result<List<ApiCodecConversion>>> {
     var page = 1
 
-    fun doFetch(): Result<List<ApiCodecConversion>>? {
-        return retry(5) {
-            "$server/api/codec_conversions".httpGet(listOf(Pair("page", page)))
+    fun doFetch(): Result<List<ApiCodecConversion>>? =
+        retry(5) {
+            "$server/api/codec_conversions"
+                .httpGet(listOf(Pair("page", page)))
                 .set("Accept", "application/json")
                 .set("X-Secret", authenticationData.secret)
                 .set("X-Device-Id", authenticationData.deviceId)
-                .responseObject<List<ApiCodecConversion>>().third
+                .responseObject<List<ApiCodecConversion>>()
+                .third
                 .fold(
                     { c: List<ApiCodecConversion> ->
                         if (c.isEmpty()) {
@@ -32,7 +34,6 @@ fun index(
                     { e: Throwable -> Result.Error(Exception("Error getting codec conversions", e)) },
                 )
         }
-    }
 
     return generateSequence { doFetch() }
 }

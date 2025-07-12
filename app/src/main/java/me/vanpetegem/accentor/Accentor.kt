@@ -16,17 +16,20 @@ import java.io.File
 import javax.inject.Inject
 
 @HiltAndroidApp
-class Accentor : Application(), ImageLoaderFactory {
+class Accentor :
+    Application(),
+    ImageLoaderFactory {
     @Inject lateinit var preferences: PreferencesDataSource
 
     override fun onCreate() {
         super.onCreate()
         version =
             if (Build.VERSION.SDK_INT >= 33) {
-                applicationContext.packageManager.getPackageInfo(
-                    packageName,
-                    PackageManager.PackageInfoFlags.of(0),
-                ).versionName!!
+                applicationContext.packageManager
+                    .getPackageInfo(
+                        packageName,
+                        PackageManager.PackageInfoFlags.of(0),
+                    ).versionName!!
             } else {
                 applicationContext.packageManager.getPackageInfo(packageName, 0).versionName!!
             }
@@ -36,21 +39,21 @@ class Accentor : Application(), ImageLoaderFactory {
     }
 
     override fun newImageLoader(): ImageLoader =
-        ImageLoader.Builder(applicationContext)
+        ImageLoader
+            .Builder(applicationContext)
             .diskCache {
-                DiskCache.Builder()
+                DiskCache
+                    .Builder()
                     .directory(File(dataDir, "coil_image_cache"))
                     .maxSizeBytes(preferences.imageCacheSize.value!!)
                     .build()
-            }
-            .components {
+            }.components {
                 if (Build.VERSION.SDK_INT >= 28) {
                     add(ImageDecoderDecoder.Factory())
                 } else {
                     add(GifDecoder.Factory())
                 }
-            }
-            .build()
+            }.build()
 }
 
 lateinit var version: String

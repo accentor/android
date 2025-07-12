@@ -13,13 +13,15 @@ fun index(
 ): Sequence<Result<List<ApiTrack>>> {
     var page = 1
 
-    fun doFetch(): Result<List<ApiTrack>>? {
-        return retry(5) {
-            "$server/api/tracks".httpGet(listOf(Pair("page", page)))
+    fun doFetch(): Result<List<ApiTrack>>? =
+        retry(5) {
+            "$server/api/tracks"
+                .httpGet(listOf(Pair("page", page)))
                 .set("Accept", "application/json")
                 .set("X-Secret", authenticationData.secret)
                 .set("X-Device-Id", authenticationData.deviceId)
-                .responseObject<List<ApiTrack>>().third
+                .responseObject<List<ApiTrack>>()
+                .third
                 .fold(
                     { a: List<ApiTrack> ->
                         if (a.isEmpty()) {
@@ -32,7 +34,6 @@ fun index(
                     { e: Throwable -> Result.Error(Exception("Error getting tracks", e)) },
                 )
         }
-    }
 
     return generateSequence { doFetch() }
 }

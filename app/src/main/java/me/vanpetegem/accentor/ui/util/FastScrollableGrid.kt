@@ -58,14 +58,23 @@ fun ScrollBar(
     val coroutineScope = rememberCoroutineScope()
     var scrollbarOffset by remember { mutableStateOf(0.dp) }
     val firstVisibleElementIndex by remember(state) {
-        derivedStateOf { state.layoutInfo.visibleItemsInfo.firstOrNull()?.index }
+        derivedStateOf {
+            state.layoutInfo.visibleItemsInfo
+                .firstOrNull()
+                ?.index
+        }
     }
 
     if (alpha > 0.0f && firstVisibleElementIndex != null) {
         val sectionName = getSectionName(firstVisibleElementIndex!!)
 
         val totalItemsCount by remember(state) { derivedStateOf { state.layoutInfo.totalItemsCount } }
-        val itemHeight by remember(state) { derivedStateOf { state.layoutInfo.visibleItemsInfo[0].size.height } }
+        val itemHeight by remember(state) {
+            derivedStateOf {
+                state.layoutInfo.visibleItemsInfo[0]
+                    .size.height
+            }
+        }
         val totalHeight = itemHeight * totalItemsCount
         val boxHeight by remember(state) { derivedStateOf { state.layoutInfo.viewportEndOffset } }
         val currentPosition by remember(state) {

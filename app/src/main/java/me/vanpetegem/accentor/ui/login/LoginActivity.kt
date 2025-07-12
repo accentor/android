@@ -117,11 +117,13 @@ fun Content(loginViewModel: LoginViewModel = viewModel()) {
                         loginViewModel.loginDataChanged(server, username, password)
                     },
                     modifier =
-                        Modifier.semantics {
-                            if (formState?.serverError != null) {
-                                error(context.getString(formState!!.serverError!!))
-                            }
-                        }.fillMaxWidth().padding(top = 16.dp, start = 16.dp, end = 16.dp),
+                        Modifier
+                            .semantics {
+                                if (formState?.serverError != null) {
+                                    error(context.getString(formState!!.serverError!!))
+                                }
+                            }.fillMaxWidth()
+                            .padding(top = 16.dp, start = 16.dp, end = 16.dp),
                     label = { Text(stringResource(R.string.prompt_server)) },
                     isError = !(formState?.serverError == null),
                     singleLine = true,
@@ -143,10 +145,13 @@ fun Content(loginViewModel: LoginViewModel = viewModel()) {
                     },
                     label = { Text(stringResource(R.string.prompt_username)) },
                     modifier =
-                        Modifier.autofill(LocalAutofill.current, LocalAutofillTree.current, listOf(AutofillType.Username)) {
-                            username = it
-                            loginViewModel.loginDataChanged(server, username, password)
-                        }.fillMaxWidth().padding(start = 16.dp, end = 16.dp).focusRequester(usernameFocusRequester),
+                        Modifier
+                            .autofill(LocalAutofill.current, LocalAutofillTree.current, listOf(AutofillType.Username)) {
+                                username = it
+                                loginViewModel.loginDataChanged(server, username, password)
+                            }.fillMaxWidth()
+                            .padding(start = 16.dp, end = 16.dp)
+                            .focusRequester(usernameFocusRequester),
                     keyboardOptions =
                         KeyboardOptions(
                             autoCorrectEnabled = false,
@@ -167,10 +172,13 @@ fun Content(loginViewModel: LoginViewModel = viewModel()) {
                     label = { Text(stringResource(R.string.prompt_password)) },
                     singleLine = true,
                     modifier =
-                        Modifier.autofill(LocalAutofill.current, LocalAutofillTree.current, listOf(AutofillType.Password)) {
-                            password = it
-                            loginViewModel.loginDataChanged(server, username, password)
-                        }.fillMaxWidth().padding(start = 16.dp, end = 16.dp).focusRequester(passwordFocusRequester),
+                        Modifier
+                            .autofill(LocalAutofill.current, LocalAutofillTree.current, listOf(AutofillType.Password)) {
+                                password = it
+                                loginViewModel.loginDataChanged(server, username, password)
+                            }.fillMaxWidth()
+                            .padding(start = 16.dp, end = 16.dp)
+                            .focusRequester(passwordFocusRequester),
                     visualTransformation = PasswordVisualTransformation(),
                     keyboardOptions =
                         KeyboardOptions(

@@ -27,7 +27,10 @@ const val NOW_PLAYING_NOTIFICATION: Int = 0xb339
 /**
  * Helper class to encapsulate code for building notifications.
  */
-class NotificationBuilder(private val context: Context, private val scope: CoroutineScope) {
+class NotificationBuilder(
+    private val context: Context,
+    private val scope: CoroutineScope,
+) {
     private val platformNotificationManager: NotificationManager =
         context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
@@ -92,7 +95,8 @@ class NotificationBuilder(private val context: Context, private val scope: Corou
         val openIntent = Intent(context, MainActivity::class.java)
         val pendingIntent = PendingIntent.getActivity(context, 0, openIntent, PendingIntent.FLAG_IMMUTABLE)
 
-        builder.setContentIntent(pendingIntent)
+        builder
+            .setContentIntent(pendingIntent)
             .setContentTitle(metadata?.title)
             .setContentText(metadata?.artist)
             .setDeleteIntent(stopPendingIntent)
@@ -104,7 +108,11 @@ class NotificationBuilder(private val context: Context, private val scope: Corou
 
         metadata?.artworkUri?.let { uri ->
             scope.launch(IO) {
-                val bitmap = context.imageLoader.execute(ImageRequest.Builder(context).data(uri).build()).drawable?.toBitmap()
+                val bitmap =
+                    context.imageLoader
+                        .execute(ImageRequest.Builder(context).data(uri).build())
+                        .drawable
+                        ?.toBitmap()
                 builder.setLargeIcon(bitmap)
                 scope.launch(Main) {
                     onNotificationChangedCallback.onNotificationChanged(MediaNotification(NOW_PLAYING_NOTIFICATION, builder.build()))
@@ -128,11 +136,10 @@ class NotificationBuilder(private val context: Context, private val scope: Corou
                 NOW_PLAYING_CHANNEL,
                 context.getString(R.string.now_playing),
                 NotificationManager.IMPORTANCE_LOW,
-            )
-                .apply {
-                    description = context.getString(R.string.notification_channel_description)
-                    setShowBadge(false)
-                }
+            ).apply {
+                description = context.getString(R.string.notification_channel_description)
+                setShowBadge(false)
+            }
 
         platformNotificationManager.createNotificationChannel(notificationChannel)
     }

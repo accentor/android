@@ -46,9 +46,7 @@ fun gsonObject(): Gson {
                 out.value(value.name.lowercase())
             }
 
-            override fun read(`in`: JsonReader): Permission {
-                return Permission.valueOf(`in`.nextString().uppercase())
-            }
+            override fun read(`in`: JsonReader): Permission = Permission.valueOf(`in`.nextString().uppercase())
         },
     )
 
@@ -62,9 +60,7 @@ fun gsonObject(): Gson {
                 out.value(value.name.lowercase())
             }
 
-            override fun read(`in`: JsonReader): Access {
-                return Access.valueOf(`in`.nextString().uppercase())
-            }
+            override fun read(`in`: JsonReader): Access = Access.valueOf(`in`.nextString().uppercase())
         },
     )
 
@@ -78,9 +74,7 @@ fun gsonObject(): Gson {
                 out.value(value.name.lowercase())
             }
 
-            override fun read(`in`: JsonReader): PlaylistType {
-                return PlaylistType.valueOf(`in`.nextString().uppercase())
-            }
+            override fun read(`in`: JsonReader): PlaylistType = PlaylistType.valueOf(`in`.nextString().uppercase())
         },
     )
 
@@ -94,9 +88,7 @@ fun gsonObject(): Gson {
                 out.value(value.name.lowercase())
             }
 
-            override fun read(`in`: JsonReader): Role {
-                return Role.valueOf(`in`.nextString().uppercase())
-            }
+            override fun read(`in`: JsonReader): Role = Role.valueOf(`in`.nextString().uppercase())
         },
     )
 

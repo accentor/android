@@ -41,11 +41,11 @@ class MediaSessionConnection
     ) {
         private val mainScope = MainScope()
         private val mediaControllerFuture: ListenableFuture<MediaController> =
-            MediaController.Builder(
-                application,
-                SessionToken(application, ComponentName(application, MusicService::class.java)),
-            )
-                .buildAsync()
+            MediaController
+                .Builder(
+                    application,
+                    SessionToken(application, ComponentName(application, MusicService::class.java)),
+                ).buildAsync()
                 .apply { addListener({ setupController() }, MoreExecutors.directExecutor()) }
 
         private lateinit var mediaController: MediaController
@@ -75,10 +75,10 @@ class MediaSessionConnection
         val shuffleMode: LiveData<Boolean> = _shuffleMode
 
         private val _queue = MutableLiveData<List<MediaItem>>().apply { postValue(ArrayList()) }
-        private val _queueIds: LiveData<List<Int>> =
+        private val queueIds: LiveData<List<Int>> =
             _queue.map { it.map { item -> item.mediaId.toInt() } }
         val queue: LiveData<List<Triple<Boolean, Track?, Album?>>> =
-            _queueIds.switchMap { q ->
+            queueIds.switchMap { q ->
                 queuePosition.switchMap { qPos ->
                     trackRepository.findByIds(q).switchMap { tracks ->
                         albumRepository.findByIds(tracks.map { it.albumId }).map { albums ->
@@ -92,7 +92,7 @@ class MediaSessionConnection
                 }
             }
 
-        val _queuePosition: MutableLiveData<Int> = MutableLiveData<Int>().apply { postValue(0) }
+        private val _queuePosition: MutableLiveData<Int> = MutableLiveData<Int>().apply { postValue(0) }
         val queueLength: LiveData<Int> = _queue.map { it.size }
         val queuePosition: LiveData<Int> = _queuePosition
 

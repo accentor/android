@@ -62,7 +62,8 @@ class MusicService : MediaSessionService() {
     private lateinit var mediaSession: MediaSession
 
     private val accentorAudioAttributes =
-        AudioAttributes.Builder()
+        AudioAttributes
+            .Builder()
             .setContentType(C.AUDIO_CONTENT_TYPE_MUSIC)
             .setUsage(C.USAGE_MEDIA)
             .build()
@@ -79,25 +80,25 @@ class MusicService : MediaSessionService() {
     }
 
     private val player: Player by lazy {
-        ExoPlayer.Builder(this)
+        ExoPlayer
+            .Builder(this)
             .setMediaSourceFactory(
                 ProgressiveMediaSource.Factory(
                     object : DataSource.Factory {
-                        override fun createDataSource(): DataSource {
-                            return CacheDataSource(
+                        override fun createDataSource(): DataSource =
+                            CacheDataSource(
                                 cache,
                                 baseDataSourceFactory.createDataSource(),
                                 (CacheDataSource.FLAG_BLOCK_ON_CACHE or CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR),
                             )
-                        }
                     },
                     DefaultExtractorsFactory().setConstantBitrateSeekingEnabled(true),
                 ),
-            )
-            .setWakeMode(C.WAKE_MODE_NETWORK)
+            ).setWakeMode(C.WAKE_MODE_NETWORK)
             .setHandleAudioBecomingNoisy(true)
             .setAudioAttributes(accentorAudioAttributes, true)
-            .build().apply {
+            .build()
+            .apply {
                 addListener(
                     object : Player.Listener {
                         private var trackId: Int? = null
@@ -143,7 +144,8 @@ class MusicService : MediaSessionService() {
         val pendingIntent = PendingIntent.getActivity(this, 0, openIntent, PendingIntent.FLAG_IMMUTABLE)
 
         mediaSession =
-            MediaSession.Builder(baseContext, player)
+            MediaSession
+                .Builder(baseContext, player)
                 .setSessionActivity(pendingIntent)
                 .setCallback(
                     object : MediaSession.Callback {
@@ -151,12 +153,9 @@ class MusicService : MediaSessionService() {
                             session: MediaSession,
                             controller: MediaSession.ControllerInfo,
                             mediaItems: List<MediaItem>,
-                        ): ListenableFuture<List<MediaItem>> {
-                            return mainScope.future(IO) { convertTracks(mediaItems) }
-                        }
+                        ): ListenableFuture<List<MediaItem>> = mainScope.future(IO) { convertTracks(mediaItems) }
                     },
-                )
-                .build()
+                ).build()
 
         val notificationBuilder = NotificationBuilder(this, mainScope)
         setMediaNotificationProvider(
@@ -201,7 +200,8 @@ class MusicService : MediaSessionService() {
                 conversionParam
 
         val metadata =
-            MediaMetadata.Builder()
+            MediaMetadata
+                .Builder()
                 .setTitle(track.title)
                 .setArtist(track.stringifyTrackArtists())
                 .setAlbumTitle(album.title)
@@ -213,7 +213,8 @@ class MusicService : MediaSessionService() {
                 .setReleaseDay(album.release.dayOfMonth)
                 .build()
 
-        return MediaItem.Builder()
+        return MediaItem
+            .Builder()
             .setMediaId(track.id.toString())
             .setMediaMetadata(metadata)
             .setUri(mediaUri)
