@@ -19,7 +19,7 @@ const val LAST_SYNC_FINISHED = "last_sync_finished"
 class PreferencesDataSource
     @Inject
     constructor(
-        @ApplicationContext private val context: Context,
+        @param:ApplicationContext private val context: Context,
     ) {
         private val sharedPreferences = context.getSharedPreferences("me.vanpetegem.accentor.preferences", Context.MODE_PRIVATE)
 
