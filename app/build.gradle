@@ -51,6 +51,7 @@ android {
         checkAllWarnings true
         disable 'AndroidGradlePluginVersion'
         disable 'GradleDependency'
+        disable 'MemberExtensionConflict'
         disable 'NewerVersionAvailable'
         disable 'ObsoleteLintCustomCheck'
         disable 'OldTargetApi'
