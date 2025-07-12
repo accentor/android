@@ -81,13 +81,13 @@ internal object DatabaseModule {
     @Singleton
     fun provideAccentorDatabase(
         @ApplicationContext context: Context,
-    ): AccentorDatabase {
-        return Room.databaseBuilder(
-            context.applicationContext,
-            AccentorDatabase::class.java,
-            "accentor_database",
-        )
-            .addMigrations(
+    ): AccentorDatabase =
+        Room
+            .databaseBuilder(
+                context.applicationContext,
+                AccentorDatabase::class.java,
+                "accentor_database",
+            ).addMigrations(
                 object : Migration(2, 3) {
                     override fun migrate(db: SupportSQLiteDatabase) {
                         db.beginTransaction()
@@ -117,8 +117,7 @@ internal object DatabaseModule {
                         }
                     }
                 },
-            )
-            .addMigrations(
+            ).addMigrations(
                 object : Migration(3, 4) {
                     override fun migrate(db: SupportSQLiteDatabase) {
                         db.beginTransaction()
@@ -135,8 +134,7 @@ internal object DatabaseModule {
                         }
                     }
                 },
-            )
-            .addMigrations(
+            ).addMigrations(
                 object : Migration(4, 5) {
                     override fun migrate(db: SupportSQLiteDatabase) {
                         db.beginTransaction()
@@ -165,8 +163,7 @@ internal object DatabaseModule {
                         }
                     }
                 },
-            )
-            .addMigrations(
+            ).addMigrations(
                 object : Migration(5, 6) {
                     override fun migrate(db: SupportSQLiteDatabase) {
                         db.beginTransaction()
@@ -192,8 +189,7 @@ internal object DatabaseModule {
                         }
                     }
                 },
-            )
-            .addMigrations(
+            ).addMigrations(
                 object : Migration(6, 7) {
                     override fun migrate(db: SupportSQLiteDatabase) {
                         db.beginTransaction()
@@ -215,8 +211,7 @@ internal object DatabaseModule {
                         }
                     }
                 },
-            )
-            .addMigrations(
+            ).addMigrations(
                 object : Migration(7, 8) {
                     override fun migrate(db: SupportSQLiteDatabase) {
                         db.beginTransaction()
@@ -236,8 +231,7 @@ internal object DatabaseModule {
                         }
                     }
                 },
-            )
-            .addMigrations(
+            ).addMigrations(
                 object : Migration(8, 9) {
                     override fun migrate(db: SupportSQLiteDatabase) {
                         db.beginTransaction()
@@ -259,8 +253,7 @@ internal object DatabaseModule {
                         }
                     }
                 },
-            )
-            .addMigrations(
+            ).addMigrations(
                 object : Migration(9, 10) {
                     override fun migrate(db: SupportSQLiteDatabase) {
                         db.beginTransaction()
@@ -278,8 +271,7 @@ internal object DatabaseModule {
                         }
                     }
                 },
-            )
-            .addMigrations(
+            ).addMigrations(
                 object : Migration(10, 11) {
                     override fun migrate(db: SupportSQLiteDatabase) {
                         db.beginTransaction()
@@ -291,8 +283,7 @@ internal object DatabaseModule {
                         }
                     }
                 },
-            )
-            .addMigrations(
+            ).addMigrations(
                 object : Migration(11, 12) {
                     override fun migrate(db: SupportSQLiteDatabase) {
                         db.beginTransaction()
@@ -329,8 +320,7 @@ internal object DatabaseModule {
                         }
                     }
                 },
-            )
-            .addMigrations(
+            ).addMigrations(
                 object : Migration(12, 13) {
                     override fun migrate(db: SupportSQLiteDatabase) {
                         db.beginTransaction()
@@ -343,9 +333,7 @@ internal object DatabaseModule {
                         }
                     }
                 },
-            )
-            .build()
-    }
+            ).build()
 
     @Provides
     fun provideAlbumDao(database: AccentorDatabase): AlbumDao = database.albumDao()

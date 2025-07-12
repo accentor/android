@@ -56,8 +56,8 @@ data class Playlist(
     fun toTrackAlbumPairs(
         trackRepository: TrackRepository,
         albumRepository: AlbumRepository,
-    ): List<Pair<Track, Album>> {
-        return when (playlistType) {
+    ): List<Pair<Track, Album>> =
+        when (playlistType) {
             PlaylistType.TRACK -> {
                 val albumMap = SparseArray<Album>()
                 val tracks = trackRepository.getByIds(itemIds)
@@ -86,5 +86,4 @@ data class Playlist(
                 }
             }
         }
-    }
 }

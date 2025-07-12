@@ -112,8 +112,7 @@ fun PlayerOverlay(
                                         false at (totalHeight - size.height).toFloat()
                                     },
                                 )
-                            }
-                            .clickable {
+                            }.clickable {
                                 scope.launch {
                                     anchoredDraggableState.animateTo(!anchoredDraggableState.currentValue)
                                 }

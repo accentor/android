@@ -19,8 +19,8 @@ class LoginViewModel
         application: Application,
         private val repository: AuthenticationRepository,
     ) : AndroidViewModel(application) {
-        private val _loginForm = MutableLiveData<LoginFormState>()
-        val loginFormState: LiveData<LoginFormState> = _loginForm
+        private val _loginFormState = MutableLiveData<LoginFormState>()
+        val loginFormState: LiveData<LoginFormState> = _loginFormState
 
         private val _loading = MutableLiveData<Boolean>()
         val loading: LiveData<Boolean> = _loading
@@ -47,20 +47,19 @@ class LoginViewModel
             password: String,
         ) {
             if (!isServerValid(server)) {
-                _loginForm.value = LoginFormState(serverError = R.string.invalid_server)
+                _loginFormState.value = LoginFormState(serverError = R.string.invalid_server)
             } else if (server.equals("") || username.equals("") || password.equals("")) {
-                _loginForm.value = LoginFormState()
+                _loginFormState.value = LoginFormState()
             } else {
-                _loginForm.value = LoginFormState(isDataValid = true)
+                _loginFormState.value = LoginFormState(isDataValid = true)
             }
         }
 
-        private fun isServerValid(server: String): Boolean {
-            return try {
+        private fun isServerValid(server: String): Boolean =
+            try {
                 URI(server)
                 server.startsWith("http", ignoreCase = true)
             } catch (e: URISyntaxException) {
                 false
             }
-        }
     }

@@ -9,16 +9,23 @@ import me.vanpetegem.accentor.util.jsonBody
 import me.vanpetegem.accentor.util.responseObject
 import me.vanpetegem.accentor.version
 
-class AuthToken(val user_agent: String)
+class AuthToken(
+    val user_agent: String,
+)
 
-class Credentials(val name: String, val password: String, val auth_token: AuthToken)
+class Credentials(
+    val name: String,
+    val password: String,
+    val auth_token: AuthToken,
+)
 
 fun create(
     server: String,
     username: String,
     password: String,
-): Result<AuthenticationData> {
-    return "$server/api/auth_tokens".httpPost()
+): Result<AuthenticationData> =
+    "$server/api/auth_tokens"
+        .httpPost()
         .set("Accept", "application/json")
         .jsonBody(
             Credentials(
@@ -26,26 +33,26 @@ fun create(
                 password,
                 AuthToken("Accentor $version on Android ${Build.VERSION.RELEASE} (${Build.DEVICE})"),
             ),
-        )
-        .responseObject<AuthenticationData>().third
+        ).responseObject<AuthenticationData>()
+        .third
         .fold(
             { user: AuthenticationData -> Result.Success(user) },
             { e: Throwable -> Result.Error(Exception("Error logging in", e)) },
         )
-}
 
 fun destroy(
     server: String,
     authenticationData: AuthenticationData,
     id: Int,
-): Result<Unit> {
-    return "$server/api/auth_tokens/$id".httpDelete()
+): Result<Unit> =
+    "$server/api/auth_tokens/$id"
+        .httpDelete()
         .set("Accept", "application/json")
         .set("X-Secret", authenticationData.secret)
         .set("X-Device-Id", authenticationData.deviceId)
-        .response().third
+        .response()
+        .third
         .fold(
             { Result.Success(Unit) },
             { e: Throwable -> Result.Error(Exception("Error logging out", e)) },
         )
-}

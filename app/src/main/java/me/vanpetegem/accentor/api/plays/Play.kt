@@ -10,27 +10,33 @@ import me.vanpetegem.accentor.util.jsonBody
 import me.vanpetegem.accentor.util.responseObject
 import java.time.Instant
 
-data class Arguments(val play: PlayArguments)
+data class Arguments(
+    val play: PlayArguments,
+)
 
-data class PlayArguments(val trackId: Int, val playedAt: Instant)
+data class PlayArguments(
+    val trackId: Int,
+    val playedAt: Instant,
+)
 
 fun create(
     server: String,
     authenticationData: AuthenticationData,
     trackId: Int,
     playedAt: Instant,
-): Result<ApiPlay> {
-    return "$server/api/plays".httpPost()
+): Result<ApiPlay> =
+    "$server/api/plays"
+        .httpPost()
         .set("Accept", "application/json")
         .set("X-Secret", authenticationData.secret)
         .set("X-Device-Id", authenticationData.deviceId)
         .jsonBody(Arguments(PlayArguments(trackId, playedAt)))
-        .responseObject<ApiPlay>().third
+        .responseObject<ApiPlay>()
+        .third
         .fold(
             { play: ApiPlay -> Result.Success(play) },
             { e: Throwable -> Result.Error(Exception("Error creating play", e)) },
         )
-}
 
 fun index(
     server: String,
@@ -38,13 +44,15 @@ fun index(
 ): Sequence<Result<List<ApiPlay>>> {
     var page = 1
 
-    fun doFetch(): Result<List<ApiPlay>>? {
-        return retry(5) {
-            "$server/api/plays".httpGet(listOf(Pair("page", page)))
+    fun doFetch(): Result<List<ApiPlay>>? =
+        retry(5) {
+            "$server/api/plays"
+                .httpGet(listOf(Pair("page", page)))
                 .set("Accept", "application/json")
                 .set("X-Secret", authenticationData.secret)
                 .set("X-Device-Id", authenticationData.deviceId)
-                .responseObject<List<ApiPlay>>().third
+                .responseObject<List<ApiPlay>>()
+                .third
                 .fold(
                     { p: List<ApiPlay> ->
                         if (p.isEmpty()) {
@@ -57,7 +65,6 @@ fun index(
                     { e: Throwable -> Result.Error(Exception("Error getting plays", e)) },
                 )
         }
-    }
 
     return generateSequence { doFetch() }
 }
