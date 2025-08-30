@@ -32,6 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -45,7 +46,7 @@ fun PlayerOverlay(
     content: @Composable (() -> Unit),
 ) {
     val scope = rememberCoroutineScope()
-    val screenHeight = LocalConfiguration.current.screenHeightDp
+    val screenHeight = LocalWindowInfo.current.containerSize.height
     var totalHeight by remember { mutableIntStateOf(screenHeight) }
     var toolbarHeight by remember { mutableIntStateOf(0) }
     val height = (totalHeight - toolbarHeight).toFloat()
