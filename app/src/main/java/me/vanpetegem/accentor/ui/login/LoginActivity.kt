@@ -31,20 +31,13 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.autofill.Autofill
-import androidx.compose.ui.autofill.AutofillNode
-import androidx.compose.ui.autofill.AutofillTree
-import androidx.compose.ui.autofill.AutofillType
+import androidx.compose.ui.autofill.ContentType
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.layout.boundsInWindow
-import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalAutofill
-import androidx.compose.ui.platform.LocalAutofillTree
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentType
 import androidx.compose.ui.semantics.error
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.ImeAction
@@ -146,10 +139,8 @@ fun Content(loginViewModel: LoginViewModel = viewModel()) {
                     label = { Text(stringResource(R.string.prompt_username)) },
                     modifier =
                         Modifier
-                            .autofill(LocalAutofill.current, LocalAutofillTree.current, listOf(AutofillType.Username)) {
-                                username = it
-                                loginViewModel.loginDataChanged(server, username, password)
-                            }.fillMaxWidth()
+                            .semantics { contentType = ContentType.Username }
+                            .fillMaxWidth()
                             .padding(start = 16.dp, end = 16.dp)
                             .focusRequester(usernameFocusRequester),
                     keyboardOptions =
@@ -173,10 +164,8 @@ fun Content(loginViewModel: LoginViewModel = viewModel()) {
                     singleLine = true,
                     modifier =
                         Modifier
-                            .autofill(LocalAutofill.current, LocalAutofillTree.current, listOf(AutofillType.Password)) {
-                                password = it
-                                loginViewModel.loginDataChanged(server, username, password)
-                            }.fillMaxWidth()
+                            .semantics { contentType = ContentType.Password }
+                            .fillMaxWidth()
                             .padding(start = 16.dp, end = 16.dp)
                             .focusRequester(passwordFocusRequester),
                     visualTransformation = PasswordVisualTransformation(),
@@ -209,26 +198,4 @@ fun Content(loginViewModel: LoginViewModel = viewModel()) {
             }
         },
     )
-}
-
-fun Modifier.autofill(
-    autofill: Autofill?,
-    autofillTree: AutofillTree,
-    autofillTypes: List<AutofillType>,
-    onFill: ((String) -> Unit),
-): Modifier {
-    val node = AutofillNode(onFill = onFill, autofillTypes = autofillTypes)
-    autofillTree += node
-
-    return onGloballyPositioned {
-        node.boundingBox = it.boundsInWindow()
-    }.onFocusChanged { state ->
-        autofill?.run {
-            if (state.isFocused) {
-                requestAutofillForNode(node)
-            } else {
-                cancelAutofillForNode(node)
-            }
-        }
-    }
 }
