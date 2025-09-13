@@ -18,8 +18,7 @@ fun index(
             "$server/api/users"
                 .httpGet(listOf(Pair("page", page)))
                 .set("Accept", "application/json")
-                .set("X-Secret", authenticationData.secret)
-                .set("X-Device-Id", authenticationData.deviceId)
+                .set("Authorization", "Token ${authenticationData.token}")
                 .responseObject<List<ApiUser>>()
                 .third
                 .fold(

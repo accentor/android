@@ -13,8 +13,7 @@ import javax.inject.Inject
 const val ID_KEY = "id"
 const val SERVER_KEY = "server"
 const val USER_ID_KEY = "user_id"
-const val DEVICE_ID_KEY = "device_id"
-const val SECRET_KEY = "secret"
+const val TOKEN_KEY = "token"
 
 class AuthenticationDataSource
     @Inject
@@ -26,8 +25,7 @@ class AuthenticationDataSource
 
         private val idData = sharedPreferences.intLiveData(ID_KEY)
         private val userIdData = sharedPreferences.intLiveData(USER_ID_KEY)
-        private val deviceIdData = sharedPreferences.stringLiveData(DEVICE_ID_KEY)
-        private val secretData = sharedPreferences.stringLiveData(SECRET_KEY)
+        private val tokenData = sharedPreferences.stringLiveData(TOKEN_KEY)
 
         private val serverData = sharedPreferences.stringLiveData(SERVER_KEY)
 
@@ -57,8 +55,8 @@ class AuthenticationDataSource
                                         return@Observer
                                     }
                                 }
-                            val deviceId: String =
-                                deviceIdData.value.let {
+                            val token: String =
+                                tokenData.value.let {
                                     if (it != null) {
                                         it
                                     } else {
@@ -66,23 +64,13 @@ class AuthenticationDataSource
                                         return@Observer
                                     }
                                 }
-                            val secret: String =
-                                secretData.value.let {
-                                    if (it != null) {
-                                        it
-                                    } else {
-                                        value = null
-                                        return@Observer
-                                    }
-                                }
-                            val newVal = AuthenticationData(id, userId, deviceId, secret)
+                            val newVal = AuthenticationData(id, userId, token)
                             if (newVal != this.value) this.value = newVal
                         }
 
                     addSource(idData, observer)
                     addSource(userIdData, observer)
-                    addSource(deviceIdData, observer)
-                    addSource(secretData, observer)
+                    addSource(tokenData, observer)
                     // If we don't do this, the value will start out as null even if we have data in the prefs.
                     observer.onChanged(null)
                 }
@@ -93,15 +81,13 @@ class AuthenticationDataSource
                 sharedPreferences.edit {
                     remove(ID_KEY)
                     remove(USER_ID_KEY)
-                    remove(DEVICE_ID_KEY)
-                    remove(SECRET_KEY)
+                    remove(TOKEN_KEY)
                 }
             } else {
                 sharedPreferences.edit {
                     putInt(ID_KEY, authData.id)
                     putInt(USER_ID_KEY, authData.userId)
-                    putString(DEVICE_ID_KEY, authData.deviceId)
-                    putString(SECRET_KEY, authData.secret)
+                    putString(TOKEN_KEY, authData.token)
                 }
             }
         }
@@ -110,7 +96,5 @@ class AuthenticationDataSource
 
         fun getServer(): String? = sharedPreferences.getString(SERVER_KEY, null)
 
-        fun getSecret(): String? = sharedPreferences.getString(SECRET_KEY, null)
-
-        fun getDeviceId(): String? = sharedPreferences.getString(DEVICE_ID_KEY, null)
+        fun getToken(): String? = sharedPreferences.getString(TOKEN_KEY, null)
     }

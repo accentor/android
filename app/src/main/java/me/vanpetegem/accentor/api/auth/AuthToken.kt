@@ -48,8 +48,7 @@ fun destroy(
     "$server/api/auth_tokens/$id"
         .httpDelete()
         .set("Accept", "application/json")
-        .set("X-Secret", authenticationData.secret)
-        .set("X-Device-Id", authenticationData.deviceId)
+        .set("Authorization", "Token ${authenticationData.token}")
         .response()
         .third
         .fold(
