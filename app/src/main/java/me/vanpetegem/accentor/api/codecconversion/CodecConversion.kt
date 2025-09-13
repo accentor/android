@@ -18,8 +18,7 @@ fun index(
             "$server/api/codec_conversions"
                 .httpGet(listOf(Pair("page", page)))
                 .set("Accept", "application/json")
-                .set("X-Secret", authenticationData.secret)
-                .set("X-Device-Id", authenticationData.deviceId)
+                .set("Authorization", "Token ${authenticationData.token}")
                 .responseObject<List<ApiCodecConversion>>()
                 .third
                 .fold(

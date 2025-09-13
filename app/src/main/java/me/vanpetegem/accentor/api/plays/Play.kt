@@ -28,8 +28,7 @@ fun create(
     "$server/api/plays"
         .httpPost()
         .set("Accept", "application/json")
-        .set("X-Secret", authenticationData.secret)
-        .set("X-Device-Id", authenticationData.deviceId)
+        .set("Authorization", "Token ${authenticationData.token}")
         .jsonBody(Arguments(PlayArguments(trackId, playedAt)))
         .responseObject<ApiPlay>()
         .third
@@ -49,8 +48,7 @@ fun index(
             "$server/api/plays"
                 .httpGet(listOf(Pair("page", page)))
                 .set("Accept", "application/json")
-                .set("X-Secret", authenticationData.secret)
-                .set("X-Device-Id", authenticationData.deviceId)
+                .set("Authorization", "Token ${authenticationData.token}")
                 .responseObject<List<ApiPlay>>()
                 .third
                 .fold(

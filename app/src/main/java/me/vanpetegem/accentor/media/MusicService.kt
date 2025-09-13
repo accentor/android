@@ -195,8 +195,7 @@ class MusicService : MediaSessionService() {
         val conversionParam = conversion?.let { "&codec_conversion_id=${it.id}" } ?: ""
         val mediaUri =
             "${authenticationDataSource.getServer()}/api/tracks/${track.id}/audio" +
-                "?secret=${authenticationDataSource.getSecret()}" +
-                "&device_id=${authenticationDataSource.getDeviceId()}" +
+                "?token=${authenticationDataSource.getToken()}" +
                 conversionParam
 
         val metadata =

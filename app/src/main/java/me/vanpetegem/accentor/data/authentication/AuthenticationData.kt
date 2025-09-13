@@ -3,8 +3,7 @@ package me.vanpetegem.accentor.data.authentication
 data class AuthenticationData(
     val id: Int,
     val userId: Int,
-    val deviceId: String,
-    val secret: String,
+    val token: String,
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -14,8 +13,7 @@ data class AuthenticationData(
 
         if (id != other.id) return false
         if (userId != other.userId) return false
-        if (deviceId != other.deviceId) return false
-        if (secret != other.secret) return false
+        if (token != other.token) return false
 
         return true
     }
@@ -23,8 +21,7 @@ data class AuthenticationData(
     override fun hashCode(): Int {
         var result = id
         result = 31 * result + userId
-        result = 31 * result + deviceId.hashCode()
-        result = 31 * result + secret.hashCode()
+        result = 31 * result + token.hashCode()
         return result
     }
 }
