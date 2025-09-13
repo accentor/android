@@ -24,6 +24,7 @@ android {
         }
     }
     buildFeatures {
+        buildConfig true
         compose true
         viewBinding true
     }
@@ -133,6 +134,10 @@ dependencies {
 
     // Material
     implementation 'com.google.android.material:material:1.13.0'
+
+    // Error reports
+    implementation("ch.acra:acra-mail:$acra_version")
+    implementation("ch.acra:acra-dialog:$acra_version")
 
     // Tests
     testImplementation 'junit:junit:4.13.2'

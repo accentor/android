@@ -1,6 +1,7 @@
 package me.vanpetegem.accentor
 
 import android.app.Application
+import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import coil.ImageLoader
@@ -11,7 +12,12 @@ import coil.disk.DiskCache
 import com.github.kittinunf.fuel.core.FuelManager
 import com.google.android.material.color.DynamicColors
 import dagger.hilt.android.HiltAndroidApp
+import me.vanpetegem.accentor.BuildConfig
 import me.vanpetegem.accentor.data.preferences.PreferencesDataSource
+import org.acra.config.dialog
+import org.acra.config.mailSender
+import org.acra.data.StringFormat
+import org.acra.ktx.initAcra
 import java.io.File
 import javax.inject.Inject
 
@@ -54,6 +60,23 @@ class Accentor :
                     add(GifDecoder.Factory())
                 }
             }.build()
+
+    override fun attachBaseContext(base: Context) {
+        super.attachBaseContext(base)
+
+        initAcra {
+            buildConfigClass = BuildConfig::class.java
+            reportFormat = StringFormat.JSON
+            dialog {
+                title = getString(R.string.error_report_dialog_title)
+                text = getString(R.string.error_report_dialog_text)
+            }
+            mailSender {
+                mailTo = "android@accentor.tech"
+                subject = "[Accentor Android] Crash report"
+            }
+        }
+    }
 }
 
 lateinit var version: String
