@@ -85,7 +85,7 @@ dependencies {
     implementation 'androidx.core:core-ktx:1.17.0'
 
     // AndroidX navigation
-    implementation "androidx.navigation:navigation-compose:2.9.3"
+    implementation "androidx.navigation:navigation-compose:2.9.4"
 
     // AndroidX Room
     implementation "androidx.room:room-runtime:$room_version"
