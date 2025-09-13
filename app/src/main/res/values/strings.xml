@@ -86,4 +86,7 @@
       <item quantity="one">%d track</item>
       <item quantity="other">%d tracks</item>
     </plurals>
+
+    <string name="error_report_dialog_title">Report error</string>
+    <string name="error_report_dialog_text">An error occurred. Do you want to report it?</string>
 </resources>
