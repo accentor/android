@@ -19,3 +19,26 @@ sealed class Result<out T> {
             is Error -> "Error[exception=$exception]"
         }
 }
+
+/**
+ * A generic class that holds a value with its loading status.
+ * @param <T>
+ */
+sealed class CreateResult<out T> {
+    data class Success<out T>(
+        val data: T,
+    ) : CreateResult<T>()
+
+    class Unprocessable : CreateResult<Nothing>()
+
+    data class Error(
+        val exception: Exception,
+    ) : CreateResult<Nothing>()
+
+    override fun toString(): String =
+        when (this) {
+            is Success<*> -> "Success[data=$data]"
+            is Unprocessable -> "Unprocessable"
+            is Error -> "Error[exception=$exception]"
+        }
+}

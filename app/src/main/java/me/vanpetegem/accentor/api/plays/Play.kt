@@ -1,10 +1,12 @@
 package me.vanpetegem.accentor.api.plays
 
+import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.httpGet
 import com.github.kittinunf.fuel.httpPost
 import me.vanpetegem.accentor.api.util.retry
 import me.vanpetegem.accentor.data.authentication.AuthenticationData
 import me.vanpetegem.accentor.data.plays.ApiPlay
+import me.vanpetegem.accentor.util.CreateResult
 import me.vanpetegem.accentor.util.Result
 import me.vanpetegem.accentor.util.jsonBody
 import me.vanpetegem.accentor.util.responseObject
@@ -24,7 +26,7 @@ fun create(
     authenticationData: AuthenticationData,
     trackId: Int,
     playedAt: Instant,
-): Result<ApiPlay> =
+): CreateResult<ApiPlay> =
     "$server/api/plays"
         .httpPost()
         .set("Accept", "application/json")
@@ -33,8 +35,14 @@ fun create(
         .responseObject<ApiPlay>()
         .third
         .fold(
-            { play: ApiPlay -> Result.Success(play) },
-            { e: Throwable -> Result.Error(Exception("Error creating play", e)) },
+            { play: ApiPlay -> CreateResult.Success(play) },
+            { e: FuelError ->
+                if (e.response.statusCode == 422) {
+                    CreateResult.Unprocessable()
+                } else {
+                    CreateResult.Error(Exception("Error creating play", e))
+                }
+            },
         )
 
 fun index(
