@@ -16,6 +16,7 @@ import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.datasource.cache.CacheDataSource
 import androidx.media3.datasource.cache.LeastRecentlyUsedCacheEvictor
 import androidx.media3.datasource.cache.SimpleCache
+import androidx.media3.exoplayer.DefaultLoadControl
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import androidx.media3.extractor.DefaultExtractorsFactory
@@ -95,7 +96,14 @@ class MusicService : MediaSessionService() {
                     DefaultExtractorsFactory().setConstantBitrateSeekingEnabled(true),
                 ),
             ).setWakeMode(C.WAKE_MODE_NETWORK)
-            .setHandleAudioBecomingNoisy(true)
+            .setLoadControl(
+                DefaultLoadControl
+                    .Builder()
+                    .setPrioritizeTimeOverSizeThresholds(true)
+                    .setBufferDurationsMs(30 * 60 * 1000, 60 * 60 * 1000, 1000, 1000)
+                    .setTargetBufferBytes(1024 * 1024 * 250)
+                    .build(),
+            ).setHandleAudioBecomingNoisy(true)
             .setAudioAttributes(accentorAudioAttributes, true)
             .build()
             .apply {
