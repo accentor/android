@@ -8,6 +8,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.gestures.AnchoredDraggableState
+import androidx.compose.foundation.gestures.DraggableAnchors
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
@@ -55,6 +57,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -128,23 +131,38 @@ fun Content(
         }
     }
 
-    PlayerOverlay(navController) {
+    val screenHeight = LocalWindowInfo.current.containerSize.height
+    val anchors =
+        DraggableAnchors {
+            true at 0f
+            false at screenHeight.toFloat()
+        }
+    val anchoredDraggableState = remember { AnchoredDraggableState(initialValue = false, anchors = anchors) }
+
+    PlayerOverlay(navController, anchoredDraggableState) {
         NavHost(navController = navController, startDestination = "home") {
-            composable("home") { Base(navController, mainViewModel, playerViewModel) { Home(navController, playerViewModel) } }
+            composable("home") { Base(navController, anchoredDraggableState, mainViewModel, playerViewModel) { Home(navController, playerViewModel) } }
             composable("artists") {
                 Base(
                     navController,
+                    anchoredDraggableState,
                     mainViewModel,
                     playerViewModel,
                     toolbar = { ArtistToolbar(it, mainViewModel) },
                 ) { ArtistGrid(navController) }
             }
             composable("artists/{artistId}", arguments = listOf(navArgument("artistId") { type = NavType.IntType })) { entry ->
-                Base(navController, mainViewModel, playerViewModel) { ArtistView(entry.arguments!!.getInt("artistId"), navController, playerViewModel) }
+                Base(
+                    navController,
+                    anchoredDraggableState,
+                    mainViewModel,
+                    playerViewModel,
+                ) { ArtistView(entry.arguments!!.getInt("artistId"), navController, playerViewModel) }
             }
             composable("albums") {
                 Base(
                     navController,
+                    anchoredDraggableState,
                     mainViewModel,
                     playerViewModel,
                     toolbar = { AlbumToolbar(it, mainViewModel) },
@@ -153,6 +171,7 @@ fun Content(
             composable("albums/{albumId}", arguments = listOf(navArgument("albumId") { type = NavType.IntType })) { entry ->
                 Base(
                     navController,
+                    anchoredDraggableState,
                     mainViewModel,
                     playerViewModel,
                     toolbar = { drawerState ->
@@ -171,13 +190,14 @@ fun Content(
             composable("playlists") {
                 Base(
                     navController,
+                    anchoredDraggableState,
                     mainViewModel,
                     playerViewModel,
                     toolbar = { PlaylistToolbar(it, mainViewModel) },
                 ) { PlaylistList(navController, playerViewModel) }
             }
             composable("playlists/{playlistId}", arguments = listOf(navArgument("playlistId") { type = NavType.IntType })) { entry ->
-                Base(navController, mainViewModel, playerViewModel) {
+                Base(navController, anchoredDraggableState, mainViewModel, playerViewModel) {
                     PlaylistView(entry.arguments!!.getInt("playlistId"), navController, playerViewModel)
                 }
             }
@@ -188,6 +208,7 @@ fun Content(
 @Composable
 fun Base(
     navController: NavController,
+    anchoredDraggableState: AnchoredDraggableState<Boolean>,
     mainViewModel: MainViewModel = viewModel(),
     playerViewModel: PlayerViewModel = viewModel(),
     toolbar: @Composable ((DrawerState) -> Unit) = { drawerState -> BaseToolbar(drawerState, mainViewModel) },
@@ -196,7 +217,6 @@ fun Base(
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     val currentNavigation by navController.currentBackStackEntryAsState()
-    val isPlayerOpen by playerViewModel.isOpen.observeAsState()
     val context = LocalContext.current
     BackHandler(enabled = drawerState.isOpen) {
         scope.launch {
@@ -230,7 +250,7 @@ fun Base(
                 }
             }
         },
-        gesturesEnabled = !(isPlayerOpen ?: false),
+        gesturesEnabled = !(anchoredDraggableState.currentValue ?: false),
     ) {
         Scaffold(
             topBar = { toolbar(drawerState) },

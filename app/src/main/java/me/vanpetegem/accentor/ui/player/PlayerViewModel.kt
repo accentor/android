@@ -18,9 +18,6 @@ class PlayerViewModel
         application: Application,
         private val mediaSessionConnection: MediaSessionConnection,
     ) : AndroidViewModel(application) {
-        private val _isOpen = MutableLiveData<Boolean>(false)
-        val isOpen: LiveData<Boolean> = _isOpen
-
         private val _showQueue = MutableLiveData<Boolean>(false)
         val showQueue: LiveData<Boolean> = _showQueue
 
@@ -38,10 +35,6 @@ class PlayerViewModel
 
         fun toggleQueue() {
             _showQueue.value = !(_showQueue.value ?: false)
-        }
-
-        fun setOpen(isOpen: Boolean) {
-            _isOpen.value = isOpen
         }
 
         suspend fun stop() = mediaSessionConnection.stop()
