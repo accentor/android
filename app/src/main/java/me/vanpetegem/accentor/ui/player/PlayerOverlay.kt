@@ -3,8 +3,6 @@ package me.vanpetegem.accentor.ui.player
 import android.content.res.Configuration
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalActivity
-import androidx.compose.animation.core.exponentialDecay
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.AnchoredDraggableState
 import androidx.compose.foundation.gestures.DraggableAnchors
@@ -31,7 +29,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -42,6 +39,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun PlayerOverlay(
     navController: NavController,
+    anchoredDraggableState: AnchoredDraggableState<Boolean>,
     playerViewModel: PlayerViewModel = viewModel(),
     content: @Composable (() -> Unit),
 ) {
@@ -49,33 +47,11 @@ fun PlayerOverlay(
     val screenHeight = LocalWindowInfo.current.containerSize.height
     var totalHeight by remember { mutableIntStateOf(screenHeight) }
     var toolbarHeight by remember { mutableIntStateOf(0) }
-    val height = (totalHeight - toolbarHeight).toFloat()
     val showQueue by playerViewModel.showQueue.observeAsState()
     val queueLength by playerViewModel.queueLength.observeAsState()
     val showPlayer = (queueLength ?: 0) > 0
     val isLandscape = (LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE)
     val isMultiWindow = LocalActivity.current?.isInMultiWindowMode() ?: false
-    val anchors =
-        DraggableAnchors {
-            true at 0f
-            false at height
-        }
-    val velThreshold = with(LocalDensity.current) { 125.dp.toPx() }
-    val posThreshold = with(LocalDensity.current) { 224.dp.toPx() }
-    val anchoredDraggableState =
-        remember {
-            AnchoredDraggableState(
-                initialValue = false,
-                anchors = anchors,
-                positionalThreshold = { posThreshold },
-                velocityThreshold = { velThreshold },
-                snapAnimationSpec = tween(),
-                decayAnimationSpec = exponentialDecay(),
-            ) {
-                playerViewModel.setOpen(it)
-                true
-            }
-        }
     val closePlayer: () -> Unit = { scope.launch { anchoredDraggableState.animateTo(false) } }
 
     Box(

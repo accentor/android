@@ -21,7 +21,6 @@ import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.SwipeToDismissBox
-import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
@@ -75,20 +74,11 @@ fun QueueItem(
         HorizontalDivider()
     }
     val scope = rememberCoroutineScope()
-    val dismissState =
-        rememberSwipeToDismissBoxState(
-            confirmValueChange = {
-                if (it == SwipeToDismissBoxValue.EndToStart || it == SwipeToDismissBoxValue.StartToEnd) {
-                    scope.launch(IO) { playerViewModel.removeFromQueue(index) }
-                    true
-                } else {
-                    false
-                }
-            },
-        )
+    val dismissState = rememberSwipeToDismissBoxState()
     SwipeToDismissBox(
         state = dismissState,
         backgroundContent = { Surface {} },
+        onDismiss = { scope.launch(IO) { playerViewModel.removeFromQueue(index) } },
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
