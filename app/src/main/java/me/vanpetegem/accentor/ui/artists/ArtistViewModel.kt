@@ -30,7 +30,7 @@ class ArtistViewModel
 
         fun albumsForArtist(artist: Artist): LiveData<List<Album>> =
             albumRepository.albumsByReleased.map { albums ->
-                val result = albums.filter { it.albumArtists.any { it.artistId == artist.id } }.toMutableList()
+                val result = albums.filter { album -> album.albumArtists.any { aa -> aa.artistId == artist.id } }.toMutableList()
                 result.reverse()
                 result
             }
@@ -39,7 +39,7 @@ class ArtistViewModel
             trackRepository.findByArtist(artist).switchMap { tracks ->
                 albumRepository.allAlbumsById.map { albums ->
                     val copy = tracks.toMutableList()
-                    copy.sortWith({ t1, t2 -> t1.compareAlphabetically(t2, albums) })
+                    copy.sortWith { t1, t2 -> t1.compareAlphabetically(t2, albums) }
                     copy
                 }
             }

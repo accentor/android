@@ -10,7 +10,6 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.Player
 import androidx.media3.database.StandaloneDatabaseProvider
-import androidx.media3.datasource.DataSource
 import androidx.media3.datasource.DefaultDataSource
 import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.datasource.cache.CacheDataSource
@@ -85,13 +84,12 @@ class MusicService : MediaSessionService() {
             .Builder(this)
             .setMediaSourceFactory(
                 ProgressiveMediaSource.Factory(
-                    object : DataSource.Factory {
-                        override fun createDataSource(): DataSource =
-                            CacheDataSource(
-                                cache,
-                                baseDataSourceFactory.createDataSource(),
-                                (CacheDataSource.FLAG_BLOCK_ON_CACHE or CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR),
-                            )
+                    {
+                        CacheDataSource(
+                            cache,
+                            baseDataSourceFactory.createDataSource(),
+                            (CacheDataSource.FLAG_BLOCK_ON_CACHE or CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR),
+                        )
                     },
                     DefaultExtractorsFactory().setConstantBitrateSeekingEnabled(true),
                 ),
@@ -187,13 +185,13 @@ class MusicService : MediaSessionService() {
 
     override fun onGetSession(info: MediaSession.ControllerInfo): MediaSession? = mediaSession
 
-    private suspend fun convertTracks(items: List<MediaItem>): List<MediaItem> {
+    private fun convertTracks(items: List<MediaItem>): List<MediaItem> {
         val converted = items.map { convertTrack(it.mediaId.toInt()) }
         val filtered = converted.filterNotNull()
         return filtered
     }
 
-    private suspend fun convertTrack(id: Int): MediaItem? {
+    private fun convertTrack(id: Int): MediaItem? {
         val track = trackRepository.getById(id) ?: return null
         val album = track.let { albumRepository.getById(it.albumId) } ?: return null
 
@@ -212,8 +210,8 @@ class MusicService : MediaSessionService() {
                 .setTitle(track.title)
                 .setArtist(track.stringifyTrackArtists())
                 .setAlbumTitle(album.title)
-                .setAlbumArtist(album.stringifyAlbumArtists().let { if (it.isEmpty()) application.getString(R.string.various_artists) else it })
-                .setArtworkUri(album.image500?.let { it.toUri() })
+                .setAlbumArtist(album.stringifyAlbumArtists().let { it.ifEmpty { application.getString(R.string.various_artists) } })
+                .setArtworkUri(album.image500?.toUri())
                 .setTrackNumber(track.number)
                 .setReleaseYear(album.release.year)
                 .setReleaseMonth(album.release.monthValue)

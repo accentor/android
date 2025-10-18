@@ -46,7 +46,7 @@ class CodecConversionRepository
             handler(Result.Success(Unit))
         }
 
-        suspend fun clear() {
+        fun clear() {
             codecConversionDao.deleteAll()
         }
     }

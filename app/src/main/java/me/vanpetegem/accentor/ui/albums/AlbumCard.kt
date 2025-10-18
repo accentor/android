@@ -42,7 +42,7 @@ import me.vanpetegem.accentor.data.albums.Album
 import me.vanpetegem.accentor.ui.player.PlayerViewModel
 
 @Composable
-public fun AlbumCard(
+fun AlbumCard(
     album: Album,
     navController: NavController,
     playerViewModel: PlayerViewModel,
@@ -70,7 +70,7 @@ public fun AlbumCard(
                     )
                     Text(
                         album.stringifyAlbumArtists().let {
-                            if (it.isEmpty()) stringResource(R.string.various_artists) else it
+                            it.ifEmpty { stringResource(R.string.various_artists) }
                         },
                         maxLines = 1,
                         modifier = Modifier.padding(bottom = 4.dp, start = 4.dp, end = 4.dp),

@@ -18,7 +18,7 @@ class PlayRepository
         suspend fun refresh(handler: suspend (Result<Unit>) -> Unit) {
             val fetchStart = Instant.now()
 
-            var toUpsert = ArrayList<Play>()
+            val toUpsert = ArrayList<Play>()
             var count = 0
             for (result in index(authenticationRepository.server.value!!, authenticationRepository.authData.value!!)) {
                 when (result) {
@@ -44,7 +44,7 @@ class PlayRepository
             handler(Result.Success(Unit))
         }
 
-        private suspend fun reportUnreportedPlays() {
+        private fun reportUnreportedPlays() {
             for (play in unreportedPlayDao.getAllUnreportedPlays()) {
                 when (val result = create(authenticationRepository.server.value!!, authenticationRepository.authData.value!!, play.trackId, play.playedAt)) {
                     is CreateResult.Success -> {
@@ -63,7 +63,7 @@ class PlayRepository
             }
         }
 
-        suspend fun reportPlay(
+        fun reportPlay(
             trackId: Int,
             playedAt: Instant,
         ) {
@@ -82,7 +82,7 @@ class PlayRepository
             }
         }
 
-        suspend fun clear() {
+        fun clear() {
             playDao.deleteAll()
         }
     }

@@ -49,7 +49,7 @@ class UserRepository
             handler(Result.Success(Unit))
         }
 
-        suspend fun clear() {
+        fun clear() {
             userDao.deleteAll()
         }
     }

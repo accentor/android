@@ -118,7 +118,7 @@ fun Content(loginViewModel: LoginViewModel = viewModel()) {
                             }.fillMaxWidth()
                             .padding(top = 16.dp, start = 16.dp, end = 16.dp),
                     label = { Text(stringResource(R.string.prompt_server)) },
-                    isError = !(formState?.serverError == null),
+                    isError = formState?.serverError != null,
                     singleLine = true,
                     keyboardOptions =
                         KeyboardOptions(

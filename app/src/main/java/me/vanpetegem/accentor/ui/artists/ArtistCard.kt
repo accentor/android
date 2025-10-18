@@ -20,7 +20,7 @@ import me.vanpetegem.accentor.R
 import me.vanpetegem.accentor.data.artists.Artist
 
 @Composable
-public fun ArtistCard(
+fun ArtistCard(
     navController: NavController,
     artist: Artist,
 ) {

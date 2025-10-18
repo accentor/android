@@ -16,7 +16,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -66,7 +65,7 @@ fun AlbumView(
                             overflow = TextOverflow.Ellipsis,
                         )
                         Text(
-                            album.stringifyAlbumArtists().let { if (it.isEmpty()) stringResource(R.string.various_artists) else it },
+                            album.stringifyAlbumArtists().let { it.ifEmpty { stringResource(R.string.various_artists) } },
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Normal,
                             modifier = Modifier.padding(start = 8.dp),
@@ -92,7 +91,7 @@ fun AlbumView(
                     }
                 }
             }
-            if (tracks != null && tracks!!.size > 0) {
+            if (tracks != null && tracks!!.isNotEmpty()) {
                 items(tracks!!.size) { i -> TrackRow(tracks!![i], navController, playerViewModel, hideAlbum = true) }
             }
         }

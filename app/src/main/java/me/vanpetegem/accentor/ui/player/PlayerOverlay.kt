@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
@@ -51,7 +50,7 @@ fun PlayerOverlay(
     val queueLength by playerViewModel.queueLength.observeAsState()
     val showPlayer = (queueLength ?: 0) > 0
     val isLandscape = (LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE)
-    val isMultiWindow = LocalActivity.current?.isInMultiWindowMode() ?: false
+    val isMultiWindow = LocalActivity.current?.isInMultiWindowMode ?: false
     val closePlayer: () -> Unit = { scope.launch { anchoredDraggableState.animateTo(false) } }
 
     Box(

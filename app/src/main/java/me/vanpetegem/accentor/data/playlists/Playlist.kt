@@ -81,7 +81,7 @@ data class Playlist(
                             albumMap.put(it.albumId, albumRepository.getById(it.albumId)!!)
                         }
                     }
-                    tracks.sortWith({ t1, t2 -> t1.compareAlphabetically(t2, albumMap) })
+                    tracks.sortWith { t1, t2 -> t1.compareAlphabetically(t2, albumMap) }
                     tracks.map { Pair(it, albumMap.get(it.albumId)) }
                 }
             }

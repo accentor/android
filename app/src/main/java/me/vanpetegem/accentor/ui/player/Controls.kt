@@ -146,7 +146,7 @@ fun Controls(playerViewModel: PlayerViewModel = viewModel()) {
             val currentTrack by playerViewModel.currentTrack.observeAsState()
             val trackLength = currentTrack?.length ?: 1
             Timer { playerViewModel.updateCurrentPosition() }
-            Text(if (seekPosition != null) seekPosition.formatTrackLength() else currentPosition.formatTrackLength())
+            Text(seekPosition?.formatTrackLength() ?: currentPosition.formatTrackLength())
             Box(modifier = Modifier.weight(1f).padding(horizontal = 8.dp)) {
                 Slider(
                     seekPosition?.toFloat() ?: (currentPosition?.toFloat() ?: 0f),

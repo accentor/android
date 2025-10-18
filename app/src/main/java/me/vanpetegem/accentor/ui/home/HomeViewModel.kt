@@ -16,9 +16,9 @@ class HomeViewModel
     constructor(
         application: Application,
         private val albumRepository: AlbumRepository,
-        private val artistRepository: ArtistRepository,
+        artistRepository: ArtistRepository,
     ) : AndroidViewModel(application) {
-        private val _currentDay = MutableLiveData<LocalDate>(LocalDate.now())
+        private val _currentDay = MutableLiveData(LocalDate.now())
 
         val recentlyReleasedAlbums = albumRepository.albumsByReleased
         val recentlyAddedAlbums = albumRepository.albumsByAdded

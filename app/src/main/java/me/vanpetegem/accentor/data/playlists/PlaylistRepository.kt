@@ -28,7 +28,7 @@ class PlaylistRepository
         suspend fun refresh(handler: suspend (Result<Unit>) -> Unit) {
             val fetchStart = Instant.now()
 
-            var toUpsert = ArrayList<Playlist>()
+            val toUpsert = ArrayList<Playlist>()
             var count = 0
             for (result in index(authenticationRepository.server.value!!, authenticationRepository.authData.value!!)) {
                 when (result) {
@@ -53,7 +53,7 @@ class PlaylistRepository
             handler(Result.Success(Unit))
         }
 
-        suspend fun clear() {
+        fun clear() {
             playlistDao.deleteAll()
         }
     }

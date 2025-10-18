@@ -19,7 +19,6 @@ import me.vanpetegem.accentor.data.playlists.PlaylistRepository
 import me.vanpetegem.accentor.data.plays.PlayRepository
 import me.vanpetegem.accentor.data.preferences.PreferencesDataSource
 import me.vanpetegem.accentor.data.tracks.TrackRepository
-import me.vanpetegem.accentor.data.users.User
 import me.vanpetegem.accentor.data.users.UserRepository
 import me.vanpetegem.accentor.ui.util.Event
 import me.vanpetegem.accentor.util.Result
@@ -41,14 +40,13 @@ class MainViewModel
         private val playRepository: PlayRepository,
         private val preferencesDataSource: PreferencesDataSource,
     ) : AndroidViewModel(application) {
-        private val refreshing = MutableLiveData<Int>(0)
+        private val refreshing = MutableLiveData(0)
         val isRefreshing: LiveData<Boolean> = refreshing.map { if (it != null) it > 0 else false }
         private var errorSinceLastRefresh: Boolean = false
 
         private val _latestError = MutableLiveData<Event<String>?>(null)
         val latestError: LiveData<Event<String>?> = _latestError
 
-        val currentUser: LiveData<User?> = userRepository.currentUser
         val loginState: LiveData<Boolean> = authenticationRepository.isLoggedIn
 
         fun refresh() {

@@ -21,9 +21,6 @@ android {
         versionName = "0.18.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        ksp {
-            arg("room.schemaLocation", "$projectDir/schemas".toString())
-        }
     }
 
     buildFeatures {
@@ -54,6 +51,10 @@ android {
             optIn.add("coil.annotation.ExperimentalCoilApi")
             jvmTarget.set(JvmTarget.JVM_17)
         }
+    }
+
+    ksp {
+        arg("room.schemaLocation", "$projectDir/schemas")
     }
 
     lint {

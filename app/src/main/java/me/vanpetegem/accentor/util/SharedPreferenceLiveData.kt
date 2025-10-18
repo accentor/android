@@ -55,30 +55,6 @@ class SharedPreferenceStringLiveData(
     override fun getValueFromPreferences(key: String): String? = if (sharedPrefs.contains(key)) sharedPrefs.getString(key, default) else default
 }
 
-class SharedPreferenceBooleanLiveData(
-    sharedPrefs: SharedPreferences,
-    key: String,
-    private val default: Boolean?,
-) : SharedPreferenceLiveData<Boolean?>(sharedPrefs, key) {
-    init {
-        value = this.getValueFromPreferences(key)
-    }
-
-    override fun getValueFromPreferences(key: String): Boolean? = if (sharedPrefs.contains(key)) sharedPrefs.getBoolean(key, false) else default
-}
-
-class SharedPreferenceFloatLiveData(
-    sharedPrefs: SharedPreferences,
-    key: String,
-    private val default: Float?,
-) : SharedPreferenceLiveData<Float?>(sharedPrefs, key) {
-    init {
-        value = this.getValueFromPreferences(key)
-    }
-
-    override fun getValueFromPreferences(key: String): Float? = if (sharedPrefs.contains(key)) sharedPrefs.getFloat(key, .0f) else default
-}
-
 class SharedPreferenceLongLiveData(
     sharedPrefs: SharedPreferences,
     key: String,
@@ -100,16 +76,6 @@ fun SharedPreferences.stringLiveData(
     key: String,
     default: String? = null,
 ): SharedPreferenceLiveData<String?> = SharedPreferenceStringLiveData(this, key, default)
-
-fun SharedPreferences.booleanLiveData(
-    key: String,
-    default: Boolean? = null,
-): SharedPreferenceLiveData<Boolean?> = SharedPreferenceBooleanLiveData(this, key, default)
-
-fun SharedPreferences.floatLiveData(
-    key: String,
-    default: Float? = null,
-): SharedPreferenceLiveData<Float?> = SharedPreferenceFloatLiveData(this, key, default)
 
 fun SharedPreferences.longLiveData(
     key: String,

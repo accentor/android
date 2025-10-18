@@ -36,7 +36,7 @@ class TrackRepository
         suspend fun refresh(handler: suspend (Result<Unit>) -> Unit) {
             val fetchStart = Instant.now()
 
-            var toUpsert = ArrayList<Track>()
+            val toUpsert = ArrayList<Track>()
             var count = 0
             for (result in index(authenticationRepository.server.value!!, authenticationRepository.authData.value!!)) {
                 when (result) {
@@ -61,7 +61,7 @@ class TrackRepository
             handler(Result.Success(Unit))
         }
 
-        suspend fun clear() {
+        fun clear() {
             trackDao.deleteAll()
         }
     }

@@ -49,8 +49,8 @@ abstract class TrackDao {
                     dbTrack?.let {
                         Track.fromDb(
                             it,
-                            trackArtists.map { TrackArtist(it.artistId, it.name, it.normalizedName, it.role, it.order, it.hidden) },
-                            trackGenres.map { it.genreId },
+                            trackArtists.map { ta -> TrackArtist(ta.artistId, ta.name, ta.normalizedName, ta.role, ta.order, ta.hidden) },
+                            trackGenres.map { tg -> tg.genreId },
                         )
                     }
                 }

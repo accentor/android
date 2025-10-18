@@ -106,12 +106,12 @@ abstract class AlbumDao {
 
     @Query(
         """
-           SELECT * FROM albums WHERE release LIKE '%' || :day || '%'
-             ORDER BY release DESC,
-                      normalized_title ASC,
-                      edition ASC,
-                      edition_description ASC,
-                      id ASC
+           SELECT * FROM albums WHERE `release` LIKE '%' || :day || '%'
+             ORDER BY `release` DESC,
+                      `normalized_title` ASC,
+                      `edition` ASC,
+                      `edition_description` ASC,
+                      `id` ASC
         """,
     )
     protected abstract fun findDbAlbumsByDay(day: String): LiveData<List<DbAlbum>>
@@ -227,7 +227,7 @@ abstract class AlbumDao {
         }
     }
 
-    @Query("SELECT * FROM albums ORDER BY normalized_title ASC, release ASC, edition ASC, edition_description ASC, id ASC")
+    @Query("SELECT * FROM albums ORDER BY `normalized_title` ASC, `release` ASC, `edition` ASC, `edition_description` ASC, `id` ASC")
     protected abstract fun getAllDbAlbums(): LiveData<List<DbAlbum>>
 
     @RewriteQueriesToDropUnusedColumns
