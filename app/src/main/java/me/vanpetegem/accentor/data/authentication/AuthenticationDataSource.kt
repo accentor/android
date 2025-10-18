@@ -29,52 +29,48 @@ class AuthenticationDataSource
 
         private val serverData = sharedPreferences.stringLiveData(SERVER_KEY)
 
-        val authData: LiveData<AuthenticationData?>
+        val authData: LiveData<AuthenticationData?> =
+            MediatorLiveData<AuthenticationData?>().apply {
+                val observer: Observer<Any?> =
+                    Observer {
+                        val id: Int =
+                            idData.value.let {
+                                if (it != null) {
+                                    it
+                                } else {
+                                    value = null
+                                    return@Observer
+                                }
+                            }
+                        val userId: Int =
+                            userIdData.value.let {
+                                if (it != null) {
+                                    it
+                                } else {
+                                    value = null
+                                    return@Observer
+                                }
+                            }
+                        val token: String =
+                            tokenData.value.let {
+                                if (it != null) {
+                                    it
+                                } else {
+                                    value = null
+                                    return@Observer
+                                }
+                            }
+                        val newVal = AuthenticationData(id, userId, token)
+                        if (newVal != this.value) this.value = newVal
+                    }
+
+                addSource(idData, observer)
+                addSource(userIdData, observer)
+                addSource(tokenData, observer)
+                // If we don't do this, the value will start out as null even if we have data in the prefs.
+                observer.onChanged(null)
+            }
         val server: LiveData<String?> = serverData
-
-        init {
-            authData =
-                MediatorLiveData<AuthenticationData?>().apply {
-                    val observer: Observer<Any?> =
-                        Observer {
-                            val id: Int =
-                                idData.value.let {
-                                    if (it != null) {
-                                        it
-                                    } else {
-                                        value = null
-                                        return@Observer
-                                    }
-                                }
-                            val userId: Int =
-                                userIdData.value.let {
-                                    if (it != null) {
-                                        it
-                                    } else {
-                                        value = null
-                                        return@Observer
-                                    }
-                                }
-                            val token: String =
-                                tokenData.value.let {
-                                    if (it != null) {
-                                        it
-                                    } else {
-                                        value = null
-                                        return@Observer
-                                    }
-                                }
-                            val newVal = AuthenticationData(id, userId, token)
-                            if (newVal != this.value) this.value = newVal
-                        }
-
-                    addSource(idData, observer)
-                    addSource(userIdData, observer)
-                    addSource(tokenData, observer)
-                    // If we don't do this, the value will start out as null even if we have data in the prefs.
-                    observer.onChanged(null)
-                }
-        }
 
         fun setAuthData(authData: AuthenticationData?) {
             if (authData == null) {

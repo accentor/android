@@ -32,7 +32,7 @@ fun Home(
         item {
             val albums by homeViewModel.recentlyReleasedAlbums.observeAsState()
             Text(stringResource(R.string.recently_released), style = MaterialTheme.typography.titleLarge, modifier = Modifier.padding(8.dp))
-            if (albums != null && albums!!.size > 0) {
+            if (albums != null && albums!!.isNotEmpty()) {
                 LazyRow {
                     items(albums!!.size) { i ->
                         Box(modifier = Modifier.width(192.dp)) {
@@ -47,7 +47,7 @@ fun Home(
         item {
             val albums by homeViewModel.recentlyAddedAlbums.observeAsState()
             Text(stringResource(R.string.recently_added_albums), style = MaterialTheme.typography.titleLarge, modifier = Modifier.padding(8.dp))
-            if (albums != null && albums!!.size > 0) {
+            if (albums != null && albums!!.isNotEmpty()) {
                 LazyRow {
                     items(albums!!.size) { i ->
                         Box(modifier = Modifier.width(192.dp)) {
@@ -66,7 +66,7 @@ fun Home(
             val currentDay by homeViewModel.currentDay.observeAsState()
             val albums by homeViewModel.albumsForDay(currentDay!!).observeAsState()
             Text(stringResource(R.string.on_this_day), style = MaterialTheme.typography.titleLarge, modifier = Modifier.padding(8.dp))
-            if (albums != null && albums!!.size > 0) {
+            if (albums != null && albums!!.isNotEmpty()) {
                 LazyRow {
                     items(albums!!.size) { i ->
                         Box(modifier = Modifier.width(192.dp)) {
@@ -81,7 +81,7 @@ fun Home(
         item {
             val albums by homeViewModel.recentlyPlayedAlbums.observeAsState()
             Text(stringResource(R.string.recently_played_albums), style = MaterialTheme.typography.titleLarge, modifier = Modifier.padding(8.dp))
-            if (albums != null && albums!!.size > 0) {
+            if (albums != null && albums!!.isNotEmpty()) {
                 LazyRow {
                     items(albums!!.size) { i ->
                         Box(modifier = Modifier.width(192.dp)) {
@@ -96,7 +96,7 @@ fun Home(
         item {
             val artists by homeViewModel.recentlyAddedArtists.observeAsState()
             Text(stringResource(R.string.recently_added_artists), style = MaterialTheme.typography.titleLarge, modifier = Modifier.padding(8.dp))
-            if (artists != null && artists!!.size > 0) {
+            if (artists != null && artists!!.isNotEmpty()) {
                 LazyRow {
                     items(artists!!.size) { i ->
                         Box(modifier = Modifier.width(192.dp)) {
@@ -111,7 +111,7 @@ fun Home(
         item {
             val artists by homeViewModel.recentlyPlayedArtists.observeAsState()
             Text(stringResource(R.string.recently_played_artists), style = MaterialTheme.typography.titleLarge, modifier = Modifier.padding(8.dp))
-            if (artists != null && artists!!.size > 0) {
+            if (artists != null && artists!!.isNotEmpty()) {
                 LazyRow {
                     items(artists!!.size) { i ->
                         Box(modifier = Modifier.width(192.dp)) {
@@ -126,7 +126,7 @@ fun Home(
         item {
             val albums by homeViewModel.randomAlbums.observeAsState()
             Text(stringResource(R.string.random_albums), style = MaterialTheme.typography.titleLarge, modifier = Modifier.padding(8.dp))
-            if (albums != null && albums!!.size > 0) {
+            if (albums != null && albums!!.isNotEmpty()) {
                 LazyRow {
                     items(albums!!.size) { i ->
                         Box(modifier = Modifier.width(192.dp)) {
@@ -141,7 +141,7 @@ fun Home(
         item {
             val artists by homeViewModel.randomArtists.observeAsState()
             Text(stringResource(R.string.random_artists), style = MaterialTheme.typography.titleLarge, modifier = Modifier.padding(8.dp))
-            if (artists != null && artists!!.size > 0) {
+            if (artists != null && artists!!.isNotEmpty()) {
                 LazyRow {
                     items(artists!!.size) { i ->
                         Box(modifier = Modifier.width(192.dp)) {

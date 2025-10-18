@@ -20,22 +20,22 @@ class PlaylistsViewModel
     @Inject
     constructor(
         application: Application,
-        private val playlistRepository: PlaylistRepository,
-        private val userRepository: UserRepository,
+        playlistRepository: PlaylistRepository,
+        userRepository: UserRepository,
     ) : AndroidViewModel(application) {
         val allPlaylists: LiveData<List<Playlist>> = playlistRepository.allPlaylists
         val allUsersById: LiveData<SparseArray<User>> = userRepository.allUsersById
 
-        private val _searching = MutableLiveData<Boolean>(false)
+        private val _searching = MutableLiveData(false)
         val searching: LiveData<Boolean> = _searching
 
-        private val _query = MutableLiveData<String>("")
+        private val _query = MutableLiveData("")
         val query: LiveData<String> = _query
 
         val filteredPlaylists: LiveData<List<Playlist>> =
             allPlaylists.switchMap { playlists ->
                 query.map { query ->
-                    if (query.equals("")) {
+                    if (query == "") {
                         playlists
                     } else {
                         playlists.filter { p -> p.name.contains(Normalizer.normalize(query, Normalizer.Form.NFKD), ignoreCase = true) }

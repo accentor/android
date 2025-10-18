@@ -17,20 +17,20 @@ class ArtistsViewModel
     @Inject
     constructor(
         application: Application,
-        private val artistRepository: ArtistRepository,
+        artistRepository: ArtistRepository,
     ) : AndroidViewModel(application) {
         val allArtists: LiveData<List<Artist>> = artistRepository.allArtists
 
-        private val _searching = MutableLiveData<Boolean>(false)
+        private val _searching = MutableLiveData(false)
         val searching: LiveData<Boolean> = _searching
 
-        private val _query = MutableLiveData<String>("")
+        private val _query = MutableLiveData("")
         val query: LiveData<String> = _query
 
         val filteredArtists: LiveData<List<Artist>> =
             allArtists.switchMap { artists ->
                 query.map { query ->
-                    if (query.equals("")) {
+                    if (query == "") {
                         artists
                     } else {
                         artists.filter { a -> a.normalizedName.contains(Normalizer.normalize(query, Normalizer.Form.NFKD), ignoreCase = true) }

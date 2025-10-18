@@ -14,7 +14,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -57,7 +56,7 @@ fun ArtistView(
                 }
             }
             item {
-                if (albums != null && albums!!.size > 0) {
+                if (albums != null && albums!!.isNotEmpty()) {
                     Text(stringResource(R.string.albums), style = MaterialTheme.typography.headlineMedium, modifier = Modifier.padding(8.dp))
                     LazyRow {
                         items(albums!!.size) { i ->
@@ -68,7 +67,7 @@ fun ArtistView(
                     }
                 }
             }
-            if (tracks != null && tracks!!.size > 0) {
+            if (tracks != null && tracks!!.isNotEmpty()) {
                 item {
                     Text(stringResource(R.string.tracks), style = MaterialTheme.typography.headlineMedium, modifier = Modifier.padding(8.dp))
                 }

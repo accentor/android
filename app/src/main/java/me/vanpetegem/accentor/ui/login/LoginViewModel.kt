@@ -25,7 +25,7 @@ class LoginViewModel
         private val _loading = MutableLiveData<Boolean>()
         val loading: LiveData<Boolean> = _loading
 
-        suspend fun login(
+        fun login(
             server: String,
             username: String,
             password: String,
@@ -48,7 +48,7 @@ class LoginViewModel
         ) {
             if (!isServerValid(server)) {
                 _loginFormState.value = LoginFormState(serverError = R.string.invalid_server)
-            } else if (server.equals("") || username.equals("") || password.equals("")) {
+            } else if (server == "" || username == "" || password == "") {
                 _loginFormState.value = LoginFormState()
             } else {
                 _loginFormState.value = LoginFormState(isDataValid = true)
@@ -59,7 +59,7 @@ class LoginViewModel
             try {
                 URI(server)
                 server.startsWith("http", ignoreCase = true)
-            } catch (e: URISyntaxException) {
+            } catch (_: URISyntaxException) {
                 false
             }
     }

@@ -27,7 +27,7 @@ class ArtistRepository
         val artistsByAdded: LiveData<List<Artist>> =
             allArtists.map {
                 val copy = it.toMutableList()
-                copy.sortWith({ a1, a2 -> a2.createdAt.compareTo(a1.createdAt) })
+                copy.sortWith { a1, a2 -> a2.createdAt.compareTo(a1.createdAt) }
                 copy
             }
         val artistsByPlayed: LiveData<List<Artist>> = artistDao.getAllByPlayed()
@@ -41,7 +41,7 @@ class ArtistRepository
         suspend fun refresh(handler: suspend (Result<Unit>) -> Unit) {
             val fetchStart = Instant.now()
 
-            var toUpsert = ArrayList<Artist>()
+            val toUpsert = ArrayList<Artist>()
             var count = 0
             for (result in index(authenticationRepository.server.value!!, authenticationRepository.authData.value!!)) {
                 when (result) {
@@ -66,7 +66,7 @@ class ArtistRepository
             handler(Result.Success(Unit))
         }
 
-        suspend fun clear() {
+        fun clear() {
             artistDao.deleteAll()
         }
     }

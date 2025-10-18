@@ -12,7 +12,6 @@ import coil.disk.DiskCache
 import com.github.kittinunf.fuel.core.FuelManager
 import com.google.android.material.color.DynamicColors
 import dagger.hilt.android.HiltAndroidApp
-import me.vanpetegem.accentor.BuildConfig
 import me.vanpetegem.accentor.data.preferences.PreferencesDataSource
 import org.acra.config.dialog
 import org.acra.config.mailSender

@@ -28,13 +28,13 @@ class AlbumRepository
         val albumsByReleased: LiveData<List<Album>> =
             allAlbums.map {
                 val copy = it.toMutableList()
-                copy.sortWith({ a1, a2 -> a2.release.compareTo(a1.release) })
+                copy.sortWith { a1, a2 -> a2.release.compareTo(a1.release) }
                 copy
             }
         val albumsByAdded: LiveData<List<Album>> =
             allAlbums.map {
                 val copy = it.toMutableList()
-                copy.sortWith({ a1, a2 -> a2.createdAt.compareTo(a1.createdAt) })
+                copy.sortWith { a1, a2 -> a2.createdAt.compareTo(a1.createdAt) }
                 copy
             }
         val albumsByPlayed: LiveData<List<Album>> = albumDao.getAllByPlayed()
@@ -58,7 +58,7 @@ class AlbumRepository
         suspend fun refresh(handler: suspend (Result<Unit>) -> Unit) {
             val fetchStart = Instant.now()
 
-            var toUpsert = ArrayList<Album>()
+            val toUpsert = ArrayList<Album>()
             var count = 0
             for (result in index(authenticationRepository.server.value!!, authenticationRepository.authData.value!!)) {
                 when (result) {
@@ -83,7 +83,7 @@ class AlbumRepository
             handler(Result.Success(Unit))
         }
 
-        suspend fun clear() {
+        fun clear() {
             albumDao.deleteAll()
         }
     }

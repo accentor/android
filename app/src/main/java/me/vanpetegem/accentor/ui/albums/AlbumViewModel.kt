@@ -27,7 +27,7 @@ class AlbumViewModel
         fun tracksForAlbum(album: Album): LiveData<List<Track>> =
             trackRepository.findByAlbum(album).map { tracks ->
                 val copy = tracks.toMutableList()
-                copy.sortWith({ t1, t2 -> t1.number.compareTo(t2.number) })
+                copy.sortWith { t1, t2 -> t1.number.compareTo(t2.number) }
                 copy
             }
     }

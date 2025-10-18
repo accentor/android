@@ -30,7 +30,7 @@ class AuthenticationRepository
             }
         }
 
-        suspend fun login(
+        fun login(
             server: String,
             username: String,
             password: String,

@@ -17,20 +17,20 @@ class AlbumsViewModel
     @Inject
     constructor(
         application: Application,
-        private val albumRepository: AlbumRepository,
+        albumRepository: AlbumRepository,
     ) : AndroidViewModel(application) {
         val allAlbums: LiveData<List<Album>> = albumRepository.allAlbums
 
-        private val _searching = MutableLiveData<Boolean>(false)
+        private val _searching = MutableLiveData(false)
         val searching: LiveData<Boolean> = _searching
 
-        private val _query = MutableLiveData<String>("")
+        private val _query = MutableLiveData("")
         val query: LiveData<String> = _query
 
         val filteredAlbums: LiveData<List<Album>> =
             allAlbums.switchMap { albums ->
                 query.map { query ->
-                    if (query.equals("")) {
+                    if (query == "") {
                         albums
                     } else {
                         albums.filter { a -> a.normalizedTitle.contains(Normalizer.normalize(query, Normalizer.Form.NFKD), ignoreCase = true) }

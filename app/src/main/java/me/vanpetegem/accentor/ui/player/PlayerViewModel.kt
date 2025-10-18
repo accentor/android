@@ -18,7 +18,7 @@ class PlayerViewModel
         application: Application,
         private val mediaSessionConnection: MediaSessionConnection,
     ) : AndroidViewModel(application) {
-        private val _showQueue = MutableLiveData<Boolean>(false)
+        private val _showQueue = MutableLiveData(false)
         val showQueue: LiveData<Boolean> = _showQueue
 
         val currentTrack = mediaSessionConnection.currentTrack
@@ -37,49 +37,47 @@ class PlayerViewModel
             _showQueue.value = !(_showQueue.value ?: false)
         }
 
-        suspend fun stop() = mediaSessionConnection.stop()
+        fun play(album: Album) = mediaSessionConnection.play(album)
 
-        suspend fun play(album: Album) = mediaSessionConnection.play(album)
+        fun play(track: Track) = mediaSessionConnection.play(track)
 
-        suspend fun play(track: Track) = mediaSessionConnection.play(track)
+        fun play(playlist: Playlist) = mediaSessionConnection.play(playlist)
 
-        suspend fun play(playlist: Playlist) = mediaSessionConnection.play(playlist)
+        fun addTrackToQueue(track: Track) = mediaSessionConnection.addTrackToQueue(track)
 
-        suspend fun addTrackToQueue(track: Track) = mediaSessionConnection.addTrackToQueue(track)
+        fun addTracksToQueue(album: Album) = mediaSessionConnection.addTracksToQueue(album)
 
-        suspend fun addTracksToQueue(album: Album) = mediaSessionConnection.addTracksToQueue(album)
+        fun addTracksToQueue(playlist: Playlist) = mediaSessionConnection.addTracksToQueue(playlist)
 
-        suspend fun addTracksToQueue(playlist: Playlist) = mediaSessionConnection.addTracksToQueue(playlist)
-
-        suspend fun addTrackToQueue(
+        fun addTrackToQueue(
             track: Track,
             index: Int,
         ) = mediaSessionConnection.addTrackToQueue(track, index)
 
-        suspend fun addTracksToQueue(
+        fun addTracksToQueue(
             album: Album,
             index: Int,
         ) = mediaSessionConnection.addTracksToQueue(album, index)
 
-        suspend fun clearQueue() = mediaSessionConnection.clearQueue()
+        fun clearQueue() = mediaSessionConnection.clearQueue()
 
-        suspend fun previous() = mediaSessionConnection.previous()
+        fun previous() = mediaSessionConnection.previous()
 
-        suspend fun pause() = mediaSessionConnection.pause()
+        fun pause() = mediaSessionConnection.pause()
 
-        suspend fun play() = mediaSessionConnection.play()
+        fun play() = mediaSessionConnection.play()
 
-        suspend fun next() = mediaSessionConnection.next()
+        fun next() = mediaSessionConnection.next()
 
-        suspend fun seekTo(time: Int) = mediaSessionConnection.seekTo(time)
+        fun seekTo(time: Int) = mediaSessionConnection.seekTo(time)
 
-        suspend fun skipTo(position: Int) = mediaSessionConnection.skipTo(position)
+        fun skipTo(position: Int) = mediaSessionConnection.skipTo(position)
 
-        suspend fun removeFromQueue(position: Int) = mediaSessionConnection.removeFromQueue(position)
+        fun removeFromQueue(position: Int) = mediaSessionConnection.removeFromQueue(position)
 
-        suspend fun setRepeatMode(repeatMode: Int) = mediaSessionConnection.setRepeatMode(repeatMode)
+        fun setRepeatMode(repeatMode: Int) = mediaSessionConnection.setRepeatMode(repeatMode)
 
-        suspend fun setShuffleMode(shuffleMode: Boolean) = mediaSessionConnection.setShuffleMode(shuffleMode)
+        fun setShuffleMode(shuffleMode: Boolean) = mediaSessionConnection.setShuffleMode(shuffleMode)
 
-        suspend fun updateCurrentPosition() = mediaSessionConnection.updateCurrentPosition()
+        fun updateCurrentPosition() = mediaSessionConnection.updateCurrentPosition()
     }
