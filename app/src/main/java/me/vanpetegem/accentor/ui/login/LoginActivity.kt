@@ -35,6 +35,7 @@ import androidx.compose.ui.autofill.ContentType
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentType
@@ -71,6 +72,7 @@ class LoginActivity : ComponentActivity() {
 @Composable
 fun Content(loginViewModel: LoginViewModel = viewModel()) {
     val context = LocalContext.current
+    val resources = LocalResources.current
     val scope = rememberCoroutineScope()
 
     suspend fun tryLogin(
@@ -81,7 +83,7 @@ fun Content(loginViewModel: LoginViewModel = viewModel()) {
         val result: LoginResult = loginViewModel.login(server, username, password)
         withContext(Main) {
             if (result.error != null) {
-                Toast.makeText(context, context.getString(result.error), Toast.LENGTH_LONG).show()
+                Toast.makeText(context, resources.getString(result.error), Toast.LENGTH_LONG).show()
             } else {
                 context.startActivity(Intent(context, MainActivity::class.java))
                 (context as Activity).finish()
@@ -113,7 +115,7 @@ fun Content(loginViewModel: LoginViewModel = viewModel()) {
                         Modifier
                             .semantics {
                                 if (formState?.serverError != null) {
-                                    error(context.getString(formState!!.serverError!!))
+                                    error(resources.getString(formState!!.serverError!!))
                                 }
                             }.fillMaxWidth()
                             .padding(top = 16.dp, start = 16.dp, end = 16.dp),
