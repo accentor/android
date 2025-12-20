@@ -250,7 +250,7 @@ fun Base(
                 }
             }
         },
-        gesturesEnabled = !(anchoredDraggableState.currentValue ?: false),
+        gesturesEnabled = !anchoredDraggableState.currentValue,
     ) {
         Scaffold(
             topBar = { toolbar(drawerState) },
