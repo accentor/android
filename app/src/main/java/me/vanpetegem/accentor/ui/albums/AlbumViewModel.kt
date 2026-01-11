@@ -10,6 +10,7 @@ import me.vanpetegem.accentor.data.albums.AlbumRepository
 import me.vanpetegem.accentor.data.tracks.Track
 import me.vanpetegem.accentor.data.tracks.TrackRepository
 import javax.inject.Inject
+import kotlin.math.roundToInt
 
 @HiltViewModel
 class AlbumViewModel
@@ -30,4 +31,6 @@ class AlbumViewModel
                 copy.sortWith { t1, t2 -> t1.number.compareTo(t2.number) }
                 copy
             }
+
+        fun sumTrackLengths(tracks: List<Track>): Int = (tracks.sumOf { it.length ?: 0 }.toDouble() / 60.toDouble()).roundToInt()
     }

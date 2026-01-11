@@ -74,6 +74,14 @@
     <string name="no_on_this_day">No albums were released on this day</string>
     <string name="no_artists">No artists could be found</string>
 
+    <plurals name="album_length_minutes">
+        <item quantity="one">%d minute</item>
+        <item quantity="other">%d minutes</item>
+    </plurals>
+    <plurals name="album_tracks_count">
+        <item quantity="one">%d track</item>
+        <item quantity="other">%d tracks</item>
+    </plurals>
     <plurals name="playlist_albums">
       <item quantity="one">%d album</item>
       <item quantity="other">%d albums</item>
