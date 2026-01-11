@@ -19,6 +19,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -46,6 +47,8 @@ fun AlbumView(
     if (albumState != null) {
         val album = albumState!!
         val tracks by albumViewModel.tracksForAlbum(album).observeAsState()
+        val tracksCount = tracks?.size ?: 0
+        val lengthMinutes = tracks?.let { albumViewModel.sumTrackLengths(it) } ?: 0
         LazyColumn(modifier = Modifier.fillMaxSize()) {
             item {
                 Row(verticalAlignment = Alignment.Top, modifier = Modifier.padding(bottom = 8.dp)) {
@@ -75,6 +78,18 @@ fun AlbumView(
                         Text(
                             if (album.edition == null) album.release.format() else "${album.release.format()} (${album.edition.format()})",
                             style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.Normal,
+                            modifier = Modifier.padding(start = 8.dp),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                        Text(
+                            "${pluralStringResource(
+                                R.plurals.album_tracks_count,
+                                tracksCount,
+                                tracksCount,
+                            )}, ${pluralStringResource(R.plurals.album_length_minutes, lengthMinutes, lengthMinutes)}",
+                            style = MaterialTheme.typography.bodySmall,
                             fontWeight = FontWeight.Normal,
                             modifier = Modifier.padding(start = 8.dp),
                             maxLines = 1,
