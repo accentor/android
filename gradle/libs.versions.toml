@@ -2,7 +2,7 @@
 acra = "5.13.1"
 activity = "1.12.3"
 agp = "9.0.0"
-androidx-navigation-compose = "2.9.6"
+androidx-navigation-compose = "2.9.7"
 androidx-test-ext-junit = "1.3.0"
 androidx-test-runner = "1.7.0"
 appcompat = "1.7.1"
