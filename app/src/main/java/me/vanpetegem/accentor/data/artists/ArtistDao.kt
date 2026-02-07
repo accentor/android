@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.map
 import androidx.room.Dao
 import androidx.room.Query
-import androidx.room.RewriteQueriesToDropUnusedColumns
 import androidx.room.Transaction
 import androidx.room.Upsert
 import java.time.Instant
@@ -13,11 +12,6 @@ import java.time.Instant
 abstract class ArtistDao {
     open fun getAll(): LiveData<List<Artist>> =
         getAllDbArtists().map { list ->
-            list.map { Artist.fromDb(it) }
-        }
-
-    open fun getAllByPlayed(): LiveData<List<Artist>> =
-        getAllDbArtistsByPlayed().map { list ->
             list.map { Artist.fromDb(it) }
         }
 
@@ -46,17 +40,16 @@ abstract class ArtistDao {
     @Query("SELECT * FROM artists ORDER BY normalized_name ASC, id ASC")
     protected abstract fun getAllDbArtists(): LiveData<List<DbArtist>>
 
-    @RewriteQueriesToDropUnusedColumns
     @Query(
         """
-           SELECT * FROM artists INNER JOIN (
+           SELECT id FROM artists INNER JOIN (
                SELECT track_artists.artist_id as artist_id, MAX(plays.played_at) as played_at FROM
                    track_artists INNER JOIN tracks ON track_artists.track_id = tracks.id INNER JOIN plays ON tracks.id = plays.track_id
                    WHERE track_artists.hidden = 0 GROUP BY track_artists.artist_id
            ) p ON p.artist_id = artists.id ORDER BY p.played_at DESC, normalized_name ASC, id ASC
         """,
     )
-    protected abstract fun getAllDbArtistsByPlayed(): LiveData<List<DbArtist>>
+    abstract fun getIdsByPlayed(): LiveData<List<Int>>
 
     @Upsert
     protected abstract fun upsert(artist: DbArtist)

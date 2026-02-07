@@ -1,8 +1,10 @@
 package me.vanpetegem.accentor.data.artists
 
 import android.util.SparseArray
+import androidx.core.util.containsKey
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.map
+import androidx.lifecycle.switchMap
 import dagger.Reusable
 import me.vanpetegem.accentor.api.artist.index
 import me.vanpetegem.accentor.data.authentication.AuthenticationRepository
@@ -30,7 +32,11 @@ class ArtistRepository
                 copy.sortWith { a1, a2 -> a2.createdAt.compareTo(a1.createdAt) }
                 copy
             }
-        val artistsByPlayed: LiveData<List<Artist>> = artistDao.getAllByPlayed()
+        val artistsByPlayed: LiveData<List<Artist>> = artistDao.getIdsByPlayed().switchMap { ids ->
+            allArtistsById.map { artists ->
+                ids.filter { artists.containsKey(it) }.map { artists[it] }
+            }
+        }
         val randomArtists: LiveData<List<Artist>> =
             allArtists.map {
                 val copy = it.toMutableList()
