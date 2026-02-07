@@ -82,10 +82,10 @@ abstract class AlbumDao {
 
     @Query(
         """
-           SELECT id FROM albums INNER JOIN (
+           SELECT album_id FROM (
                SELECT tracks.album_id as album_id, MAX(plays.played_at) AS played_at FROM
                    tracks INNER JOIN plays ON tracks.id = plays.track_id GROUP BY tracks.album_id
-           ) p ON p.album_id = albums.id ORDER BY p.played_at DESC
+           ) p ORDER BY p.played_at DESC
         """,
     )
     abstract fun getIdsByPlayed(): LiveData<List<Int>>
