@@ -34,6 +34,14 @@ data class Album(
         return order
     }
 
+    fun compareToByRelease(other: Album): Int {
+        var order = other.release.compareTo(this.release)
+        order = if (order == 0) compareAlbumEditions(other, this) else order
+        order = if (order == 0) this.normalizedTitle.compareTo(other.normalizedTitle) else order
+        order = if (order == 0) this.id - other.id else order
+        return order
+    }
+
     companion object {
         fun fromDb(
             a: DbAlbum,
