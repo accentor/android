@@ -5,14 +5,14 @@ import androidx.core.util.containsKey
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.map
 import androidx.lifecycle.switchMap
-import dagger.Reusable
 import me.vanpetegem.accentor.api.artist.index
 import me.vanpetegem.accentor.data.authentication.AuthenticationRepository
 import me.vanpetegem.accentor.util.Result
 import java.time.Instant
 import javax.inject.Inject
+import javax.inject.Singleton
 
-@Reusable
+@Singleton
 class ArtistRepository
     @Inject
     constructor(
