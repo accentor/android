@@ -64,7 +64,9 @@ class AlbumRepository
                 ids.filter { albums.containsKey(it) }.map { albums[it] }
             }
 
-        fun findByDay(day: LocalDate): LiveData<List<Album>> = allAlbums.map { albums -> albums.filter { it.release.dayOfMonth == day.dayOfMonth && it.release.month == day.month } }
+        fun findByDay(day: LocalDate): LiveData<List<Album>> = allAlbums.map { albums -> albums.filter { it.release.dayOfMonth == day.dayOfMonth && it.release.month == day.month }.sortedWith { a1, a2 ->
+            a1.compareToByRelease(a2)
+        } }
 
         suspend fun refresh(handler: suspend (Result<Unit>) -> Unit) {
             val fetchStart = Instant.now()
