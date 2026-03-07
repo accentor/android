@@ -39,11 +39,12 @@ class AlbumRepository
                 copy.sortWith { a1, a2 -> a2.createdAt.compareTo(a1.createdAt) }
                 copy
             }
-        val albumsByPlayed: LiveData<List<Album>> = albumDao.getIdsByPlayed().switchMap { ids ->
-            allAlbumsById.map { albums ->
-                ids.filter { albums.containsKey(it) }.map { albums[it] }
+        val albumsByPlayed: LiveData<List<Album>> =
+            albumDao.getIdsByPlayed().switchMap { ids ->
+                allAlbumsById.map { albums ->
+                    ids.filter { albums.containsKey(it) }.map { albums[it] }
+                }
             }
-        }
         val randomAlbums: LiveData<List<Album>> =
             allAlbums.map {
                 val copy = it.toMutableList()
@@ -51,22 +52,44 @@ class AlbumRepository
                 copy
             }
 
-        fun findById(id: Int): LiveData<Album?> = allAlbumsById.map { if (it.containsKey(id)) { it[id] } else { null }  }
+        fun findById(id: Int): LiveData<Album?> =
+            allAlbumsById.map {
+                if (it.containsKey(id)) {
+                    it[id]
+                } else {
+                    null
+                }
+            }
 
-        fun getById(id: Int): Album? = allAlbumsById.value?.let { if (it.containsKey(id)) { it[id] } else { null }  }
+        fun getById(id: Int): Album? =
+            allAlbumsById.value?.let {
+                if (it.containsKey(id)) {
+                    it[id]
+                } else {
+                    null
+                }
+            }
 
-        fun getByIds(ids: List<Int>): List<Album> = allAlbumsById.value?.let { albums ->
+        fun getByIds(ids: List<Int>): List<Album> =
+            allAlbumsById.value?.let { albums ->
                 ids.filter { albums.containsKey(it) }.map { albums[it] }
             } ?: emptyList()
 
-
-        fun findByIds(ids: List<Int>): LiveData<List<Album>> = allAlbumsById.map { albums ->
+        fun findByIds(ids: List<Int>): LiveData<List<Album>> =
+            allAlbumsById.map { albums ->
                 ids.filter { albums.containsKey(it) }.map { albums[it] }
             }
 
-        fun findByDay(day: LocalDate): LiveData<List<Album>> = allAlbums.map { albums -> albums.filter { it.release.dayOfMonth == day.dayOfMonth && it.release.month == day.month }.sortedWith { a1, a2 ->
-            a1.compareToByRelease(a2)
-        } }
+        fun findByDay(day: LocalDate): LiveData<List<Album>> =
+            allAlbums.map { albums ->
+                albums
+                    .filter {
+                        it.release.dayOfMonth == day.dayOfMonth &&
+                            it.release.month == day.month
+                    }.sortedWith { a1, a2 ->
+                        a1.compareToByRelease(a2)
+                    }
+            }
 
         suspend fun refresh(handler: suspend (Result<Unit>) -> Unit) {
             val fetchStart = Instant.now()

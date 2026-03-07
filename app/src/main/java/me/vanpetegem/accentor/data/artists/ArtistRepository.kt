@@ -32,11 +32,12 @@ class ArtistRepository
                 copy.sortWith { a1, a2 -> a2.createdAt.compareTo(a1.createdAt) }
                 copy
             }
-        val artistsByPlayed: LiveData<List<Artist>> = artistDao.getIdsByPlayed().switchMap { ids ->
-            allArtistsById.map { artists ->
-                ids.filter { artists.containsKey(it) }.map { artists[it] }
+        val artistsByPlayed: LiveData<List<Artist>> =
+            artistDao.getIdsByPlayed().switchMap { ids ->
+                allArtistsById.map { artists ->
+                    ids.filter { artists.containsKey(it) }.map { artists[it] }
+                }
             }
-        }
         val randomArtists: LiveData<List<Artist>> =
             allArtists.map {
                 val copy = it.toMutableList()
