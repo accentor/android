@@ -79,7 +79,7 @@ class NotificationBuilder(
         val stopPendingIntent =
             actionFactory.createMediaActionPendingIntent(
                 session,
-                Player.COMMAND_STOP.toLong(),
+                Player.COMMAND_STOP,
             )
 
         builder.addAction(previousAction)
