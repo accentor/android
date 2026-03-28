@@ -20,6 +20,7 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import androidx.media3.extractor.DefaultExtractorsFactory
 import androidx.media3.session.CommandButton
+import androidx.media3.session.DefaultMediaNotificationProvider
 import androidx.media3.session.MediaNotification
 import androidx.media3.session.MediaSession
 import androidx.media3.session.MediaSessionService
@@ -172,6 +173,12 @@ class MusicService : MediaSessionService() {
                     actionFactory: MediaNotification.ActionFactory,
                     onNotificationChangedCallback: MediaNotification.Provider.Callback,
                 ): MediaNotification = notificationBuilder.buildNotification(session, actionFactory, onNotificationChangedCallback)
+
+                override fun getNotificationChannelInfo(): MediaNotification.Provider.NotificationChannelInfo =
+                    MediaNotification.Provider.NotificationChannelInfo(
+                        DefaultMediaNotificationProvider.DEFAULT_CHANNEL_ID,
+                        getString(DefaultMediaNotificationProvider.DEFAULT_CHANNEL_NAME_RESOURCE_ID),
+                    )
 
                 // Ignore, there are none.
                 override fun handleCustomCommand(
