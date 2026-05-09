@@ -118,7 +118,6 @@ dependencies {
     implementation(libs.lifecycle.viewmodel.compose)
     implementation(libs.lifecycle.viewmodel.ktx)
     implementation(libs.material)
-    implementation(libs.media)
     implementation(libs.media3.common)
     implementation(libs.media3.database)
     implementation(libs.media3.datasource)
