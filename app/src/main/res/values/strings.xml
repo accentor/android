@@ -9,7 +9,6 @@
     <string name="sign_in">Sign in</string>
     <string name="invalid_server">Server is not a valid URL</string>
     <string name="login_failed">"Login failed"</string>
-    <string name="notification_channel_description">Shows what music is currently playing in Accentor</string>
 
     <string name="home">Home</string>
     <string name="open_menu">Open menu</string>
