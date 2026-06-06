@@ -18,7 +18,6 @@
         android:theme="@style/AppTheme"
         android:allowBackup="true"
         android:supportsRtl="true"
-        android:usesCleartextTraffic="true"
         android:enableOnBackInvokedCallback="true"
         android:windowSoftInputMode="adjustResize">
         <activity android:name=".ui.login.LoginActivity" />
