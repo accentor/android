@@ -10,12 +10,12 @@ plugins {
 
 android {
     namespace = "me.vanpetegem.accentor"
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "me.vanpetegem.accentor"
         minSdk = 26
-        targetSdk = 36
+        targetSdk = 37
         versionCode = 48
         versionName = "0.20.1"
 
