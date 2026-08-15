@@ -16,8 +16,8 @@ android {
         applicationId = "me.vanpetegem.accentor"
         minSdk = 26
         targetSdk = 37
-        versionCode = 50
-        versionName = "0.20.3"
+        versionCode = 49
+        versionName = "0.20.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
