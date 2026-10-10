@@ -1,5 +1,5 @@
 [versions]
-acra = "5.13.1"
+acra = "5.14.2"
 activity = "1.13.0"
 agp = "9.4.1"
 androidx-navigation-compose = "2.10.2"
